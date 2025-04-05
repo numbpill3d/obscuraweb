@@ -1,6 +1,11 @@
+// Initialize Supabase client
+const SUPABASE_URL = 'https://ibpnwppmlvlizuuxland.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicG53d3BtbHZsaXp1dXhsYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNTcwMDAsImV4cCI6MjA1ODgzMzAwMH0.ZKlskNFBzS-tiIblQZJtSbDdva_X-sR2FE0aZaD56_A';
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const imageFeed = document.getElementById('image-feed');
-    console.log('imageFeed element:', imageFeed);
     const widgetContainer = document.getElementById('widget-container');
     const submitForm = document.getElementById('submit-form');
     const submissionMessage = document.getElementById('submission-message');
@@ -75,7 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to create image items for the feed
     function createImageItem(image) {
-        console.log('createImageItem called with image:', image);
         const item = document.createElement('div');
         item.classList.add('image-item');
 
@@ -232,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 submitForm.reset(); // Clear the form
                 win98Alert('Image submitted successfully!'); // Windows 98 style alert
-                populateImageFeed();
+                populateImageFeed(); // Repopulate feed to show new image
             } else {
                 win98Alert('Please upload an image or provide an image URL.');
                 return; // Stop submission if no image provided
@@ -263,14 +267,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 3000); // Auto-restore after 3 seconds for demo purposes
             }
         });
-    }
+    });
 
     // Initialize the page
     populateImageFeed();
     createWidget();
-    
-    // Initialize Supabase client
-    const SUPABASE_URL = 'https://ibpnwppmlvlizuuxland.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicG53d3BtbHZsaXp1dXhsYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNTcwMDAsImV4cCI6MjA1ODgzMzAwMH0.ZKlskNFBzS-tiIblQZJtSbDdva_X-sR2FE0aZaD56_A';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 });
