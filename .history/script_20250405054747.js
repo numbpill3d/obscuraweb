@@ -2,6 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageFeed = document.getElementById('image-feed');
     const widgetContainer = document.getElementById('widget-container');
     const submitForm = document.getElementById('submit-form');
+
+    // Initialize Supabase client using the global supabase object
+    const supabaseUrl = 'https://ibpnwppmlvlizuuxland.supabase.co';
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicG53cHBtbHZsaXp1dXhsYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNTcwMDAsImV4cCI6MjA1ODgzMzAwMH0.ZKlskNFBzS-tiIblQZJtSbDdva_X-sR2FE0aZaD56_A';
+    const supabase = supabaseClient.createClient(supabaseUrl, supabaseAnonKey);
     const submissionMessage = document.getElementById('submission-message');
     const embedInstructions = document.getElementById('embed-instructions');
     const copyEmbedButton = document.getElementById('copy-embed');
@@ -72,21 +77,43 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(alertContainer);
     }
 
+    // Function to fetch images from Supabase
+    async function fetchImages() {
+        try {
+            const { data, error } = await supabase
+                .from('submissions')
+                .select('image_url, site_link, tags');
+
+            if (error) {
+                console.error('Error fetching images:', error);
+                return [];
+            }
+            return data;
+        } catch (error) {
+            console.error('Error in fetchImages:', error);
+            return [];
+        }
+    }
+
     // Function to create image items for the feed
     function createImageItem(image) {
         const item = document.createElement('div');
         item.classList.add('image-item');
 
         const img = document.createElement('img');
-        img.src = image.src;
-        img.alt = image.alt || image.tags;
+        img.src = image.image_url || image.src;
+        img.alt = image.tags || image.alt;
 
         const tagsDiv = document.createElement('div');
         tagsDiv.classList.add('tags');
-        tagsDiv.textContent = image.tags;
+        if (Array.isArray(image.tags)) {
+            tagsDiv.textContent = image.tags.join(', ');
+        } else if (typeof image.tags === 'string') {
+            tagsDiv.textContent = image.tags;
+        }
 
         const link = document.createElement('a');
-        link.href = image.link;
+        link.href = image.site_link || image.link;
         link.target = '_blank'; // Open link in new tab
         link.appendChild(img);
 
@@ -97,24 +124,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Function to populate the image feed
-    function populateImageFeed() {
+    async function populateImageFeed() {
         if (!imageFeed) return;
         
         imageFeed.innerHTML = ''; // Clear existing feed
         
-        // Use placeholder images
-        const placeholders = [
-            { src: 'https://via.placeholder.com/200/c0c0c0/000000?text=THE+UNDERWEB+1', link: '#', tags: 'placeholder, web1.0, retro' },
-            { src: 'https://via.placeholder.com/200/c0c0c0/000000?text=THE+UNDERWEB+2', link: '#', tags: 'placeholder, windows98, aesthetic' },
-            { src: 'https://via.placeholder.com/200/c0c0c0/000000?text=THE+UNDERWEB+3', link: '#', tags: 'placeholder, neocities, webring' },
-            { src: 'https://via.placeholder.com/200/c0c0c0/000000?text=THE+UNDERWEB+4', link: '#', tags: 'placeholder, pixel, art' },
-            { src: 'https://via.placeholder.com/200/c0c0c0/000000?text=THE+UNDERWEB+5', link: '#', tags: 'placeholder, vaporwave, glitch' },
-            { src: 'https://via.placeholder.com/200/c0c0c0/000000?text=THE+UNDERWEB+6', link: '#', tags: 'placeholder, indie, web' }
-        ];
+        // Add loading message
+        const loadingMsg = document.createElement('div');
+        loadingMsg.textContent = 'Loading images...';
+        loadingMsg.style.textAlign = 'center';
+        loadingMsg.style.padding = '20px';
+        imageFeed.appendChild(loadingMsg);
         
-        placeholders.forEach(image => {
-            imageFeed.appendChild(createImageItem(image));
-        });
+        try {
+            // Use placeholder images for now
+            const placeholders = [
+                { src: 'https://via.placeholder.com/200/c0c0c0/000000?text=THE+UNDERWEB+1', link: '#', tags: 'placeholder, web1.0, retro' },
+                { src: 'https://via.placeholder.com/200/c0c0c0/000000?text=THE+UNDERWEB+2', link: '#', tags: 'placeholder, windows98, aesthetic' },
+                { src: 'https://via.placeholder.com/200/c0c0c0/000000?text=THE+UNDERWEB+3', link: '#', tags: 'placeholder, neocities, webring' },
+                { src: 'https://via.placeholder.com/200/c0c0c0/000000?text=THE+UNDERWEB+4', link: '#', tags: 'placeholder, pixel, art' },
+                { src: 'https://via.placeholder.com/200/c0c0c0/000000?text=THE+UNDERWEB+5', link: '#', tags: 'placeholder, vaporwave, glitch' },
+                { src: 'https://via.placeholder.com/200/c0c0c0/000000?text=THE+UNDERWEB+6', link: '#', tags: 'placeholder, indie, web' }
+            ];
+            
+            // Clear loading message
+            imageFeed.innerHTML = '';
+            
+            placeholders.forEach(image => {
+                imageFeed.appendChild(createImageItem(image));
+            });
+        } catch (error) {
+            console.error('Error loading images:', error);
+            imageFeed.innerHTML = '<div style="text-align: center; padding: 20px;">Error loading images. Please try again later.</div>';
+        }
     }
 
     // Widget functionality
@@ -124,29 +166,34 @@ document.addEventListener('DOMContentLoaded', () => {
         
         widgetStrip.innerHTML = ''; // Clear existing widget images
 
-        // Use placeholder images
-        const imagesToUse = [
-            { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W1', link: '#', tags: 'placeholder' },
-            { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W2', link: '#', tags: 'placeholder' },
-            { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W3', link: '#', tags: 'placeholder' },
-            { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W4', link: '#', tags: 'placeholder' },
-            { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W5', link: '#', tags: 'placeholder' }
-        ];
-        
-        // Display a subset of random images in the widget
-        const shuffledImages = [...imagesToUse].sort(() => 0.5 - Math.random()); // Shuffle images
-        const widgetImages = shuffledImages.slice(0, Math.min(5, shuffledImages.length)); // Display up to 5 random images
+        try {
+            // Use placeholder images
+            const imagesToUse = [
+                { image_url: 'https://via.placeholder.com/80/c0c0c0/000000?text=W1', site_link: '#', tags: 'placeholder' },
+                { image_url: 'https://via.placeholder.com/80/c0c0c0/000000?text=W2', site_link: '#', tags: 'placeholder' },
+                { image_url: 'https://via.placeholder.com/80/c0c0c0/000000?text=W3', site_link: '#', tags: 'placeholder' },
+                { image_url: 'https://via.placeholder.com/80/c0c0c0/000000?text=W4', site_link: '#', tags: 'placeholder' },
+                { image_url: 'https://via.placeholder.com/80/c0c0c0/000000?text=W5', site_link: '#', tags: 'placeholder' }
+            ];
+            
+            // Display a subset of random images in the widget
+            const shuffledImages = [...imagesToUse].sort(() => 0.5 - Math.random()); // Shuffle images
+            const widgetImages = shuffledImages.slice(0, Math.min(5, shuffledImages.length)); // Display up to 5 random images
 
-        widgetImages.forEach(image => {
-            const widgetImage = document.createElement('img');
-            widgetImage.src = image.src;
-            widgetImage.alt = image.tags;
-            widgetImage.classList.add('widget-image');
-            widgetImage.addEventListener('click', () => {
-                window.open(image.link, '_blank');
+            widgetImages.forEach(image => {
+                const widgetImage = document.createElement('img');
+                widgetImage.src = image.image_url; // Use image_url from data
+                widgetImage.alt = image.tags; // Use tags for alt text
+                widgetImage.classList.add('widget-image');
+                widgetImage.addEventListener('click', () => {
+                    window.open(image.site_link, '_blank'); // Use site_link from data
+                });
+                widgetStrip.appendChild(widgetImage);
             });
-            widgetStrip.appendChild(widgetImage);
-        });
+        } catch (error) {
+            console.error('Error creating widget:', error);
+            widgetStrip.innerHTML = '<div style="text-align: center; padding: 10px; color: white;">Error loading widget images</div>';
+        }
     }
 
     // Submission form handling
@@ -182,22 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
             win98Alert('Embed code copied to clipboard!'); // Windows 98 style alert
         });
     }
-
-    // Add click handlers to window title bar X buttons
-    document.querySelectorAll('.win98-box-title span:last-child').forEach(closeButton => {
-        closeButton.style.cursor = 'pointer';
-        closeButton.addEventListener('click', function() {
-            const parentBox = this.closest('.win98-box');
-            if (parentBox) {
-                parentBox.style.display = 'none';
-                
-                // Show a "restore" button somewhere
-                setTimeout(() => {
-                    parentBox.style.display = 'block';
-                }, 3000); // Auto-restore after 3 seconds for demo purposes
-            }
-        });
-    });
 
     // Initialize the page
     populateImageFeed();
