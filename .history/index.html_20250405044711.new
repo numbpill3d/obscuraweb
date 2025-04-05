@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE UNDERWEB</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.supabase.co/supabase-js-v2.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="ascii-art">
+            ████████╗██╗  ██╗███████╗    ██╗   ██╗███╗   ██╗██████╗ ███████╗██████╗ ██╗    ██╗███████╗██████╗ 
+            ╚══██╔══╝██║  ██║██╔════╝    ██║   ██║████╗  ██║██╔══██╗██╔════╝██╔══██╗██║    ██║██╔════╝██╔══██╗
+               ██║   ███████║█████╗      ██║   ██║██╔██╗ ██║██║  ██║█████╗  ██████╔╝██║ █╗ ██║█████╗  ██████╔╝
+               ██║   ██╔══██║██╔══╝      ██║   ██║██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗██║███╗██║██╔══╝  ██╔══██╗
+               ██║   ██║  ██║███████╗    ╚██████╔╝██║ ╚████║██████╔╝███████╗██║  ██║╚███╔███╔╝███████╗██████╔╝
+               ╚═╝   ╚═╝  ╚═╝╚══════╝     ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚══════╝╚═════╝ 
+        </div>
+        <h1><a href="/">THE UNDERWEB</a></h1>
+        <div class="win98-box" style="max-width: 600px; margin: 0 auto;">

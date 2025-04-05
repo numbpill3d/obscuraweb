@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE UNDERWEB - Link Directory</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body id="links-page">
+    <header>
+        <div class="ascii-art">
+            ████████╗██╗  ██╗███████╗    ██╗   ██╗███╗   ██╗██████╗ ███████╗██████╗ ██╗    ██╗███████╗██████╗ 
+            ╚══██╔══╝██║  ██║██╔════╝    ██║   ██║████╗  ██║██╔══██╗██╔════╝██╔══██╗██║    ██║██╔════╝██╔══██╗
+               ██║   ███████║█████╗      ██║   ██║██╔██╗ ██║██║  ██║█████╗  ██████╔╝██║ █╗ ██║█████╗  ██████╔╝
+               ██║   ██╔══██║██╔══╝      ██║   ██║██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗██║███╗██║██╔══╝  ██╔══██╗
+               ██║   ██║  ██║███████╗    ╚██████╔╝██║ ╚████║██████╔╝███████╗██║  ██║╚███╔███╔╝███████╗██████╔╝
+               ╚═╝   ╚═╝  ╚═╝╚══════╝     ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚══════╝╚═════╝ 
+        </div>
+        <h1><a href="/">THE UNDERWEB</a></h1>
+    </header>
+
+    <nav>
+        <a href="/">HOME</a>
+        <a href="links.html">LINKS</a>
+        <a href="about.html">ABOUT</a>
+        <a href="chat.html">CHAT</a>
+    </nav>
+
+    <marquee scrollamount="5" behavior="alternate">
+        <span class="blink">★</span> WELCOME TO THE UNDERWEB - YOUR PORTAL TO THE HIDDEN CORNERS OF THE INTERNET <span class="blink">★</span>
+    </marquee>
+
+    <main>
+        <div class="win98-box">
+            <div class="win98-box-title">
+                <span>links.html</span>
+                <span>X</span>
+            </div>
+            <div class="win98-box-content">
+                <section id="link-directory">
+                    <h2>Link Directory</h2>
+                    
+                    <div class="win98-box" style="margin: 20px 0;">
+                        <div class="win98-box-title">
+                            <span>Webrings</span>
+                        </div>
+                        <div class="win98-box-content">
+                            <ul>
+                                <li><a href="#">Neocities Webring</a></li>
+                                <li><a href="#">Retro Computing Ring</a></li>
+                                <li><a href="#">Pixel Art Collective</a></li>
+                                <li><a href="#">Indie Game Devs</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="win98-box" style="margin: 20px 0;">
+                        <div class="win98-box-title">
+                            <span>Communities</span>
+                        </div>
+                        <div class="win98-box-content">
+                            <ul>
+                                <li><a href="#">Neocities Forum</a></li>
+                                <li><a href="#">Retro Web Enthusiasts</a></li>
+                                <li><a href="#">Web 1.0 Revival Group</a></li>
+                                <li><a href="#">Pixel Art Discord</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="win98-box" style="margin: 20px 0;">
+                        <div class="win98-box-title">
+                            <span>Resources</span>
+                        </div>
+                        <div class="win98-box-content">
+                            <ul>
+                                <li><a href="#">HTML/CSS Tutorials</a></li>
+                                <li><a href="#">Free Web Hosting</a></li>
+                                <li><a href="#">Pixel Art Tools</a></li>
+                                <li><a href="#">MIDI Music Archive</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="win98-box" style="margin: 20px 0;">
+                        <div class="win98-box-title">
+                            <span>Cool Sites</span>
+                        </div>
+                        <div class="win98-box-content">
+                            <ul>
+                                <li><a href="https://nolove.neocities.org" target="_blank">nolove.neocities.org</a></li>
+                                <li><a href="https://bmh.neocities.org" target="_blank">bmh.neocities.org</a></li>
+                                <li><a href="https://maggotgirl2002.neocities.org" target="_blank">maggotgirl2002.neocities.org</a></li>
+                                <li><a href="https://wygolvillage.neocities.org" target="_blank">wygolvillage.neocities.org</a></li>
+                                <li><a href="https://lilithdev.neocities.org" target="_blank">lilithdev.neocities.org</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="win98-box" style="margin: 20px 0;">
+                        <div class="win98-box-title">
+                            <span>Zines & Blogs</span>
+                        </div>
+                        <div class="win98-box-content">
+                            <ul>
+                                <li><a href="#">Digital Zine Collection</a></li>
+                                <li><a href="#">Retro Computing Blog</a></li>
+                                <li><a href="#">Web Art Gallery</a></li>
+                                <li><a href="#">Indie Game Reviews</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="ascii-art">
+                        ╔═══════════════════════════════════════════════════════════╗
+                        ║                                                           ║
+                        ║   ██╗    ██╗███████╗██████╗     ██████╗ ██╗███╗   ██╗    ║

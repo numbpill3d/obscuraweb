@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE UNDERWEB - About</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body id="about-page">
+    <header>
+        <div class="ascii-art">
+            ████████╗██╗  ██╗███████╗    ██╗   ██╗███╗   ██╗██████╗ ███████╗██████╗ ██╗    ██╗███████╗██████╗ 
+            ╚══██╔══╝██║  ██║██╔════╝    ██║   ██║████╗  ██║██╔══██╗██╔════╝██╔══██╗██║    ██║██╔════╝██╔══██╗
+               ██║   ███████║█████╗      ██║   ██║██╔██╗ ██║██║  ██║█████╗  ██████╔╝██║ █╗ ██║█████╗  ██████╔╝
+               ██║   ██╔══██║██╔══╝      ██║   ██║██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗██║███╗██║██╔══╝  ██╔══██╗
+               ██║   ██║  ██║███████╗    ╚██████╔╝██║ ╚████║██████╔╝███████╗██║  ██║╚███╔███╔╝███████╗██████╔╝
+               ╚═╝   ╚═╝  ╚═╝╚══════╝     ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚══════╝╚═════╝ 
+        </div>
+        <h1><a href="/">THE UNDERWEB</a></h1>
+    </header>
+
+    <nav>
+        <a href="/">HOME</a>
+        <a href="links.html">LINKS</a>
+        <a href="about.html">ABOUT</a>
+        <a href="chat.html">CHAT</a>
+    </nav>
+
+    <marquee scrollamount="5" behavior="alternate">
+        <span class="blink">★</span> WELCOME TO THE UNDERWEB - YOUR PORTAL TO THE HIDDEN CORNERS OF THE INTERNET <span class="blink">★</span>
+    </marquee>
+
+    <main>
+        <div class="win98-box">
+            <div class="win98-box-title">
+                <span>about.html</span>
+                <span>X</span>
+            </div>
+            <div class="win98-box-content">
+                <section id="about-content">
+                    <h2>About THE UNDERWEB</h2>
+                    <p>THE UNDERWEB was created by voidrane splicer as a non-verbal search engine for the indieweb.</p>
+                    <p>Tired of traditional search boxes? THE UNDERWEB offers a dynamic feed of user-submitted imagery, each image linking back to the submitter's site. It's a visual exploration of the decentralized web, indexed by the community itself.</p>
+                    <p>This site is designed to help indieweb creators gain visibility and discover new and interesting corners of the internet. By embedding THE UNDERWEB widget, users contribute to the network and get their own site indexed.</p>
+                    <p>Hover over images to reveal tags and explore the diverse aesthetics of the indieweb.</p>
+                    
+                    <div class="ascii-art">
+                        .--.                   .---.
+                       |  |                   |   |
+                       |--|                   |---|
+                       |  |                   |   |
+                       |  |                   |   |
+                    .--|  |---.            .--|   |---.
+                   |           |          |            |
+                   |           |          |            |
+                   |           |          |            |
+                    '---------'            '----------'
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
+                        |  |                   |   |
