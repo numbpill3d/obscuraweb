@@ -180,7 +180,8 @@ CREATE TABLE public.tags (
     name TEXT NOT NULL UNIQUE,
     slug TEXT NOT NULL UNIQUE,
     description TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    CONSTRAINT user_activity_user_id_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
 );
 
 -- Thread-tag relationship table
@@ -203,6 +204,8 @@ CREATE TABLE public.user_activity (
     ip_address TEXT,
     user_agent TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+    CONSTRAINT user_activity_user_id_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
 );
 
 -- Content reports table
@@ -231,7 +234,8 @@ CREATE TABLE public.user_bans (
     reason TEXT NOT NULL,
     expires_at TIMESTAMP WITH TIME ZONE,
     is_permanent BOOLEAN DEFAULT false,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
     CONSTRAINT user_bans_user_id_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE,
     CONSTRAINT user_bans_moderator_id_fk FOREIGN KEY (moderator_id) REFERENCES public.users(id)
 );

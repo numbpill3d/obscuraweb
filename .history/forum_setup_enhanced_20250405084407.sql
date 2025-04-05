@@ -180,7 +180,8 @@ CREATE TABLE public.tags (
     name TEXT NOT NULL UNIQUE,
     slug TEXT NOT NULL UNIQUE,
     description TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    CONSTRAINT user_activity_user_id_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
 );
 
 -- Thread-tag relationship table
@@ -203,6 +204,8 @@ CREATE TABLE public.user_activity (
     ip_address TEXT,
     user_agent TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+    CONSTRAINT user_activity_user_id_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
 );
 
 -- Content reports table
@@ -231,7 +234,8 @@ CREATE TABLE public.user_bans (
     reason TEXT NOT NULL,
     expires_at TIMESTAMP WITH TIME ZONE,
     is_permanent BOOLEAN DEFAULT false,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
     CONSTRAINT user_bans_user_id_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE,
     CONSTRAINT user_bans_moderator_id_fk FOREIGN KEY (moderator_id) REFERENCES public.users(id)
 );
@@ -375,89 +379,6 @@ BEGIN
     INSERT INTO public.user_reputation (user_id, reputation_points)
     VALUES (user_id_param, points_param);
     
-    current_points := points_param;
-  ELSE
-    -- Update points
-    UPDATE public.user_reputation
-    SET reputation_points = reputation_points + points_param,
-        updated_at = timezone('utc'::text, now())
-    WHERE user_id = user_id_param;
-    
-    current_points := current_points + points_param;
-  END IF;
-  
-  -- Determine new level based on points
-  IF current_points < 10 THEN
-    new_level := 'Newbie';
-  ELSIF current_points < 50 THEN
-    new_level := 'Member';
-  ELSIF current_points < 200 THEN
-    new_level := 'Active Member';
-  ELSIF current_points < 500 THEN
-    new_level := 'Trusted Member';
-  ELSIF current_points < 1000 THEN
-    new_level := 'Veteran';
-  ELSE
-    new_level := 'Elite';
-  END IF;
-  
-  -- Update level if needed
-  UPDATE public.user_reputation
-  SET level = new_level
-  WHERE user_id = user_id_param AND level <> new_level;
-END;
-$$;
-
--- Function to create a notification for thread subscribers
-CREATE OR REPLACE FUNCTION public.notify_thread_subscribers(thread_id_param BIGINT, post_id_param BIGINT, poster_id_param UUID)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-  thread_title TEXT;
-  poster_name TEXT;
-BEGIN
-  -- Get thread title and poster name
-  SELECT t.title, u.display_name INTO thread_title, poster_name
-  FROM public.threads t
-  JOIN public.users u ON u.id = poster_id_param
-  WHERE t.id = thread_id_param;
-  
-  -- Create notifications for subscribers
-  INSERT INTO public.notifications (user_id, type, content, link)
-  SELECT 
-    s.user_id, 
-    'thread_reply', 
-    poster_name || ' replied to thread: ' || thread_title, 
-    '/thread/' || thread_id_param || '#post-' || post_id_param
-  FROM public.thread_subscriptions s
-  WHERE s.thread_id = thread_id_param
-  AND s.user_id <> poster_id_param
-  AND s.notification_type IN ('all', 'replies');
-END;
-$$;
-
--- Function to search threads and posts
-CREATE OR REPLACE FUNCTION public.search_forum(search_query TEXT)
-RETURNS TABLE (
-  result_type TEXT,
-  id BIGINT,
-  title TEXT,
-  content TEXT,
-  author TEXT,
-  created_at TIMESTAMP WITH TIME ZONE,
-  relevance REAL
-)
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-  RETURN QUERY
-  -- Search in threads
-  SELECT 
-    'thread' AS result_type,
-    t.id,
     t.title,
     NULL::TEXT AS content,
     u.display_name AS author,
@@ -800,4 +721,4 @@ BEGIN
     PERFORM public.log_user_activity(NEW.user_id, 'thread_create');
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ language 'plpgsql' 

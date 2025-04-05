@@ -566,57 +566,6 @@ ALTER TABLE public.content_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_bans ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for users table
-CREATE POLICY "Allow public read access to users" ON public.users
-    FOR SELECT USING (true);
-
-CREATE POLICY "Allow users to update their own profile" ON public.users
-    FOR UPDATE USING (auth.uid() = id);
-
-CREATE POLICY "Allow admins to update any user" ON public.users
-    FOR UPDATE USING (public.is_admin(auth.uid()));
-
--- Create policies for threads table (new policies only)
-CREATE POLICY "Allow public read access to threads" ON public.threads
-    FOR SELECT USING (true);
-
-CREATE POLICY "Allow authenticated users to create threads" ON public.threads
-    FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
-
-CREATE POLICY "Allow thread owners to update their threads" ON public.threads
-    FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Allow moderators to update any thread" ON public.threads
-    FOR UPDATE USING (public.is_moderator(auth.uid()));
-
-CREATE POLICY "Allow thread owners to delete their threads" ON public.threads
-    FOR DELETE USING (auth.uid() = user_id);
-
-CREATE POLICY "Allow moderators to delete any thread" ON public.threads
-    FOR DELETE USING (public.is_moderator(auth.uid()));
-
--- Create policies for posts table (new policies only)
-CREATE POLICY "Allow public read access to posts" ON public.posts
-    FOR SELECT USING (true);
-
-CREATE POLICY "Allow authenticated users to create posts" ON public.posts
-    FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
-
-CREATE POLICY "Allow post owners to update their posts" ON public.posts
-    FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Allow moderators to update any post" ON public.posts
-    FOR UPDATE USING (public.is_moderator(auth.uid()));
-
-CREATE POLICY "Allow post owners to delete their posts" ON public.posts
-    FOR DELETE USING (auth.uid() = user_id);
-
-CREATE POLICY "Allow moderators to delete any post" ON public.posts
-    FOR DELETE USING (public.is_moderator(auth.uid()));
-
--- Create policies for categories table
-CREATE POLICY "Allow public read access to categories" ON public.categories
-    FOR SELECT USING (true);
-
 CREATE POLICY "Allow admins to manage categories" ON public.categories
     FOR ALL USING (public.is_admin(auth.uid()));
 
