@@ -173,52 +173,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 const timestamp = Date.now();
                 const imageName = `image-${timestamp}-${imageUpload.name}`;
 
-                try {
-                    if (supabaseClient) {
-                        supabaseClient.storage.from('images').upload(imageName, imageUpload).then(async uploadResult => {
-                            if (uploadResult.error) {
-                                win98Alert('Error uploading image: ' + uploadResult.error.message);
-                                return;
-                            }
-
-                            // Get public URL from storage
-                            const urlResult = await supabaseClient.storage.from('images').getPublicUrl(imageName);
-                            if (urlResult.error) {
-                                win98Alert('Error getting public URL: ' + urlResult.error.message);
-                                return;
-                            }
-                            submittedImageUrl = urlResult.data.publicUrl;
-
-                            // Create new image item and add to feed
-                            const newImage = {
-                                src: submittedImageUrl,
-                                link: siteLink,
-                                tags: tagsInput
-                            };
-                            imageFeed.prepend(createImageItem(newImage));
-
-                            // Show submission message
-                            if (submissionMessage) {
-                                submissionMessage.style.display = 'block';
-                            }
-
-                            // Show embed instructions if they exist
-                            if (embedInstructions) {
-                                embedInstructions.style.display = 'block';
-                            }
-
-                            submitForm.reset(); // Clear the form
-                            win98Alert('Image submitted successfully!'); // Windows 98 style alert
-                            populateImageFeed(); // Repopulate feed to show new image
-                        });
-                    } else {
-                        // Fallback if Supabase client is not available
-                        win98Alert('Image upload is not available at the moment. Please try using an image URL instead.');
+                supabaseClient.storage.from('images').upload(imageName, imageUpload).then(async uploadResult => {
+                    if (uploadResult.error) {
+                        win98Alert('Error uploading image: ' + uploadResult.error.message);
+                        return;
                     }
-                } catch (error) {
-                    console.error('Error in Supabase upload:', error);
-                    win98Alert('Error uploading image: ' + error.message);
-                }
+
+                    // Get public URL from storage
+                    const urlResult = await supabaseClient.storage.from('images').getPublicUrl(imageName);
+                    if (urlResult.error) {
+                        win98Alert('Error getting public URL: ' + urlResult.error.message);
+                        return;
+                    }
+                    submittedImageUrl = urlResult.data.publicUrl;
+
+                    // Create new image item and add to feed
+                    const newImage = {
+                        src: submittedImageUrl,
+                        link: siteLink,
+                        tags: tagsInput
+                    };
+                    imageFeed.prepend(createImageItem(newImage));
+
+                    // Show submission message
+                    if (submissionMessage) {
+                        submissionMessage.style.display = 'block';
+                    }
+
+                    // Show embed instructions if they exist
+                    if (embedInstructions) {
+                        embedInstructions.style.display = 'block';
+                    }
+
+                    submitForm.reset(); // Clear the form
+                    win98Alert('Image submitted successfully!'); // Windows 98 style alert
+                    populateImageFeed(); // Repopulate feed to show new image
+                });
             } else if (imageUrl) {
                 submittedImageUrl = imageUrl;
 
@@ -273,22 +263,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 3000); // Auto-restore after 3 seconds for demo purposes
             }
         });
-    });
-
-    // Initialize Supabase client if available
-    let supabaseClient = null;
-    try {
-        if (window.supabase) {
-            console.log('Supabase library found, initializing client');
-            const SUPABASE_URL = 'https://ibpnwppmlvlizuuxland.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicG53d3BtbHZsaXp1dXhsYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNTcwMDAsImV4cCI6MjA1ODgzMzAwMH0.ZKlskNFBzS-tiIblQZJtSbDdva_X-sR2FE0aZaD56_A';
-            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } else {
-            console.error('Supabase library not found');
-        }
-    } catch (error) {
-        console.error('Error initializing Supabase client:', error);
     }
+
+    // Initialize Supabase client
+    const SUPABASE_URL = 'https://ibpnwppmlvlizuuxland.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicG53d3BtbHZsaXp1dXhsYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNTcwMDAsImV4cCI6MjA1ODgzMzAwMH0.ZKlskNFBzS-tiIblQZJtSbDdva_X-sR2FE0aZaD56_A';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
     // Initialize the page
     populateImageFeed();
