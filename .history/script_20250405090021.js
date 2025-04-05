@@ -103,37 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return item;
     }
 
-    // Function to save image data to Supabase database
-    async function saveImageToDatabase(imageData) {
-        if (!supabaseClient) return false;
-        
-        try {
-            // Convert the image data to match your database schema
-            const dbImageData = {
-                image_url: imageData.src,
-                site_url: imageData.link,
-                tags: imageData.tags,
-                created_at: new Date().toISOString()
-            };
-            
-            // Insert the image data into the 'images' table
-            const { data, error } = await supabaseClient
-                .from('images')
-                .insert([dbImageData]);
-                
-            if (error) {
-                console.error('Error saving image to database:', error);
-                return false;
-            }
-            
-            console.log('Image saved to database successfully:', data);
-            return true;
-        } catch (error) {
-            console.error('Exception saving image to database:', error);
-            return false;
-        }
-    }
-
     // Function to populate the image feed from Supabase
     async function populateImageFeed() {
         console.log('populateImageFeed called');
@@ -274,14 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             };
                             imageFeed.prepend(createImageItem(newImage));
 
-                            // Save image to database
-                            saveImageToDatabase(newImage)
-                                .then(success => {
-                                    if (!success) {
-                                        console.warn('Image displayed but not saved to database');
-                                    }
-                                });
-
                             // Show submission message
                             if (submissionMessage) {
                                 submissionMessage.style.display = 'block';
@@ -313,14 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     tags: tagsInput
                 };
                 imageFeed.prepend(createImageItem(newImage));
-
-                // Save image to database
-                saveImageToDatabase(newImage)
-                    .then(success => {
-                        if (!success) {
-                            console.warn('Image displayed but not saved to database');
-                        }
-                    });
 
                 // Show submission message
                 if (submissionMessage) {

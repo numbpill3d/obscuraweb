@@ -1,6 +1,3 @@
-// Initialize Supabase client globally
-let supabaseClient = null;
-
 document.addEventListener('DOMContentLoaded', () => {
     const imageFeed = document.getElementById('image-feed');
     console.log('imageFeed element:', imageFeed);
@@ -83,8 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         item.classList.add('image-item');
 
         const img = document.createElement('img');
-        // Handle both image.image_url (from Supabase) and image.src (from form submission)
-        img.src = image.image_url || image.src;
+        img.src = image.src;
         img.alt = image.alt || image.tags;
 
         const tagsDiv = document.createElement('div');
@@ -92,8 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tagsDiv.textContent = image.tags;
 
         const link = document.createElement('a');
-        // Handle both image.site_url (from Supabase) and image.link (from form submission)
-        link.href = image.site_url || image.link;
+        link.href = image.link;
         link.target = '_blank'; // Open link in new tab
         link.appendChild(img);
 
@@ -101,37 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
         item.appendChild(tagsDiv);
 
         return item;
-    }
-
-    // Function to save image data to Supabase database
-    async function saveImageToDatabase(imageData) {
-        if (!supabaseClient) return false;
-        
-        try {
-            // Convert the image data to match your database schema
-            const dbImageData = {
-                image_url: imageData.src,
-                site_url: imageData.link,
-                tags: imageData.tags,
-                created_at: new Date().toISOString()
-            };
-            
-            // Insert the image data into the 'images' table
-            const { data, error } = await supabaseClient
-                .from('images')
-                .insert([dbImageData]);
-                
-            if (error) {
-                console.error('Error saving image to database:', error);
-                return false;
-            }
-            
-            console.log('Image saved to database successfully:', data);
-            return true;
-        } catch (error) {
-            console.error('Exception saving image to database:', error);
-            return false;
-        }
     }
 
     // Function to populate the image feed from Supabase
@@ -149,9 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (error) {
                     console.error('Error fetching images from Supabase:', error);
-                    
-                    // Show placeholder images instead when there's an error
-                    displayPlaceholderImages();
                     return;
                 }
 
@@ -161,44 +122,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 } else {
                     console.log('No images found in Supabase.');
-                    // Show placeholder images when no images are found
-                    displayPlaceholderImages();
+                    imageFeed.innerHTML = '<p>No images submitted yet.</p>';
                 }
             } catch (error) {
                 console.error('Error populating image feed:', error);
-                // Show placeholder images on any error
-                displayPlaceholderImages();
             }
         } else {
             console.error('Supabase client not initialized.');
-            // Show placeholder images when Supabase client is not initialized
-            displayPlaceholderImages();
+            imageFeed.innerHTML = '<p>Supabase client not initialized.</p>';
         }
-    }
-    
-    // Function to display placeholder images when Supabase fails
-    function displayPlaceholderImages() {
-        const placeholderImages = [
-            {
-                src: 'https://via.placeholder.com/300/c0c0c0/000000?text=Image+1',
-                link: '#',
-                tags: 'placeholder, sample'
-            },
-            {
-                src: 'https://via.placeholder.com/300/c0c0c0/000000?text=Image+2',
-                link: '#',
-                tags: 'placeholder, example'
-            },
-            {
-                src: 'https://via.placeholder.com/300/c0c0c0/000000?text=Image+3',
-                link: '#',
-                tags: 'placeholder, demo'
-            }
-        ];
-        
-        placeholderImages.forEach(image => {
-            imageFeed.appendChild(createImageItem(image));
-        });
     }
 
     // Widget functionality
@@ -274,14 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             };
                             imageFeed.prepend(createImageItem(newImage));
 
-                            // Save image to database
-                            saveImageToDatabase(newImage)
-                                .then(success => {
-                                    if (!success) {
-                                        console.warn('Image displayed but not saved to database');
-                                    }
-                                });
-
                             // Show submission message
                             if (submissionMessage) {
                                 submissionMessage.style.display = 'block';
@@ -294,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             submitForm.reset(); // Clear the form
                             win98Alert('Image submitted successfully!'); // Windows 98 style alert
+                            populateImageFeed(); // Repopulate feed to show new image
                         });
                     } else {
                         // Fallback if Supabase client is not available
@@ -314,14 +239,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 imageFeed.prepend(createImageItem(newImage));
 
-                // Save image to database
-                saveImageToDatabase(newImage)
-                    .then(success => {
-                        if (!success) {
-                            console.warn('Image displayed but not saved to database');
-                        }
-                    });
-
                 // Show submission message
                 if (submissionMessage) {
                     submissionMessage.style.display = 'block';
@@ -334,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 submitForm.reset(); // Clear the form
                 win98Alert('Image submitted successfully!'); // Windows 98 style alert
+                populateImageFeed();
             } else {
                 win98Alert('Please upload an image or provide an image URL.');
                 return; // Stop submission if no image provided
@@ -367,6 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Initialize Supabase client if available
+    let supabaseClient = null;
     try {
         if (window.supabase) {
             console.log('Supabase library found, initializing client');
