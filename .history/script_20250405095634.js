@@ -148,16 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         imageFeed.innerHTML = ''; // Clear existing feed
 
-        // First try to load from local storage as a quick fallback
-        const localImages = loadFromLocalStorage();
-        if (localImages && localImages.length > 0) {
-            console.log('Loaded images from local storage');
-            localImages.forEach(image => {
-                imageFeed.appendChild(createImageItem(image));
-            });
-        }
-
-        // Then try to load from Supabase if available
         if (supabaseClient) {
             try {
                 console.log('Fetching images from Supabase database');
@@ -168,25 +158,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (error) {
                     console.error('Error fetching images from Supabase:', error);
+                    win98Alert('Error loading images: ' + error.message);
                     
-                    // Don't show alert for API key errors, just use local storage
-                    if (!error.message.includes('API key') && !error.message.includes('JWT')) {
-                        win98Alert('Error loading images: ' + error.message);
-                    }
-                    
-                    // If we didn't already load from local storage, show placeholders
-                    if (!localImages || localImages.length === 0) {
-                        displayPlaceholderImages();
-                    }
+                    // Show placeholder images instead when there's an error
+                    displayPlaceholderImages();
                     return;
                 }
 
                 console.log('Images fetched from database:', images);
                 
-                // Clear any local storage images to show the fresh data
                 if (images && images.length > 0) {
-                    imageFeed.innerHTML = '';
-                    
                     images.forEach(image => {
                         // Map database fields to the format expected by createImageItem
                         const displayImage = {
@@ -201,52 +182,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 } else {
                     console.log('No images found in Supabase.');
-                    // If we didn't already load from local storage, show placeholders
-                    if (!localImages || localImages.length === 0) {
-                        displayPlaceholderImages();
-                    }
+                    // Show placeholder images when no images are found
+                    displayPlaceholderImages();
                 }
             } catch (error) {
                 console.error('Error populating image feed:', error);
-                
-                // Don't show alert for connection errors if we have local storage
-                if (!localImages || localImages.length === 0) {
-                    // Only show alert for non-connection errors
-                    if (!error.message.includes('API key') && !error.message.includes('JWT')) {
-                        win98Alert('Error loading images: ' + error.message);
-                    }
-                    displayPlaceholderImages();
-                }
+                win98Alert('Error loading images: ' + error.message);
+                // Show placeholder images on any error
+                displayPlaceholderImages();
             }
         } else {
             console.error('Supabase client not initialized.');
-            // If we didn't already load from local storage, show placeholders
-            if (!localImages || localImages.length === 0) {
-                displayPlaceholderImages();
-            }
+            // Show placeholder images when Supabase client is not initialized
+            displayPlaceholderImages();
         }
     }
     
     // Function to display placeholder images when Supabase fails
     function displayPlaceholderImages() {
-        if (!imageFeed) return;
-        
-        console.log('Displaying placeholder images');
-        
-        // Clear any existing content
-        imageFeed.innerHTML = '';
-        
-        // First try to load from local storage
-        const localImages = loadFromLocalStorage();
-        if (localImages && localImages.length > 0) {
-            console.log('Using images from local storage');
-            localImages.forEach(image => {
-                imageFeed.appendChild(createImageItem(image));
-            });
-            return;
-        }
-        
-        // If no local storage images, use placeholders
         const placeholderImages = [
             {
                 src: 'https://via.placeholder.com/300/c0c0c0/000000?text=Image+1',
@@ -268,30 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
         placeholderImages.forEach(image => {
             imageFeed.appendChild(createImageItem(image));
         });
-    }
-    
-    // Local storage fallback functions
-    function saveToLocalStorage(image) {
-        try {
-            let images = loadFromLocalStorage() || [];
-            images.unshift(image); // Add new image to the beginning
-            localStorage.setItem('underweb_images', JSON.stringify(images));
-            console.log('Saved image to local storage');
-        } catch (error) {
-            console.error('Error saving to local storage:', error);
-        }
-    }
-    
-    function loadFromLocalStorage() {
-        try {
-            const savedImages = localStorage.getItem('underweb_images');
-            if (savedImages) {
-                return JSON.parse(savedImages);
-            }
-        } catch (error) {
-            console.error('Error loading from local storage:', error);
-        }
-        return null;
     }
 
     // Widget functionality
@@ -384,8 +313,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 .then(success => {
                                     if (!success) {
                                         console.warn('Image displayed but not saved to database');
-                                        // Save to local storage as fallback
-                                        saveToLocalStorage(newImage);
                                     }
                                 });
 
@@ -426,8 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     .then(success => {
                         if (!success) {
                             console.warn('Image displayed but not saved to database');
-                            // Save to local storage as fallback
-                            saveToLocalStorage(newImage);
                         }
                     });
 
@@ -475,58 +400,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Function to verify Supabase connection
-    async function verifySupabaseConnection() {
-        if (!supabaseClient) return false;
-        
-        try {
-            // Try a simple query to verify the connection
-            const { error } = await supabaseClient.auth.getSession();
-            
-            if (error) {
-                console.error('Supabase connection verification failed:', error);
-                return false;
-            }
-            
-            console.log('Supabase connection verified successfully');
-            return true;
-        } catch (error) {
-            console.error('Error verifying Supabase connection:', error);
-            return false;
-        }
-    }
-
     // Initialize Supabase client if available
     try {
         if (window.supabase) {
             console.log('Supabase library found, initializing client');
-            
-            // Try a different API key format - this is a public anon key so it's safe to include
             const SUPABASE_URL = 'https://ibpnwppmlvlizuuxland.supabase.co';
-            
-            // Use a simpler API key format that might work better
-            // This is the same key but formatted differently
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicG53d3BtbHZsaXp1dXhsYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNTcwMDAsImV4cCI6MjA1ODgzMzAwMH0.ZKlskNFBzS-tiIblQZJtSbDdva_X-sR2FE0aZaD56_A';
-            
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            
-            // Verify the connection works
-            verifySupabaseConnection().then(isConnected => {
-                if (!isConnected) {
-                    console.warn('Using local storage fallback due to Supabase connection issues');
-                    // Don't show an error alert to the user, just use placeholders
-                    displayPlaceholderImages();
-                }
-            });
         } else {
             console.error('Supabase library not found');
-            // Use placeholders when Supabase is not available
-            displayPlaceholderImages();
         }
     } catch (error) {
         console.error('Error initializing Supabase client:', error);
-        // Use placeholders on initialization error
-        displayPlaceholderImages();
     }
     
     // Initialize the page
