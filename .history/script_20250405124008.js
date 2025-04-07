@@ -128,7 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
             if (error) {
                 console.error('Error saving image to database:', error);
-                console.error('Full error object:', error); // Log full error object
                 win98Alert('Error saving image to database: ' + error.message);
                 return false;
             }
