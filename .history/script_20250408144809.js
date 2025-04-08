@@ -366,28 +366,55 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (!success) {
                                 console.warn('Image displayed but not saved to database');
                                 // Save to local storage as fallback
-                                saveToLocalStorage(newImage);
+                            // Get public URL from storage
+                            const urlResult = await supabaseClient.storage.from('images').getPublicUrl(imageName);
+                            if (urlResult.error) {
+                                console.error('Get public URL error:', urlResult.error);
+                                win98Alert('Error getting public URL: ' + urlResult.error.message);
+                                return;
                             }
+                            submittedImageUrl = urlResult.data.publicUrl;
+                            console.log('Got public URL:', submittedImageUrl);
+
+                            // Create new image item and add to feed
+                            const newImage = {
+                                src: submittedImageUrl,
+                                link: siteLink,
+                                tags: tagsInput
+                            };
+                            imageFeed.prepend(createImageItem(newImage));
+
+                            // Save image to database
+                            saveImageToDatabase(newImage)
+                                .then(success => {
+                                    if (!success) {
+                                        console.warn('Image displayed but not saved to database');
+                                        // Save to local storage as fallback
+                                        saveToLocalStorage(newImage);
+                                    }
+                                });
+
+                            // Show submission message
+                            if (submissionMessage) {
+                                submissionMessage.style.display = 'block';
+                            }
+
+                            // Show embed instructions if they exist
+                            if (embedInstructions) {
+                                embedInstructions.style.display = 'block';
+                            }
+
+                            submitForm.reset(); // Clear the form
+                            win98Alert('Image submitted successfully!'); // Windows 98 style alert
                         });
-
-                    // Show submission message
-                    if (submissionMessage) {
-                        submissionMessage.style.display = 'block';
+                    } else {
+                        // Fallback if Supabase client is not available
+                        win98Alert('Image upload is not available at the moment. Please try using an image URL instead.');
                     }
-
-                    // Show embed instructions if they exist
-                    if (embedInstructions) {
-                        embedInstructions.style.display = 'block';
-                    }
-
-                    submitForm.reset(); // Clear the form
-                    win98Alert('Image submitted successfully!'); // Windows 98 style alert
-                };
-                reader.onerror = function(error) {
-                    console.error('Error reading file:', error);
-                    win98Alert('Error reading file. Please try again or use an image URL instead.');
-                };
-                reader.readAsDataURL(imageUpload);
+                } catch (error) {
+                    console.error('Error in Supabase upload:', error);
+                    win98Alert('Error uploading image: ' + error.message);
+                }
             } else if (imageUrl) {
                 submittedImageUrl = imageUrl;
 
