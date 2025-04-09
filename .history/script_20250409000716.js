@@ -79,49 +79,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { error: updateError } = await supabaseClient
                 .storage
                 .updateBucket('images', bucketConfig);
-
-            if (updateError) {
-                console.error('Error updating bucket:', updateError);
+                console.error('Storage setup error:', storageError);
+                throw storageError;
             }
 
-            // Create uploads folder if it doesn't exist
-            try {
-                const { data: folders } = await supabaseClient
-                    .storage
-                    .from('images')
-                    .list();
-
-                const uploadsFolder = folders?.find(f => f.name === 'uploads');
-                if (!uploadsFolder) {
-                    // Create an empty file to initialize the folder
-                    const { error: folderError } = await supabaseClient
-                        .storage
-                        .from('images')
-                        .upload('uploads/.keep', new Blob(['']));
-
-                    if (folderError && !folderError.message.includes('already exists')) {
-                        console.error('Error creating uploads folder:', folderError);
-                    }
-                }
-            } catch (folderError) {
-                console.error('Error checking/creating uploads folder:', folderError);
+            // Verify the connection works
+            const isConnected = await verifySupabaseConnection();
+            if (!isConnected) {
+                throw new Error('Failed to verify Supabase connection');
             }
 
-            // Verify bucket access and permissions
-            const { error: testError } = await supabaseClient
-                .storage
-                .from('images')
-                .list('uploads');
-
-            if (testError) {
-                throw new Error(`Cannot access images bucket: ${testError.message}`);
-            }
-
-            console.log('Storage system initialized and verified');
+            console.log('Supabase initialized successfully');
             return true;
         } catch (error) {
-            console.error('Storage initialization error:', error);
-            throw error;
+            console.error('Error initializing Supabase client:', error);
+            displayPlaceholderImages();
+            return false;
         }
     }
 
@@ -506,28 +479,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                         lastModified: imageUpload.lastModified
                     };
 
-                    console.log('Preparing upload:', {
+                    console.log('Uploading file:', {
                         path: filePath,
                         type: imageUpload.type,
                         size: imageUpload.size,
                         metadata: fileMetadata
                     });
 
-                    // Ensure the uploads folder exists
-                    const { error: folderError } = await supabaseClient
-                        .storage
-                        .from('images')
-                        .list('uploads');
-
-                    if (folderError) {
-                        console.log('Creating uploads folder...');
-                        await supabaseClient
-                            .storage
-                            .from('images')
-                            .upload('uploads/.keep', new Blob(['']));
-                    }
-
-                    // Check if file already exists
+                    // First check if file exists
                     const { data: existingFile } = await supabaseClient
                         .storage
                         .from('images')
@@ -537,41 +496,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     if (existingFile?.length > 0) {
                         console.log('File exists, will be overwritten');
-                        // Remove existing file first to avoid conflicts
-                        await supabaseClient
-                            .storage
-                            .from('images')
-                            .remove([filePath]);
                     }
 
-                    // Upload with enhanced error handling and retry logic
-                    let uploadAttempt = 0;
-                    const maxAttempts = 3;
-                    let uploadData, uploadError;
-
-                    while (uploadAttempt < maxAttempts) {
-                        uploadAttempt++;
-                        console.log(`Upload attempt ${uploadAttempt} of ${maxAttempts}`);
-
-                        const result = await supabaseClient
-                            .storage
-                            .from('images')
-                            .upload(filePath, imageUpload, {
-                                cacheControl: '3600',
-                                upsert: true,
-                                contentType: imageUpload.type
-                            });
-
-                        uploadData = result.data;
-                        uploadError = result.error;
-
-                        if (!uploadError) break;
-
-                        if (uploadAttempt < maxAttempts) {
-                            console.log(`Upload failed, retrying in 1 second...`);
-                            await new Promise(resolve => setTimeout(resolve, 1000));
-                        }
-                    }
+                    // Upload with enhanced error handling
+                    const { data: uploadData, error: uploadError } = await supabaseClient
+                        .storage
+                        .from('images')
+                        .upload(filePath, imageUpload, {
+                            cacheControl: '3600',
+                            upsert: true,
+                            contentType: imageUpload.type,
+                            duplex: 'half'
+                        });
 
                     if (uploadError) {
                         console.error('Upload error:', uploadError);

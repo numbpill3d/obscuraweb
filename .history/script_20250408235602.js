@@ -28,8 +28,60 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Create Supabase client
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-            // Initialize and verify storage system
-            await initializeStorage();
+            // Ensure storage bucket exists and is properly configured
+            try {
+                const { data: buckets, error: bucketsError } = await supabaseClient
+                    .storage
+                    .listBuckets();
+
+                if (bucketsError) {
+                    throw new Error(`Storage error: ${bucketsError.message}`);
+                }
+
+                const imagesBucket = buckets.find(b => b.name === 'images');
+                if (!imagesBucket) {
+                    console.log('Creating images bucket...');
+                    const { error: createError } = await supabaseClient
+                        .storage
+                        .createBucket('images', {
+                            public: true,
+                            allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+                            fileSizeLimit: 5242880 // 5MB
+                        });
+
+                    if (createError) {
+                        throw new Error(`Failed to create bucket: ${createError.message}`);
+                    }
+                } else {
+                    // Update existing bucket configuration
+                    const { error: updateError } = await supabaseClient
+                        .storage
+                        .updateBucket('images', {
+                            public: true,
+                            allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+                            fileSizeLimit: 5242880 // 5MB
+                        });
+
+                    if (updateError) {
+                        console.error('Error updating bucket:', updateError);
+                    }
+                }
+
+                // Verify bucket access
+                const { data: testData, error: testError } = await supabaseClient
+                    .storage
+                    .from('images')
+                    .list();
+
+                if (testError) {
+                    throw new Error(`Cannot access images bucket: ${testError.message}`);
+                }
+
+                console.log('Storage bucket verified and configured');
+            } catch (storageError) {
+                console.error('Storage setup error:', storageError);
+                throw storageError;
+            }
 
             // Verify the connection works
             const isConnected = await verifySupabaseConnection();
@@ -43,85 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error initializing Supabase client:', error);
             displayPlaceholderImages();
             return false;
-        }
-    }
-
-    // Initialize and verify storage system
-    async function initializeStorage() {
-        try {
-            // Check if storage is available
-            const { data: buckets, error: bucketsError } = await supabaseClient.storage.listBuckets();
-            
-            if (bucketsError) {
-                throw new Error(`Storage error: ${bucketsError.message}`);
-            }
-
-            // Find or create images bucket
-            const imagesBucket = buckets.find(b => b.name === 'images');
-            const bucketConfig = {
-                public: true,
-                allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-                fileSizeLimit: 5242880 // 5MB
-            };
-
-            if (!imagesBucket) {
-                console.log('Creating images bucket...');
-                const { error: createError } = await supabaseClient
-                    .storage
-                    .createBucket('images', bucketConfig);
-
-                if (createError) {
-                    throw new Error(`Failed to create bucket: ${createError.message}`);
-                }
-            }
-
-            // Ensure bucket configuration is up to date
-            const { error: updateError } = await supabaseClient
-                .storage
-                .updateBucket('images', bucketConfig);
-
-            if (updateError) {
-                console.error('Error updating bucket:', updateError);
-            }
-
-            // Create uploads folder if it doesn't exist
-            try {
-                const { data: folders } = await supabaseClient
-                    .storage
-                    .from('images')
-                    .list();
-
-                const uploadsFolder = folders?.find(f => f.name === 'uploads');
-                if (!uploadsFolder) {
-                    // Create an empty file to initialize the folder
-                    const { error: folderError } = await supabaseClient
-                        .storage
-                        .from('images')
-                        .upload('uploads/.keep', new Blob(['']));
-
-                    if (folderError && !folderError.message.includes('already exists')) {
-                        console.error('Error creating uploads folder:', folderError);
-                    }
-                }
-            } catch (folderError) {
-                console.error('Error checking/creating uploads folder:', folderError);
-            }
-
-            // Verify bucket access and permissions
-            const { error: testError } = await supabaseClient
-                .storage
-                .from('images')
-                .list('uploads');
-
-            if (testError) {
-                throw new Error(`Cannot access images bucket: ${testError.message}`);
-            }
-
-            console.log('Storage system initialized and verified');
-            return true;
-        } catch (error) {
-            console.error('Storage initialization error:', error);
-            throw error;
         }
     }
 
@@ -506,28 +479,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                         lastModified: imageUpload.lastModified
                     };
 
-                    console.log('Preparing upload:', {
+                    console.log('Uploading file:', {
                         path: filePath,
                         type: imageUpload.type,
                         size: imageUpload.size,
                         metadata: fileMetadata
                     });
 
-                    // Ensure the uploads folder exists
-                    const { error: folderError } = await supabaseClient
-                        .storage
-                        .from('images')
-                        .list('uploads');
-
-                    if (folderError) {
-                        console.log('Creating uploads folder...');
-                        await supabaseClient
-                            .storage
-                            .from('images')
-                            .upload('uploads/.keep', new Blob(['']));
-                    }
-
-                    // Check if file already exists
+                    // First check if file exists
                     const { data: existingFile } = await supabaseClient
                         .storage
                         .from('images')
@@ -537,41 +496,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     if (existingFile?.length > 0) {
                         console.log('File exists, will be overwritten');
-                        // Remove existing file first to avoid conflicts
-                        await supabaseClient
-                            .storage
-                            .from('images')
-                            .remove([filePath]);
                     }
 
-                    // Upload with enhanced error handling and retry logic
-                    let uploadAttempt = 0;
-                    const maxAttempts = 3;
-                    let uploadData, uploadError;
-
-                    while (uploadAttempt < maxAttempts) {
-                        uploadAttempt++;
-                        console.log(`Upload attempt ${uploadAttempt} of ${maxAttempts}`);
-
-                        const result = await supabaseClient
-                            .storage
-                            .from('images')
-                            .upload(filePath, imageUpload, {
-                                cacheControl: '3600',
-                                upsert: true,
-                                contentType: imageUpload.type
-                            });
-
-                        uploadData = result.data;
-                        uploadError = result.error;
-
-                        if (!uploadError) break;
-
-                        if (uploadAttempt < maxAttempts) {
-                            console.log(`Upload failed, retrying in 1 second...`);
-                            await new Promise(resolve => setTimeout(resolve, 1000));
-                        }
-                    }
+                    // Upload with enhanced error handling
+                    const { data: uploadData, error: uploadError } = await supabaseClient
+                        .storage
+                        .from('images')
+                        .upload(filePath, imageUpload, {
+                            cacheControl: '3600',
+                            upsert: true,
+                            contentType: imageUpload.type,
+                            duplex: 'half'
+                        });
 
                     if (uploadError) {
                         console.error('Upload error:', uploadError);
