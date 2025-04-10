@@ -733,37 +733,6 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="about-section">
-                    <h2 class="about-title">Digital Philosophy</h2>
-                    <p class="about-text">
-                        We believe that the internet was always meant to be a tapestry of individual expression rather than a monolithic marketplace. By seeking out and preserving the peculiar, the personal, and the inexplicable corners of the web, we maintain a connection to the internet's original promise: a place where reality is malleable and every user is both explorer and creator.
-                    </p>
-                    <p class="about-text">
-                        In the words of our founder: "The most interesting spaces are those that exist between categories, beyond algorithms, and outside metrics. The true beauty of the web lies not in what's trending, but in what's hidden—waiting to be discovered."
-                    </p>
-                </div>
-                
-                <div class="about-section">
-                    <h2 class="about-title">Contact the Void</h2>
-                    <p class="about-text">
-                        Communication through conventional digital channels is transient, monitored, and bound by the laws of physics. We prefer methods that drift through the digital void, but nevertheless have established the following contact points for those who wish to reach us:
-                    </p>
-                    
-                    <div class="terminal-section">
-                        <div class="terminal-output">
-                            EMAIL=void@underweb.digital<br>
-                            IRC=#underweb on irc.freenode.net<br>
-                            BBS=underweb.digital:23<br>
-                            <br>
-                            :::SIGNAL_DEGRADATION=MINIMAL:::
-                        </div>
-                    </div>
-                    
-                    <p class="about-text">
-                        For those who truly wish to connect with the essence of THE UNDERWEB, simply gaze into your screen at midnight and whisper your intentions into the static. The digital void is always listening.
-                    </p>
-                </div>
             </div>
         </div>
     </main>
@@ -858,7 +827,7 @@
             const statNumbers = document.querySelectorAll('.stat-number');
             
             statNumbers.forEach(number => {
-                const finalValue = parseInt(number.textContent.replace(/,/g, ''));
+                const finalValue = parseInt(number.textContent);
                 number.textContent = '0';
                 
                 const observer = new IntersectionObserver(entries => {
@@ -901,49 +870,30 @@
                     }
                 });
             });
-            
-            // Terminal cursor blink effect
-            const terminalSections = document.querySelectorAll('.terminal-section');
-            
-            terminalSections.forEach(section => {
-                const cursor = document.createElement('span');
-                cursor.classList.add('cursor');
-                cursor.textContent = '█';
-                cursor.style.animation = 'fadeInOut 1s infinite';
-                cursor.style.color = 'var(--terminal-green)';
-                cursor.style.marginLeft = '2px';
-                
-                const output = section.querySelector('.terminal-output');
-                if (output) {
-                    output.appendChild(cursor);
-                }
-            });
-            
-            // Add subtle glitch effect occasionally to terminal sections
-            setInterval(() => {
-                const randomTerminal = terminalSections[Math.floor(Math.random() * terminalSections.length)];
-                
-                if (randomTerminal) {
-                    randomTerminal.style.animation = 'glitch 0.2s 1';
-                    setTimeout(() => {
-                        randomTerminal.style.animation = '';
-                    }, 200);
-                }
-            }, 5000);
-            
-            // Add interaction to team members
-            const teamMembers = document.querySelectorAll('.team-member');
-            
-            teamMembers.forEach(member => {
-                member.addEventListener('click', function() {
-                    // Simple interaction - just apply a glitch effect
-                    this.style.animation = 'glitch 0.3s 1';
-                    setTimeout(() => {
-                        this.style.animation = '';
-                    }, 300);
-                });
-            });
         });
     </script>
 </body>
-</html>
+</html>about-section">
+                    <h2 class="about-title">Our Mission</h2>
+                    <div class="typewriter">
+                        Rediscovering the forgotten corners of cyberspace...
+                    </div>
+                    <p class="about-text">
+                        THE UNDERWEB exists as a portal to the forgotten realms of the internet, a digital archaeologist's dream space where the web's hidden dimensions converge. Our mission is to catalog and preserve the web's most ethereal, unusual, and overlooked corners.
+                    </p>
+                    <p class="about-text">
+                        In an age of algorithm-driven homogeneity, we celebrate the strange, the personal, and the experimental. We believe the internet should remain a place of dreams and discovery, not merely a platform for consumption and surveillance.
+                    </p>
+                    <div class="terminal-section">
+                        <div class="terminal-output">
+                            INIT_SEQUENCE="/////UNDERWEB_PROTOCOL_v2.5/////"<br>
+                            ACCESSING_DREAMS=TRUE<br>
+                            REALITY_FILTER=FALSE<br>
+                            DATA_STREAM=[OPEN]<br>
+                            <br>
+                            :::CONNECTION ESTABLISHED:::
+                        </div>
+                    </div>
+                </div>
+
+                <div class="
