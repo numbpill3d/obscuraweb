@@ -1,14 +1,5 @@
-// @ts-nocheck
-
-/**
- * Initialize Supabase client globally
- */
+// Initialize Supabase client globally
 let supabaseClient = null;
-
-// Extend Window interface
-/** @typedef {{ supabase?: { createClient(url: string, key: string): SupabaseClient }}} SupabaseWindow */
-/** @type {Window & typeof globalThis & SupabaseWindow} */
-const win = window;
 
 document.addEventListener('DOMContentLoaded', async () => {
     const imageFeed = document.getElementById('image-feed');
@@ -25,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize Supabase client
     async function initSupabase() {
         try {
-            if (!win.supabase) {
+            if (!window.supabase) {
                 throw new Error('Supabase library not found');
             }
 
@@ -35,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicG53d3BtbHZsaXp1dXhsYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNTcwMDAsImV4cCI6MjA1ODgzMzAwMH0.ZKlskNFBzS-tiIblQZJtSbDdva_X-sR2FE0aZaD56_A';
             
             // Create Supabase client
-            supabaseClient = win.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
             // Initialize and verify storage system
             await initializeStorage();
@@ -66,9 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             // Find or create images bucket
-            /** @type {Bucket[]} */
-            const typedBuckets = buckets;
-            const imagesBucket = typedBuckets.find((b) => b.name === 'images');
+            const imagesBucket = buckets.find(b => b.name === 'images');
             const bucketConfig = {
                 public: true,
                 allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
@@ -102,9 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     .from('images')
                     .list();
 
-                /** @type {Folder[]} */
-                const typedFolders = folders || [];
-                const uploadsFolder = typedFolders.find((f) => f.name === 'uploads');
+                const uploadsFolder = folders?.find(f => f.name === 'uploads');
                 if (!uploadsFolder) {
                     // Create an empty file to initialize the folder
                     const { error: folderError } = await supabaseClient
@@ -160,10 +147,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Windows 98 style alert function
-    /**
-     * Display a Windows 98 style alert
-     * @param {string} message - The message to display
-     */
     function win98Alert(message) {
         // Create alert container
         const alertContainer = document.createElement('div');
@@ -229,11 +212,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Function to create image items for the feed
-    /**
-     * Create an image item element
-     * @param {any} image - The image data
-     * @returns {HTMLDivElement}
-     */
     function createImageItem(image) {
         console.log('createImageItem called with image:', image);
         const item = document.createElement('div');
@@ -241,7 +219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const img = document.createElement('img');
         // Handle both image.image_url (from Supabase) and image.src (from form submission)
-        img.src = image.image_url || image.src || '';
+        img.src = image.image_url || image.src;
         img.alt = image.alt || image.tags;
 
         const tagsDiv = document.createElement('div');
@@ -250,7 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const link = document.createElement('a');
         // Handle both image.site_url (from Supabase) and image.link (from form submission)
-        link.href = image.site_url || image.link || '#';
+        link.href = image.site_url || image.link;
         link.target = '_blank'; // Open link in new tab
         link.appendChild(img);
 
@@ -261,11 +239,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Function to save image data to Supabase database
-    /**
-     * Save image data to Supabase database
-     * @param {ImageItem} imageData - The image data to save
-     * @returns {Promise<boolean>}
-     */
     async function saveImageToDatabase(imageData) {
         if (!supabaseClient) {
             console.error('Cannot save to database: Supabase client not initialized');
@@ -299,7 +272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return true;
         } catch (error) {
             console.error('Exception saving image to database:', error);
-            win98Alert('Error saving image: ' + (error instanceof Error ? error.message : 'Unknown error'));
+            win98Alert('Error saving image: ' + error.message);
             return false;
         }
     }
@@ -377,9 +350,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Don't show alert for connection errors if we have local storage
                 if (!localImages || localImages.length === 0) {
                     // Only show alert for non-connection errors
-                    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-                    if (!errorMsg.includes('API key') && !errorMsg.includes('JWT')) {
-                        win98Alert('Error loading images: ' + errorMsg);
+                    if (!error.message.includes('API key') && !error.message.includes('JWT')) {
+                        win98Alert('Error loading images: ' + error.message);
                     }
                     displayPlaceholderImages();
                 }
@@ -432,21 +404,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         ];
         
         placeholderImages.forEach(image => {
-            const imageData = {
-                src: image.src,
-                image_url: image.src,
-                link: image.link,
-                site_url: image.link,
-                tags: image.tags
-            };
-            imageFeed.appendChild(createImageItem(imageData));
+            imageFeed.appendChild(createImageItem(image));
         });
     }
     
     // Local storage fallback functions
-    /**
-     * @param {any} image
-     */
     function saveToLocalStorage(image) {
         try {
             let images = loadFromLocalStorage() || [];
@@ -507,22 +469,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         submitForm.addEventListener('submit', async function(event) {
             event.preventDefault(); // Prevent default form submission
 
-            const imageUploadEl = document.getElementById('image-upload');
-            const imageUrlEl = document.getElementById('image-url');
-            const siteLinkEl = document.getElementById('site-link');
-            const tagsInputEl = document.getElementById('tags');
-
-            if (!(imageUploadEl instanceof HTMLInputElement) ||
-                !(imageUrlEl instanceof HTMLInputElement) ||
-                !(siteLinkEl instanceof HTMLInputElement) ||
-                !(tagsInputEl instanceof HTMLInputElement)) {
-                throw new Error('Required form elements not found');
-            }
-
-            const imageUpload = imageUploadEl.files?.[0];
-            const imageUrl = imageUrlEl.value;
-            const siteLink = siteLinkEl.value;
-            const tagsInput = tagsInputEl.value;
+            const imageUpload = document.getElementById('image-upload').files[0];
+            const imageUrl = document.getElementById('image-url').value;
+            const siteLink = document.getElementById('site-link').value;
+            const tagsInput = document.getElementById('tags').value;
 
             let submittedImageUrl = '';
 
@@ -646,7 +596,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         console.log('Generated public URL:', publicUrl);
                     } catch (urlError) {
                         console.error('Error getting public URL:', urlError);
-                        throw new Error(`Failed to get public URL: ${urlError instanceof Error ? urlError.message : 'Unknown error'}`);
+                        throw new Error(`Failed to get public URL: ${urlError.message}`);
                     }
 
                     submittedImageUrl = publicUrl;
@@ -660,16 +610,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     };
 
                     if (imageFeed) {
-                        if (imageFeed) {
-                            const imageData = {
-                                src: newImage.src,
-                                image_url: newImage.src,
-                                link: newImage.link,
-                                site_url: newImage.link,
-                                tags: newImage.tags
-                            };
-                            imageFeed.prepend(createImageItem(imageData));
-                        }
+                        imageFeed.prepend(createImageItem(newImage));
                     }
 
                     // Save to database
@@ -687,13 +628,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                         embedInstructions.style.display = 'block';
                     }
 
-                    if (submitForm instanceof HTMLFormElement) {
-                        submitForm.reset();
-                    }
+                    submitForm.reset();
                     win98Alert('Image submitted successfully!');
                 } catch (error) {
                     console.error('Error handling file upload:', error);
-                    win98Alert(error instanceof Error ? error.message : 'Unknown error');
+                    win98Alert(error.message);
                 }
             } else if (imageUrl) {
                 submittedImageUrl = imageUrl;
@@ -704,16 +643,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     link: siteLink,
                     tags: tagsInput
                 };
-                if (imageFeed) {
-                    const imageData = {
-                        src: newImage.src,
-                        image_url: newImage.src,
-                        link: newImage.link,
-                        site_url: newImage.link,
-                        tags: newImage.tags
-                    };
-                    imageFeed.prepend(createImageItem(imageData));
-                }
+                imageFeed.prepend(createImageItem(newImage));
 
                 // Save image to database
                 saveImageToDatabase(newImage)
@@ -735,9 +665,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     embedInstructions.style.display = 'block';
                 }
 
-                if (submitForm instanceof HTMLFormElement) {
-                    submitForm.reset(); // Clear the form
-                }
+                submitForm.reset(); // Clear the form
                 win98Alert('Image submitted successfully!'); // Windows 98 style alert
             } else {
                 win98Alert('Please upload an image or provide an image URL.');
@@ -749,9 +677,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Copy embed code functionality
     if (copyEmbedButton && embedCodeTextarea) {
         copyEmbedButton.addEventListener('click', () => {
-            if (embedCodeTextarea instanceof HTMLTextAreaElement) {
-                embedCodeTextarea.select();
-            }
+            embedCodeTextarea.select();
             document.execCommand('copy');
             win98Alert('Embed code copied to clipboard!'); // Windows 98 style alert
         });
@@ -759,21 +685,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Add click handlers to window title bar X buttons
     document.querySelectorAll('.win98-box-title span:last-child').forEach(closeButton => {
-        if (closeButton instanceof HTMLElement) {
-            closeButton.style.cursor = 'pointer';
-            closeButton.addEventListener('click', function() {
-                const parentBox = this.closest('.win98-box');
-                if (parentBox && parentBox instanceof HTMLElement) {
-                    parentBox.style.display = 'none';
+        closeButton.style.cursor = 'pointer';
+        closeButton.addEventListener('click', function() {
+            const parentBox = this.closest('.win98-box');
+            if (parentBox) {
+                parentBox.style.display = 'none';
 
-                    // Show a "restore" button somewhere
-                    setTimeout(() => {
-                        if (parentBox instanceof HTMLElement) {
-                            parentBox.style.display = 'block';
-                        }
-                    }, 3000); // Auto-restore after 3 seconds for demo purposes
-                }
-            });
+                // Show a "restore" button somewhere
+                setTimeout(() => {
+                    parentBox.style.display = 'block';
+                }, 3000); // Auto-restore after 3 seconds for demo purposes
+            }
+        });
     });
 
     // Initialize Supabase and start the app

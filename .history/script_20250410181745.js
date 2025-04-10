@@ -1,8 +1,9 @@
-// @ts-nocheck
+// @ts-check
 
-/**
- * Initialize Supabase client globally
- */
+/** @typedef {import('@supabase/supabase-js').SupabaseClient} SupabaseClient */
+/** @typedef {import('@supabase/supabase-js').User} User */
+
+/** @type {SupabaseClient | null} */
 let supabaseClient = null;
 
 // Extend Window interface
@@ -66,9 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             // Find or create images bucket
-            /** @type {Bucket[]} */
-            const typedBuckets = buckets;
-            const imagesBucket = typedBuckets.find((b) => b.name === 'images');
+            const imagesBucket = buckets.find(b => b.name === 'images');
             const bucketConfig = {
                 public: true,
                 allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
@@ -102,9 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     .from('images')
                     .list();
 
-                /** @type {Folder[]} */
-                const typedFolders = folders || [];
-                const uploadsFolder = typedFolders.find((f) => f.name === 'uploads');
+                const uploadsFolder = folders?.find(f => f.name === 'uploads');
                 if (!uploadsFolder) {
                     // Create an empty file to initialize the folder
                     const { error: folderError } = await supabaseClient
@@ -230,8 +227,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Function to create image items for the feed
     /**
+     * @typedef {Object} ImageItem
+     * @property {string} src - Image URL
+     * @property {string} image_url - Alternative image URL
+     * @property {string} link - Link URL
+     * @property {string} site_url - Alternative link URL
+     * @property {string} tags - Image tags
+     * @property {string} [alt] - Image alt text
+     */
+
+    /**
      * Create an image item element
-     * @param {any} image - The image data
+     * @param {ImageItem} image - The image data
      * @returns {HTMLDivElement}
      */
     function createImageItem(image) {
@@ -241,7 +248,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const img = document.createElement('img');
         // Handle both image.image_url (from Supabase) and image.src (from form submission)
-        img.src = image.image_url || image.src || '';
+        img.src = image.image_url || image.src;
         img.alt = image.alt || image.tags;
 
         const tagsDiv = document.createElement('div');
@@ -250,7 +257,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const link = document.createElement('a');
         // Handle both image.site_url (from Supabase) and image.link (from form submission)
-        link.href = image.site_url || image.link || '#';
+        link.href = image.site_url || image.link;
         link.target = '_blank'; // Open link in new tab
         link.appendChild(img);
 
@@ -299,7 +306,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return true;
         } catch (error) {
             console.error('Exception saving image to database:', error);
-            win98Alert('Error saving image: ' + (error instanceof Error ? error.message : 'Unknown error'));
+            win98Alert('Error saving image: ' + error.message);
             return false;
         }
     }
@@ -377,9 +384,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Don't show alert for connection errors if we have local storage
                 if (!localImages || localImages.length === 0) {
                     // Only show alert for non-connection errors
-                    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-                    if (!errorMsg.includes('API key') && !errorMsg.includes('JWT')) {
-                        win98Alert('Error loading images: ' + errorMsg);
+                    if (!error.message.includes('API key') && !error.message.includes('JWT')) {
+                        win98Alert('Error loading images: ' + error.message);
                     }
                     displayPlaceholderImages();
                 }
@@ -432,21 +438,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         ];
         
         placeholderImages.forEach(image => {
-            const imageData = {
-                src: image.src,
-                image_url: image.src,
-                link: image.link,
-                site_url: image.link,
-                tags: image.tags
-            };
-            imageFeed.appendChild(createImageItem(imageData));
+            imageFeed.appendChild(createImageItem(image));
         });
     }
     
     // Local storage fallback functions
-    /**
-     * @param {any} image
-     */
     function saveToLocalStorage(image) {
         try {
             let images = loadFromLocalStorage() || [];
@@ -646,7 +642,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         console.log('Generated public URL:', publicUrl);
                     } catch (urlError) {
                         console.error('Error getting public URL:', urlError);
-                        throw new Error(`Failed to get public URL: ${urlError instanceof Error ? urlError.message : 'Unknown error'}`);
+                        throw new Error(`Failed to get public URL: ${urlError.message}`);
                     }
 
                     submittedImageUrl = publicUrl;
@@ -660,16 +656,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     };
 
                     if (imageFeed) {
-                        if (imageFeed) {
-                            const imageData = {
-                                src: newImage.src,
-                                image_url: newImage.src,
-                                link: newImage.link,
-                                site_url: newImage.link,
-                                tags: newImage.tags
-                            };
-                            imageFeed.prepend(createImageItem(imageData));
-                        }
+                        imageFeed.prepend(createImageItem(newImage));
                     }
 
                     // Save to database
@@ -693,7 +680,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     win98Alert('Image submitted successfully!');
                 } catch (error) {
                     console.error('Error handling file upload:', error);
-                    win98Alert(error instanceof Error ? error.message : 'Unknown error');
+                    win98Alert(error.message);
                 }
             } else if (imageUrl) {
                 submittedImageUrl = imageUrl;
@@ -704,16 +691,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     link: siteLink,
                     tags: tagsInput
                 };
-                if (imageFeed) {
-                    const imageData = {
-                        src: newImage.src,
-                        image_url: newImage.src,
-                        link: newImage.link,
-                        site_url: newImage.link,
-                        tags: newImage.tags
-                    };
-                    imageFeed.prepend(createImageItem(imageData));
-                }
+                imageFeed.prepend(createImageItem(newImage));
 
                 // Save image to database
                 saveImageToDatabase(newImage)
@@ -763,17 +741,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             closeButton.style.cursor = 'pointer';
             closeButton.addEventListener('click', function() {
                 const parentBox = this.closest('.win98-box');
-                if (parentBox && parentBox instanceof HTMLElement) {
-                    parentBox.style.display = 'none';
+                if (parentBox) {
+                parentBox.style.display = 'none';
 
-                    // Show a "restore" button somewhere
-                    setTimeout(() => {
-                        if (parentBox instanceof HTMLElement) {
-                            parentBox.style.display = 'block';
-                        }
-                    }, 3000); // Auto-restore after 3 seconds for demo purposes
-                }
-            });
+                // Show a "restore" button somewhere
+                setTimeout(() => {
+                    parentBox.style.display = 'block';
+                }, 3000); // Auto-restore after 3 seconds for demo purposes
+            }
+        });
     });
 
     // Initialize Supabase and start the app

@@ -763,17 +763,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             closeButton.style.cursor = 'pointer';
             closeButton.addEventListener('click', function() {
                 const parentBox = this.closest('.win98-box');
-                if (parentBox && parentBox instanceof HTMLElement) {
+                if (parentBox) {
+                if (parentBox instanceof HTMLElement) {
                     parentBox.style.display = 'none';
 
                     // Show a "restore" button somewhere
                     setTimeout(() => {
-                        if (parentBox instanceof HTMLElement) {
-                            parentBox.style.display = 'block';
-                        }
+                        parentBox.style.display = 'block';
                     }, 3000); // Auto-restore after 3 seconds for demo purposes
                 }
-            });
+                }, 3000); // Auto-restore after 3 seconds for demo purposes
+            }
+        });
     });
 
     // Initialize Supabase and start the app

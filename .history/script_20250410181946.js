@@ -1,8 +1,28 @@
-// @ts-nocheck
+// @ts-check
 
 /**
- * Initialize Supabase client globally
+ * @typedef {Object} SupabaseClient
+ * @property {Object} storage - Storage interface
+ * @property {Object} auth - Auth interface
+ * @property {function} from - Database interface
  */
+
+/**
+ * @typedef {Object} User
+ * @property {string} id - User ID
+ */
+
+/**
+ * @typedef {Object} Bucket
+ * @property {string} name - Bucket name
+ */
+
+/**
+ * @typedef {Object} Folder
+ * @property {string} name - Folder name
+ */
+
+/** @type {SupabaseClient | null} */
 let supabaseClient = null;
 
 // Extend Window interface
@@ -230,8 +250,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Function to create image items for the feed
     /**
+     * @typedef {Object} ImageItem
+     * @property {string} [src] - Image URL
+     * @property {string} [image_url] - Alternative image URL
+     * @property {string} [link] - Link URL
+     * @property {string} [site_url] - Alternative link URL
+     * @property {string} tags - Image tags
+     * @property {string} [alt] - Image alt text
+     */
+
+    /**
      * Create an image item element
-     * @param {any} image - The image data
+     * @param {{ src?: string, image_url?: string, link?: string, site_url?: string, tags: string, alt?: string }} image - The image data
      * @returns {HTMLDivElement}
      */
     function createImageItem(image) {
@@ -241,7 +271,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const img = document.createElement('img');
         // Handle both image.image_url (from Supabase) and image.src (from form submission)
-        img.src = image.image_url || image.src || '';
+        img.src = image.image_url || image.src;
         img.alt = image.alt || image.tags;
 
         const tagsDiv = document.createElement('div');
@@ -250,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const link = document.createElement('a');
         // Handle both image.site_url (from Supabase) and image.link (from form submission)
-        link.href = image.site_url || image.link || '#';
+        link.href = image.site_url || image.link;
         link.target = '_blank'; // Open link in new tab
         link.appendChild(img);
 
@@ -444,9 +474,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // Local storage fallback functions
-    /**
-     * @param {any} image
-     */
     function saveToLocalStorage(image) {
         try {
             let images = loadFromLocalStorage() || [];
@@ -763,17 +790,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             closeButton.style.cursor = 'pointer';
             closeButton.addEventListener('click', function() {
                 const parentBox = this.closest('.win98-box');
-                if (parentBox && parentBox instanceof HTMLElement) {
+                if (parentBox) {
+                if (parentBox instanceof HTMLElement) {
                     parentBox.style.display = 'none';
 
                     // Show a "restore" button somewhere
                     setTimeout(() => {
-                        if (parentBox instanceof HTMLElement) {
-                            parentBox.style.display = 'block';
-                        }
+                        parentBox.style.display = 'block';
                     }, 3000); // Auto-restore after 3 seconds for demo purposes
                 }
-            });
+                }, 3000); // Auto-restore after 3 seconds for demo purposes
+            }
+        });
     });
 
     // Initialize Supabase and start the app
