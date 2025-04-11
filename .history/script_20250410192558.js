@@ -774,7 +774,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }, 3000); // Auto-restore after 3 seconds for demo purposes
                 }
             });
-        }
     });
 
     // Initialize Supabase and start the app
@@ -782,4 +781,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         populateImageFeed();
         createWidget();
     });
-});
