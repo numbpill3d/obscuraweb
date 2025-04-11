@@ -312,19 +312,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Function to check if local storage is available
-    function isLocalStorageAvailable() {
-        try {
-            const test = '__storage_test__';
-            localStorage.setItem(test, test);
-            localStorage.removeItem(test);
-            return true;
-        } catch (e) {
-            console.error('Local storage not available:', e);
-            return false;
-        }
-    }
-
     // Function to populate the image feed from both local storage and Supabase
     async function populateImageFeed() {
         console.log('populateImageFeed called');
@@ -337,32 +324,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Clear existing content while preserving header
         targetElement.innerHTML = submittedLinks ? '<h2>Submitted Links</h2>' : '';
 
-        // Check if local storage is available
-        if (!isLocalStorageAvailable()) {
-            console.error('Local storage is not available');
-            displayPlaceholderImages();
-            return;
-        }
-
-        // Load from local storage first
-        try {
-            const localImages = loadFromLocalStorage() || [];
-            console.log('Loaded images from local storage:', localImages);
-            
-            if (localImages.length > 0) {
-                console.log('Displaying local storage images:', localImages.length);
-                localImages.forEach(image => {
-                    const imageElement = createImageItem(image);
-                    targetElement.appendChild(imageElement);
-                    console.log('Added image to feed:', image.src);
-                });
-            } else {
-                console.log('No images found in local storage');
-            }
-        } catch (error) {
-            console.error('Error loading from local storage:', error);
-            displayPlaceholderImages();
-            return;
+        // Always load from local storage first for immediate display
+        const localImages = loadFromLocalStorage() || [];
+        console.log('Loaded images from local storage:', localImages);
+        
+        if (localImages.length > 0) {
+            console.log('Displaying local storage images:', localImages.length);
+            localImages.forEach(image => {
+                const imageElement = createImageItem(image);
+                targetElement.appendChild(imageElement);
+                console.log('Added image to feed:', image.src);
+            });
+        } else {
+            console.log('No images found in local storage');
         }
 
         // Then fetch from Supabase and update local storage
@@ -480,18 +454,13 @@ document.addEventListener('DOMContentLoaded', async () => {
      * @param {any} image
      */
     function saveToLocalStorage(image) {
-        if (!isLocalStorageAvailable()) {
-            console.error('Cannot save to local storage: storage not available');
-            return false;
-        }
-
         try {
             console.log('Attempting to save image to local storage:', image);
             let images = loadFromLocalStorage() || [];
             console.log('Current images in storage:', images.length);
 
             // Normalize image URLs for comparison
-            const normalizeUrl = (url) => url?.replace(/^https?:\/\//, '').split('?')[0];
+            const normalizeUrl = (url) => url?.replace(/^https?:\/\//, '');
             const newImageUrl = normalizeUrl(image.src || image.image_url);
 
             // Check for duplicates based on normalized URL
@@ -508,13 +477,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     link: image.link || image.site_url,
                     site_url: image.link || image.site_url,
                     tags: image.tags,
-                    alt: image.tags,
-                    timestamp: Date.now() // Add timestamp for sorting
+                    alt: image.tags
                 };
 
                 images.unshift(formattedImage); // Add new image to the beginning
                 localStorage.setItem('underweb_images', JSON.stringify(images));
-                console.log('Successfully saved new image to local storage:', formattedImage);
+                console.log('Successfully saved new image to local storage');
                 return true;
             } else {
                 console.log('Image already exists in local storage');
@@ -527,11 +495,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     function loadFromLocalStorage() {
-        if (!isLocalStorageAvailable()) {
-            console.error('Cannot load from local storage: storage not available');
-            return null;
-        }
-
         try {
             console.log('Loading images from local storage');
             const savedImages = localStorage.getItem('underweb_images');
@@ -540,28 +503,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const parsedImages = JSON.parse(savedImages);
                 console.log('Successfully loaded images:', parsedImages.length);
                 
-                // Ensure all images have consistent properties and sort by timestamp
-                const formattedImages = parsedImages
-                    .map(image => ({
-                        src: image.src || image.image_url,
-                        image_url: image.src || image.image_url,
-                        link: image.link || image.site_url,
-                        site_url: image.link || image.site_url,
-                        tags: image.tags,
-                        alt: image.tags,
-                        timestamp: image.timestamp || Date.now()
-                    }))
-                    .sort((a, b) => b.timestamp - a.timestamp); // Sort by timestamp, newest first
-
-                console.log('Formatted and sorted images:', formattedImages);
-                return formattedImages;
+                // Ensure all images have consistent properties
+                return parsedImages.map(image => ({
+                    src: image.src || image.image_url,
+                    image_url: image.src || image.image_url,
+                    link: image.link || image.site_url,
+                    site_url: image.link || image.site_url,
+                    tags: image.tags,
+                    alt: image.tags
+                }));
             } else {
                 console.log('No images found in local storage');
                 return null;
             }
         } catch (error) {
             console.error('Error loading from local storage:', error);
-            localStorage.removeItem('underweb_images'); // Clear corrupted data
             return null;
         }
     }

@@ -267,60 +267,39 @@ document.addEventListener('DOMContentLoaded', async () => {
      * @returns {Promise<boolean>}
      */
     async function saveImageToDatabase(imageData) {
-        // Always save to local storage first for immediate persistence
-        saveToLocalStorage(imageData);
-        
         if (!supabaseClient) {
-            console.log('Supabase client not initialized, using local storage only');
-            return true; // Return true since we saved to local storage
+            console.error('Cannot save to database: Supabase client not initialized');
+            return false;
         }
         
         try {
-            // Convert the image data to match database schema
+            // Convert the image data to match your database schema
             const dbImageData = {
                 image_url: imageData.src,
                 site_url: imageData.link,
                 tags: imageData.tags
+                // Let Supabase handle the created_at timestamp with its defaults
             };
             
-            console.log('Saving image to Supabase:', dbImageData);
+            console.log('Saving image to database:', dbImageData);
             
-            // Insert into Supabase
+            // Insert the image data into the 'images' table
             const { data, error } = await supabaseClient
                 .from('images')
                 .insert([dbImageData]);
                 
             if (error) {
-                console.error('Error saving to Supabase:', error);
-                // Don't show alert for connection issues since we have local storage
-                if (!error.message.includes('API key') && !error.message.includes('JWT')) {
-                    win98Alert('Warning: Image saved locally but failed to sync with server');
-                }
-                return true; // Still return true since we have local storage backup
+                console.error('Error saving image to database:', error);
+                console.error('Full error object:', error); // Log full error object
+                win98Alert('Error saving image to database: ' + error.message);
+                return false;
             }
             
-            console.log('Image saved to both local storage and Supabase:', data);
+            console.log('Image saved to database successfully:', data);
             return true;
         } catch (error) {
-            console.error('Exception saving to Supabase:', error);
-            // Don't alert for connection issues
-            const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-            if (!errorMsg.includes('API key') && !errorMsg.includes('JWT')) {
-                win98Alert('Warning: Image saved locally but failed to sync with server');
-            }
-            return true; // Still return true since we have local storage backup
-        }
-    }
-
-    // Function to check if local storage is available
-    function isLocalStorageAvailable() {
-        try {
-            const test = '__storage_test__';
-            localStorage.setItem(test, test);
-            localStorage.removeItem(test);
-            return true;
-        } catch (e) {
-            console.error('Local storage not available:', e);
+            console.error('Exception saving image to database:', error);
+            win98Alert('Error saving image: ' + (error instanceof Error ? error.message : 'Unknown error'));
             return false;
         }
     }
@@ -329,40 +308,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function populateImageFeed() {
         console.log('populateImageFeed called');
         const targetElement = imageFeed || submittedLinks;
-        if (!targetElement) {
-            console.error('Target element not found');
-            return;
-        }
+        if (!targetElement) return;
 
-        // Clear existing content while preserving header
         targetElement.innerHTML = submittedLinks ? '<h2>Submitted Links</h2>' : '';
 
-        // Check if local storage is available
-        if (!isLocalStorageAvailable()) {
-            console.error('Local storage is not available');
-            displayPlaceholderImages();
-            return;
-        }
-
-        // Load from local storage first
-        try {
-            const localImages = loadFromLocalStorage() || [];
-            console.log('Loaded images from local storage:', localImages);
-            
-            if (localImages.length > 0) {
-                console.log('Displaying local storage images:', localImages.length);
-                localImages.forEach(image => {
-                    const imageElement = createImageItem(image);
-                    targetElement.appendChild(imageElement);
-                    console.log('Added image to feed:', image.src);
-                });
-            } else {
-                console.log('No images found in local storage');
-            }
-        } catch (error) {
-            console.error('Error loading from local storage:', error);
-            displayPlaceholderImages();
-            return;
+        // Always load from local storage first for immediate display
+        const localImages = loadFromLocalStorage() || [];
+        console.log('Loaded images from local storage:', localImages);
+        
+        if (localImages.length > 0) {
+            localImages.forEach(image => {
+                targetElement.appendChild(createImageItem(image));
+            });
         }
 
         // Then fetch from Supabase and update local storage
@@ -475,95 +432,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
     
-    // Enhanced local storage functions with better error handling and logging
+    // Enhanced local storage functions
     /**
      * @param {any} image
      */
     function saveToLocalStorage(image) {
-        if (!isLocalStorageAvailable()) {
-            console.error('Cannot save to local storage: storage not available');
-            return false;
-        }
-
         try {
-            console.log('Attempting to save image to local storage:', image);
             let images = loadFromLocalStorage() || [];
-            console.log('Current images in storage:', images.length);
-
-            // Normalize image URLs for comparison
-            const normalizeUrl = (url) => url?.replace(/^https?:\/\//, '').split('?')[0];
-            const newImageUrl = normalizeUrl(image.src || image.image_url);
-
-            // Check for duplicates based on normalized URL
-            const isDuplicate = images.some(existing => {
-                const existingUrl = normalizeUrl(existing.src || existing.image_url);
-                return existingUrl === newImageUrl;
-            });
-
+            // Check for duplicates based on URL
+            const isDuplicate = images.some(existing => 
+                existing.src === image.src || 
+                existing.image_url === image.src
+            );
             if (!isDuplicate) {
-                // Format the image data consistently
-                const formattedImage = {
-                    src: image.src || image.image_url,
-                    image_url: image.src || image.image_url,
-                    link: image.link || image.site_url,
-                    site_url: image.link || image.site_url,
-                    tags: image.tags,
-                    alt: image.tags,
-                    timestamp: Date.now() // Add timestamp for sorting
-                };
-
-                images.unshift(formattedImage); // Add new image to the beginning
+                images.unshift(image); // Add new image to the beginning
                 localStorage.setItem('underweb_images', JSON.stringify(images));
-                console.log('Successfully saved new image to local storage:', formattedImage);
-                return true;
-            } else {
-                console.log('Image already exists in local storage');
-                return false;
+                console.log('Saved new image to local storage');
             }
         } catch (error) {
             console.error('Error saving to local storage:', error);
-            return false;
         }
     }
     
     function loadFromLocalStorage() {
-        if (!isLocalStorageAvailable()) {
-            console.error('Cannot load from local storage: storage not available');
-            return null;
-        }
-
         try {
-            console.log('Loading images from local storage');
             const savedImages = localStorage.getItem('underweb_images');
-            
             if (savedImages) {
-                const parsedImages = JSON.parse(savedImages);
-                console.log('Successfully loaded images:', parsedImages.length);
-                
-                // Ensure all images have consistent properties and sort by timestamp
-                const formattedImages = parsedImages
-                    .map(image => ({
-                        src: image.src || image.image_url,
-                        image_url: image.src || image.image_url,
-                        link: image.link || image.site_url,
-                        site_url: image.link || image.site_url,
-                        tags: image.tags,
-                        alt: image.tags,
-                        timestamp: image.timestamp || Date.now()
-                    }))
-                    .sort((a, b) => b.timestamp - a.timestamp); // Sort by timestamp, newest first
-
-                console.log('Formatted and sorted images:', formattedImages);
-                return formattedImages;
-            } else {
-                console.log('No images found in local storage');
-                return null;
+                return JSON.parse(savedImages);
             }
         } catch (error) {
             console.error('Error loading from local storage:', error);
-            localStorage.removeItem('underweb_images'); // Clear corrupted data
-            return null;
         }
+        return null;
     }
 
     // Widget functionality
@@ -800,55 +700,41 @@ document.addEventListener('DOMContentLoaded', async () => {
                     link: siteLink,
                     tags: tagsInput
                 };
-                // Format the image data
-                const imageData = {
-                    src: newImage.src,
-                    image_url: newImage.src,
-                    link: newImage.link,
-                    site_url: newImage.link,
-                    tags: newImage.tags
-                };
-
-                // Save to local storage first
-                saveToLocalStorage(imageData);
-                console.log('Saved to local storage:', imageData);
-
-                // Update display
                 if (imageFeed) {
+                    const imageData = {
+                        src: newImage.src,
+                        image_url: newImage.src,
+                        link: newImage.link,
+                        site_url: newImage.link,
+                        tags: newImage.tags
+                    };
                     imageFeed.prepend(createImageItem(imageData));
-                    console.log('Added image to feed:', imageData);
                 }
 
-                // Save to database
-                saveImageToDatabase(imageData)
+                // Save image to database
+                saveImageToDatabase(newImage)
                     .then(success => {
-                        console.log('Database save result:', success);
                         if (!success) {
-                            console.warn('Image saved to local storage only');
+                            console.warn('Image displayed but not saved to database');
+                            // Save to local storage as fallback
+                            saveToLocalStorage(newImage);
                         }
-                    })
-                    .catch(error => {
-                        console.error('Error saving to database:', error);
                     });
 
-                // Show success messages
+                // Show submission message
                 if (submissionMessage) {
                     submissionMessage.style.display = 'block';
                 }
+
+                // Show embed instructions if they exist
                 if (embedInstructions) {
                     embedInstructions.style.display = 'block';
                 }
 
-                // Reset form and show success message
                 if (submitForm instanceof HTMLFormElement) {
-                    submitForm.reset();
+                    submitForm.reset(); // Clear the form
                 }
-                win98Alert('Image submitted successfully!');
-
-                // Refresh the image feed to ensure it's up to date
-                setTimeout(() => {
-                    populateImageFeed();
-                }, 500);
+                win98Alert('Image submitted successfully!'); // Windows 98 style alert
             } else {
                 win98Alert('Please upload an image or provide an image URL.');
                 return; // Stop submission if no image provided
