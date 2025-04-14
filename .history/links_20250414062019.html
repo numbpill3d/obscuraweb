@@ -680,7 +680,7 @@
                                 <div class="link-card-tags">
                                     #retrocomputing #webdesign #editor
                                 </div>
-                                <a href="#" class="link-button">Visit Site</div>
+                                <a href="#" class="link-button">Visit Site</a>
                             </div>
                         </div>
                         
@@ -815,21 +815,19 @@
             const submissionMessage = document.getElementById('submission-message');
             
             if (linkSubmitForm && submissionMessage) {
-                linkSubmitForm.addEventListener('submit', function (event) {
+                linkSubmitForm.addEventListener('submit', function(event) {
                     event.preventDefault();
-
-                    const siteName = document.getElementById('site-name').value.trim();
-                    const siteUrl = document.getElementById('site-url').value.trim();
-                    const siteDescription = document.getElementById('site-description').value.trim();
-
-                    if (!siteName || !siteUrl || !siteDescription) {
-                        alert('Please fill out all required fields.');
-                        return;
-                    }
-
-                    // Proceed with form submission
+                    
+                    // Simulate form submission
                     linkSubmitForm.style.display = 'none';
                     submissionMessage.style.display = 'block';
+                    
+                    // For demonstration - would be replaced with actual API calls
+                    setTimeout(function() {
+                        linkSubmitForm.style.display = 'block';
+                        submissionMessage.style.display = 'none';
+                        linkSubmitForm.reset();
+                    }, 3000);
                 });
             }
             

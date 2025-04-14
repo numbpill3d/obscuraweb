@@ -680,7 +680,7 @@
                                 <div class="link-card-tags">
                                     #retrocomputing #webdesign #editor
                                 </div>
-                                <a href="#" class="link-button">Visit Site</div>
+                                <a href="#" class="link-button">Visit Site</a>
                             </div>
                         </div>
                         
@@ -815,21 +815,19 @@
             const submissionMessage = document.getElementById('submission-message');
             
             if (linkSubmitForm && submissionMessage) {
-                linkSubmitForm.addEventListener('submit', function (event) {
+                linkSubmitForm.addEventListener('submit', function(event) {
                     event.preventDefault();
-
-                    const siteName = document.getElementById('site-name').value.trim();
-                    const siteUrl = document.getElementById('site-url').value.trim();
-                    const siteDescription = document.getElementById('site-description').value.trim();
-
-                    if (!siteName || !siteUrl || !siteDescription) {
-                        alert('Please fill out all required fields.');
-                        return;
-                    }
-
-                    // Proceed with form submission
+                    
+                    // Simulate form submission
                     linkSubmitForm.style.display = 'none';
                     submissionMessage.style.display = 'block';
+                    
+                    // For demonstration - would be replaced with actual API calls
+                    setTimeout(function() {
+                        linkSubmitForm.style.display = 'block';
+                        submissionMessage.style.display = 'none';
+                        linkSubmitForm.reset();
+                    }, 3000);
                 });
             }
             
@@ -860,9 +858,8 @@
             }
             
             // Reset function
-            const resetButton = document.getElementById('reset-button');
-            if (resetButton) {
-                resetButton.addEventListener('click', function () {
+            if (resetButton && searchInput) {
+                resetButton.addEventListener('click', function() {
                     searchInput.value = '';
                     linkCards.forEach(card => {
                         card.style.display = 'flex';
@@ -901,22 +898,15 @@
             
             // Sort filter (simplified implementation)
             if (sortFilter) {
-                sortFilter.addEventListener('change', function () {
-                    const sortBy = sortFilter.value;
-                    const container = document.querySelector('.links-container');
-                    const cards = Array.from(container.children);
-
-                    cards.sort((a, b) => {
-                        if (sortBy === 'a-z') {
-                            return a.querySelector('.link-card-header').textContent.localeCompare(b.querySelector('.link-card-header').textContent);
-                        } else if (sortBy === 'z-a') {
-                            return b.querySelector('.link-card-header').textContent.localeCompare(a.querySelector('.link-card-header').textContent);
-                        }
-                        // Add logic for 'newest' and 'oldest' if timestamps are available
-                        return 0;
-                    });
-
-                    cards.forEach(card => container.appendChild(card));
+                sortFilter.addEventListener('change', function() {
+                    // This would be implemented with actual sorting based on data attributes
+                    // For demonstration purposes, we'll just add a note
+                    console.log('Sorting by: ' + sortFilter.value);
+                    
+                    // In a real implementation, you would:
+                    // 1. Get all cards
+                    // 2. Sort them based on the selected criterion
+                    // 3. Re-append them to their containers in the new order
                 });
             }
             
@@ -939,3 +929,4 @@
     </script>
 </body>
 </html>
+```
