@@ -897,6 +897,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         createWidget();
     });
 });
-
-console.log('Supabase client:', supabaseClient);
-console.log('Image data:', imageData);

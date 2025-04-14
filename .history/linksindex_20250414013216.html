@@ -875,61 +875,54 @@
             
             statNumbers.forEach(number => {
                 const finalValue = parseInt(number.textContent.replace(/,/g, ''));
-                if (isNaN(finalValue)) {
-                    console.error('Invalid stat number:', number.textContent);
-                    return;
-                }
                 number.textContent = '0';
-
+                
+                // Animate the number counting up
                 const duration = 2000; // ms
                 const startTime = performance.now();
-
+                
                 function animateNumber(timestamp) {
                     const elapsed = timestamp - startTime;
                     const progress = Math.min(elapsed / duration, 1);
+                    
                     const currentValue = Math.floor(progress * finalValue);
                     number.textContent = currentValue.toLocaleString();
-
+                    
                     if (progress < 1) {
                         requestAnimationFrame(animateNumber);
                     } else {
                         number.textContent = finalValue.toLocaleString();
                     }
                 }
-
+                
                 const observer = new IntersectionObserver(entries => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
+                            console.log('Stat number element:', number);
                             requestAnimationFrame(animateNumber);
                             observer.unobserve(entry.target);
                         }
                     });
                 });
-
+                
                 observer.observe(number);
             });
             
             // Dreamy floating effect for boxes on scroll
             const dreamyElements = document.querySelectorAll('.win98-box');
-            let ticking = false;
-
-            window.addEventListener('scroll', function () {
-                if (!ticking) {
-                    requestAnimationFrame(() => {
-                        dreamyElements.forEach(element => {
-                            const rect = element.getBoundingClientRect();
-                            const isInView = rect.top < window.innerHeight && rect.bottom > 0;
-
-                            if (isInView) {
-                                const scrollPos = window.scrollY;
-                                const offset = (scrollPos - rect.top) * 0.05;
-                                element.style.transform = `translateY(${Math.sin(offset) * 5}px)`;
-                            }
-                        });
-                        ticking = false;
-                    });
-                    ticking = true;
-                }
+            
+            window.addEventListener('scroll', function() {
+                dreamyElements.forEach(element => {
+                    const rect = element.getBoundingClientRect();
+                    const isInView = rect.top < window.innerHeight && rect.bottom > 0;
+                    
+                    if (isInView) {
+                        console.log('Dreamy element in view:', element);
+                        const scrollPos = window.scrollY;
+                        const offset = (scrollPos - rect.top) * 0.05;
+                        element.style.transform = `translateY(${Math.sin(offset) * 5}px)`;
+                    }
+                });
             });
         });
     </script>

@@ -1,4 +1,4 @@
-(async function () {
+(async function() {
     // Initialize Supabase client
     let supabaseClient = null;
     let images = [
@@ -14,7 +14,7 @@
             console.log('Initializing Supabase client for widget...');
             const SUPABASE_URL = 'https://ibpnwppmlvlizuuxland.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicG53d3BtbHZsaXp1dXhsYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNTcwMDAsImV4cCI6MjA1ODgzMzAwMH0.ZKlskNFBzS-tiIblQZJtSbDdva_X-sR2FE0aZaD56_A';
-
+            
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
             // Fetch images from Supabase
@@ -33,16 +33,23 @@
                     link: img.site_url || '#',
                     tags: img.tags || 'No tags'
                 }));
-                console.log('Fetched images for widget:', images);
             } else {
                 console.warn('Fetched images are invalid. Using placeholder images.');
             }
+            console.log('Supabase client:', supabaseClient);
+            console.log('Fetched images:', fetchedImages);
         } else {
             console.warn('Supabase library not found. Widget will display placeholder images only.');
         }
     } catch (error) {
         console.error('Error initializing Supabase for widget:', error);
-        win98Alert('An unexpected error occurred. Displaying placeholders.');
+    }
+
+    if (images.length === 0) {
+        console.warn('No images available. Displaying placeholders.');
+        images = [
+            { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=No+Image', link: '#', tags: 'placeholder' }
+        ];
     }
 
     function createWidgetStrip(container) {
@@ -54,7 +61,7 @@
         win98Box.style.boxShadow = '2px 2px 0px rgba(0,0,0,0.5)';
         win98Box.style.padding = '2px';
         win98Box.style.margin = '10px 0';
-
+        
         // Create title bar
         const titleBar = document.createElement('div');
         titleBar.style.background = 'linear-gradient(90deg, #000080, #1084d0)';
@@ -65,12 +72,12 @@
         titleBar.style.justifyContent = 'space-between';
         titleBar.style.alignItems = 'center';
         titleBar.innerHTML = '<span>THE UNDERWEB Widget</span><span>X</span>';
-
+        
         // Create content area
         const contentArea = document.createElement('div');
         contentArea.style.padding = '10px';
         contentArea.style.backgroundColor = '#c0c0c0';
-
+        
         // Create widget strip
         const widgetStrip = document.createElement('div');
         widgetStrip.id = 'widget-strip';
@@ -99,14 +106,14 @@
             });
             widgetStrip.appendChild(widgetImage);
         });
-
+        
         // Add credit text
         const creditText = document.createElement('div');
         creditText.style.fontSize = '10px';
         creditText.style.textAlign = 'center';
         creditText.style.marginTop = '5px';
         creditText.innerHTML = '<a href="/" target="_blank">THE UNDERWEB</a> - Explore the hidden web';
-
+        
         // Assemble the widget
         contentArea.appendChild(widgetStrip);
         contentArea.appendChild(creditText);
@@ -116,11 +123,11 @@
     }
 
     const widgetContainers = document.querySelectorAll('#underweb-widget');
+    console.log('Widget containers:', widgetContainers);
     if (widgetContainers.length === 0) {
         console.warn('No widget containers found. Ensure #underweb-widget exists in the DOM.');
         return;
     }
-
     widgetContainers.forEach(container => {
         createWidgetStrip(container);
     });
