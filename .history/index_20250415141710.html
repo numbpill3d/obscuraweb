@@ -187,8 +187,6 @@
             border: 1px solid var(--border-color);
             box-shadow: var(--box-shadow);
             margin: 1rem 0;
-            -webkit-backdrop-filter: blur(5px);
-
             backdrop-filter: blur(5px);
             max-width: 100%;
             position: relative;
@@ -685,19 +683,11 @@
                 </ul>
                 
                 <h3>Submit Your Image</h3>
-                     <label for="image-upload">Upload Image:</label>
-
                 <form id="submit-form">
                     <input type="file" id="image-upload" accept="image/*">
-                     <label for="image-url">Image URL (optional):</label>
-
                     <input type="url" id="image-url" placeholder="Image URL (optional)">
-                     <label for="site-link">Your Site Link:</label>
-
                     <input type="url" id="site-link" placeholder="Your Site Link" required>
                     <p style="font-size: 0.8em; margin-top: 5px;">(Please upload an image or enter an image URL, at least one is required)</p>
-                     <label for="tags">Tags (comma-separated):</label>
-
                     <input type="text" id="tags" placeholder="Tags (comma-separated)">
                     <button type="submit">Submit</button>
                 </form>
