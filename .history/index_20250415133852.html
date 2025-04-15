@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>THE UNDERWEB</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <meta name="keywords" content="hidden web, retro web, digital art, obscure websites, internet treasures">
-    <meta name="author" content="THE UNDERWEB Team">
     <style>
         /* Base Styles and Reset */
         * {
@@ -620,11 +618,6 @@
     </style>
 </head>
 <body>
-    <noscript>
-        <p style="text-align: center; color: var(--primary-text);">
-            JavaScript is required to view this page. Please enable JavaScript in your browser settings.
-        </p>
-    </noscript>
     <!-- Stars background effect -->
     <div class="stars" id="stars"></div>
 
@@ -633,6 +626,8 @@
             ████████╗██╗  ██╗███████╗    ██╗   ██╗███╗   ██╗██████╗ ███████╗██████╗ ██╗    ██╗███████╗██████╗ 
             ╚══██╔══╝██║  ██║██╔════╝    ██║   ██║████╗  ██║██╔══██╗██╔════╝██╔══██╗██║    ██║██╔════╝██╔══██╗
                ██║   ███████║█████╗      ██║   ██║██╔██╗ ██║██║  ██║█████╗  ██████╔╝██║ █╗ ██║█████╗  ██████╔╝
+               ██║   ██╔══██║██╔══╝      ██║   ██║██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗██║███╗██║██╔══╝  ██╔══██╗
+               ██║   ██║  ██║███████╗    ╚██████╔╝██║ ╚████║██████╔╝███████╗██║  ██║╚███╔███╔╝███████╗██████╔╝
                ╚═╝   ╚═╝  ╚═╝╚══════╝     ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚══════╝╚═════╝ 
         </div>
         <div class="win98-box" style="max-width: 600px; margin: 0 auto;">
@@ -922,26 +917,6 @@
                         element.style.transform = `translateY(${Math.sin(offset) * 5}px)`;
                     }
                 });
-            });
-            
-            let ticking = false;
-            window.addEventListener('scroll', function () {
-                if (!ticking) {
-                    requestAnimationFrame(() => {
-                        dreamyElements.forEach(element => {
-                            const rect = element.getBoundingClientRect();
-                            const isInView = rect.top < window.innerHeight && rect.bottom > 0;
-
-                            if (isInView) {
-                                const scrollPos = window.scrollY;
-                                const offset = (scrollPos - rect.top) * 0.05;
-                                element.style.transform = `translateY(${Math.sin(offset) * 5}px)`;
-                            }
-                        });
-                        ticking = false;
-                    });
-                    ticking = true;
-                }
             });
         });
     </script>
