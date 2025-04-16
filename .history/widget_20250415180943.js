@@ -1,6 +1,3 @@
-// @ts-nocheck
-/* This is a pure JavaScript file that should not be type-checked */
-
 (async function () {
     // Helper function for alerts
     function win98Alert(message) {

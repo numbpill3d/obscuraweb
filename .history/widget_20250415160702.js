@@ -1,9 +1,13 @@
-// @ts-nocheck
-/* This is a pure JavaScript file that should not be type-checked */
+// Add TypeScript declarations for the window.supabase property
+declare global {
+    interface Window {
+        supabase: any;
+    }
+}
 
 (async function () {
     // Helper function for alerts
-    function win98Alert(message) {
+    function win98Alert(message: string): void {
         console.warn("[UNDERWEB WIDGET] " + message);
         // Since this is a widget on another site, we won't show actual alerts to avoid disrupting the host site
     }
@@ -54,7 +58,7 @@
         win98Alert('An unexpected error occurred. Displaying placeholders.');
     }
 
-    function createWidgetStrip(container) {
+    function createWidgetStrip(container: HTMLElement): void {
         // Create Windows 98 style container
         const win98Box = document.createElement('div');
         win98Box.style.border = '2px solid';
@@ -133,7 +137,4 @@
     widgetContainers.forEach(container => {
         createWidgetStrip(container);
     });
-    
-    // Notify that widget has loaded successfully
-    console.log("[UNDERWEB WIDGET] Successfully loaded widget");
 })();

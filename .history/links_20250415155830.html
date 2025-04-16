@@ -209,7 +209,6 @@
             border: 1px solid var(--border-color);
             box-shadow: var(--box-shadow);
             margin: 1rem 0;
-            -webkit-backdrop-filter: blur(5px);
             backdrop-filter: blur(5px);
             max-width: 100%;
             position: relative;
@@ -562,8 +561,7 @@
                         <button id="search-button" aria-label="Search links">Search</button>
                         <button id="reset-button" aria-label="Reset search results">Reset</button>
                     </div>
-                    <label for="category-filter">Filter by Category:</label>
-                    <select class="filter-dropdown" id="category-filter" aria-label="Filter by category">
+                    <select class="filter-dropdown" id="category-filter">
                         <option value="all">All Categories</option>
                         <option value="art">Digital Art</option>
                         <option value="forums">Forums</option>
@@ -571,8 +569,7 @@
                         <option value="archives">Archives</option>
                         <option value="curiosities">Digital Curiosities</option>
                     </select>
-                    <label for="sort-filter">Sort By:</label>
-                    <select class="filter-dropdown" id="sort-filter" aria-label="Sort results">
+                    <select class="filter-dropdown" id="sort-filter">
                         <option value="newest">Newest First</option>
                         <option value="oldest">Oldest First</option>
                         <option value="a-z">A-Z</option>
@@ -783,8 +780,7 @@
                     <input type="url" id="site-url" placeholder="Site URL (include https://)" required>
                     <input type="text" id="site-description" placeholder="Brief Description" required>
                     <input type="text" id="site-tags" placeholder="Tags (comma-separated)">
-                    <label for="site-category">Category:</label>
-                    <select id="site-category" aria-label="Site category">
+                    <select id="site-category">
                         <option value="">Select Category</option>
                         <option value="art">Digital Art</option>
                         <option value="forums">Forums</option>
