@@ -7,17 +7,6 @@
  */
 
 (async function () {
-    // Extend Window interface
-    /** @typedef {{
-     *   supabase?: { createClient(url: string, key: string): any },
-     *   UNDERWEB?: {
-     *     common?: {
-     *       SUPABASE_CONFIG?: { URL: string, ANON_KEY: string }
-     *     }
-     *   }
-     * }} SupabaseWindow */
-    /** @type {Window & typeof globalThis & SupabaseWindow} */
-    const win = window;
     // Helper function for alerts
     /**
      * @param {string} message - The message to display
@@ -90,17 +79,28 @@
     const createWidgetStrip = (container) => {
         // Create Windows 98 style container
         const win98Box = document.createElement('div');
-        win98Box.className = 'win98-box';
+        win98Box.style.border = '2px solid';
+        win98Box.style.borderColor = '#ffffff #808080 #808080 #ffffff';
+        win98Box.style.backgroundColor = '#c0c0c0';
+        win98Box.style.boxShadow = '2px 2px 0px rgba(0,0,0,0.5)';
+        win98Box.style.padding = '2px';
         win98Box.style.margin = '10px 0';
 
         // Create title bar
         const titleBar = document.createElement('div');
-        titleBar.className = 'win98-box-title';
+        titleBar.style.background = 'linear-gradient(90deg, #000080, #1084d0)';
+        titleBar.style.color = 'white';
+        titleBar.style.fontWeight = 'bold';
+        titleBar.style.padding = '3px 5px';
+        titleBar.style.display = 'flex';
+        titleBar.style.justifyContent = 'space-between';
+        titleBar.style.alignItems = 'center';
         titleBar.innerHTML = '<span>THE UNDERWEB Widget</span><span>X</span>';
 
         // Create content area
         const contentArea = document.createElement('div');
-        contentArea.className = 'win98-box-content';
+        contentArea.style.padding = '10px';
+        contentArea.style.backgroundColor = '#c0c0c0';
 
         // Create widget strip
         const widgetStrip = document.createElement('div');

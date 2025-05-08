@@ -31,7 +31,7 @@
 let supabaseClient = null;
 
 // Extend Window interface
-/** @typedef {{ supabase?: { createClient(url: string, key: string): any }, UNDERWEB?: any }} SupabaseWindow */
+/** @typedef {{ supabase?: { createClient(url: string, key: string): any }}} SupabaseWindow */
 /** @type {Window & typeof globalThis & SupabaseWindow} */
 const win = window;
 
@@ -50,43 +50,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize Supabase client
     const initSupabase = async () => {
         try {
-            if (win.UNDERWEB && win.UNDERWEB.common && win.UNDERWEB.common.initSupabase) {
-                // Use the common.js implementation
-                supabaseClient = await win.UNDERWEB.common.initSupabase();
-                if (supabaseClient) {
-                    // Initialize and verify storage system
-                    await initializeStorage();
-                    console.log('Supabase initialized successfully');
-                    return true;
-                } else {
-                    throw new Error('Failed to initialize Supabase client');
-                }
-            } else {
-                // Fallback if common.js is not loaded
-                if (!win.supabase) {
-                    throw new Error('Supabase library not found');
-                }
-
-                console.log('Initializing Supabase client...');
-
-                const SUPABASE_URL = 'https://ibpnwppmlvlizuuxland.supabase.co';
-                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicG53d3BtbHZsaXp1dXhsYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNTcwMDAsImV4cCI6MjA1ODgzMzAwMH0.ZKlskNFBzS-tiIblQZJtSbDdva_X-sR2FE0aZaD56_A';
-
-                // Create Supabase client
-                supabaseClient = win.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-                // Initialize and verify storage system
-                await initializeStorage();
-
-                // Verify the connection works
-                const isConnected = await verifySupabaseConnection();
-                if (!isConnected) {
-                    throw new Error('Failed to verify Supabase connection');
-                }
-
-                console.log('Supabase initialized successfully');
-                return true;
+            if (!win.supabase) {
+                throw new Error('Supabase library not found');
             }
+
+            console.log('Initializing Supabase client...');
+
+            const SUPABASE_URL = 'https://ibpnwppmlvlizuuxland.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicG53d3BtbHZsaXp1dXhsYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNTcwMDAsImV4cCI6MjA1ODgzMzAwMH0.ZKlskNFBzS-tiIblQZJtSbDdva_X-sR2FE0aZaD56_A';
+
+            // Create Supabase client
+            supabaseClient = win.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            // Initialize and verify storage system
+            await initializeStorage();
+
+            // Verify the connection works
+            const isConnected = await verifySupabaseConnection();
+            if (!isConnected) {
+                throw new Error('Failed to verify Supabase connection');
+            }
+
+            console.log('Supabase initialized successfully');
+            return true;
         } catch (error) {
             console.error('Error initializing Supabase client:', error);
             displayPlaceholderImages();
@@ -200,18 +186,73 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Use the win98Alert function from common.js
+    // Windows 98 style alert function
     /**
      * Display a Windows 98 style alert
      * @param {string} message - The message to display
      */
     function win98Alert(message) {
-        if (win.UNDERWEB && win.UNDERWEB.common && win.UNDERWEB.common.win98Alert) {
-            win.UNDERWEB.common.win98Alert(message);
-        } else {
-            // Fallback if common.js is not loaded
-            alert(message);
-        }
+        // Create alert container
+        const alertContainer = document.createElement('div');
+        alertContainer.style.position = 'fixed';
+        alertContainer.style.top = '50%';
+        alertContainer.style.left = '50%';
+        alertContainer.style.transform = 'translate(-50%, -50%)';
+        alertContainer.style.zIndex = '9999';
+
+        // Create Windows 98 style box
+        const win98Box = document.createElement('div');
+        win98Box.style.border = '2px solid';
+        win98Box.style.borderColor = '#ffffff #808080 #808080 #ffffff';
+        win98Box.style.backgroundColor = '#c0c0c0';
+        win98Box.style.boxShadow = '2px 2px 0px rgba(0,0,0,0.5)';
+        win98Box.style.padding = '2px';
+        win98Box.style.width = '300px';
+
+        // Create title bar
+        const titleBar = document.createElement('div');
+        titleBar.style.background = 'linear-gradient(90deg, #000080, #1084d0)';
+        titleBar.style.color = 'white';
+        titleBar.style.fontWeight = 'bold';
+        titleBar.style.padding = '3px 5px';
+        titleBar.style.display = 'flex';
+        titleBar.style.justifyContent = 'space-between';
+        titleBar.style.alignItems = 'center';
+        titleBar.innerHTML = '<span>THE UNDERWEB</span><span>X</span>';
+
+        // Create content area
+        const contentArea = document.createElement('div');
+        contentArea.style.padding = '15px';
+        contentArea.style.backgroundColor = '#c0c0c0';
+        contentArea.style.textAlign = 'center';
+
+        // Add message
+        const messageText = document.createElement('p');
+        messageText.textContent = message;
+        messageText.style.margin = '0 0 15px 0';
+
+        // Add OK button
+        const okButton = document.createElement('button');
+        okButton.textContent = 'OK';
+        okButton.style.padding = '5px 20px';
+        okButton.style.border = '2px solid';
+        okButton.style.borderColor = '#ffffff #808080 #808080 #ffffff';
+        okButton.style.backgroundColor = '#c0c0c0';
+        okButton.style.cursor = 'pointer';
+
+        okButton.addEventListener('click', () => {
+            document.body.removeChild(alertContainer);
+        });
+
+        // Assemble the alert
+        contentArea.appendChild(messageText);
+        contentArea.appendChild(okButton);
+        win98Box.appendChild(titleBar);
+        win98Box.appendChild(contentArea);
+        alertContainer.appendChild(win98Box);
+
+        // Add to body
+        document.body.appendChild(alertContainer);
     }
 
     // Function to create image items for the feed

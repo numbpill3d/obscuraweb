@@ -125,16 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let editingPostId = null;
 
     /**
-     * @typedef {{
-     *   supabase?: { createClient(url: string, key: string): any },
-     *   UNDERWEB?: {
-     *     common?: {
-     *       win98Alert: (message: string) => void,
-     *       win98Confirm: (message: string, onConfirm?: Function, onCancel?: Function) => void,
-     *       showError: (message: string) => void
-     *     }
-     *   }
-     * }} SupabaseWindow
+     * @typedef {{ supabase?: { createClient(url: string, key: string): any }}} SupabaseWindow
      */
 
     /**
@@ -211,11 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {string} message - The error message to display
      */
     const showError = (message) => {
-        if (win.UNDERWEB && win.UNDERWEB.common && win.UNDERWEB.common.showError) {
-            win.UNDERWEB.common.showError(message);
-        } else {
-            win98Alert('Error: ' + message);
-        }
+        win98Alert('Error: ' + message);
     }
 
     // Authentication functions

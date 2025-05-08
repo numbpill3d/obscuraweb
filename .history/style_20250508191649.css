@@ -3,6 +3,8 @@
 /* ===== GLOBAL STYLES ===== */
 body {
     font-family: "MS Sans Serif", "Pixelated MS Sans Serif", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     margin: 0;
     padding: 0;
     background-color: #008080; /* Classic Windows 98 teal */
@@ -33,6 +35,18 @@ body {
 .win98-box-content {
     padding: 10px;
     background-color: #c0c0c0;
+}
+
+/* Responsive container */
+.responsive-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Banner image */
+.banner-image {
+    width: 100%;
+    height: auto;
 }
 
 /* Links */
@@ -170,6 +184,7 @@ main {
     padding: 5px;
     text-align: center;
     opacity: 0;
+    -webkit-transition: opacity 0.3s ease;
     transition: opacity 0.3s ease;
 }
 
@@ -309,4 +324,42 @@ marquee {
     border-left: 2px solid #808080;
     border-right: 2px solid #ffffff;
     border-bottom: 2px solid #ffffff;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+    main {
+        flex-direction: column;
+    }
+
+    #sidebar {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .column {
+        min-width: 100%;
+        margin: 0 0 20px 0;
+    }
+
+    #image-feed {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+}
+
+/* Accessibility improvements */
+:focus {
+    outline: 2px solid #0000FF;
+    outline-offset: 2px;
+}
+
+/* Ensure all buttons have appropriate contrast */
+button, input[type="submit"] {
+    color: #000000;
+    background-color: #c0c0c0;
+}
+
+/* High contrast text for better readability */
+.win98-box-content {
+    color: #000000;
 }

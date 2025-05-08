@@ -211,11 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {string} message - The error message to display
      */
     const showError = (message) => {
-        if (win.UNDERWEB && win.UNDERWEB.common && win.UNDERWEB.common.showError) {
-            win.UNDERWEB.common.showError(message);
-        } else {
-            win98Alert('Error: ' + message);
-        }
+        win98Alert('Error: ' + message);
     }
 
     // Authentication functions

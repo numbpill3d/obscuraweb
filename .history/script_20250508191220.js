@@ -50,43 +50,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize Supabase client
     const initSupabase = async () => {
         try {
-            if (win.UNDERWEB && win.UNDERWEB.common && win.UNDERWEB.common.initSupabase) {
-                // Use the common.js implementation
-                supabaseClient = await win.UNDERWEB.common.initSupabase();
-                if (supabaseClient) {
-                    // Initialize and verify storage system
-                    await initializeStorage();
-                    console.log('Supabase initialized successfully');
-                    return true;
-                } else {
-                    throw new Error('Failed to initialize Supabase client');
-                }
-            } else {
-                // Fallback if common.js is not loaded
-                if (!win.supabase) {
-                    throw new Error('Supabase library not found');
-                }
-
-                console.log('Initializing Supabase client...');
-
-                const SUPABASE_URL = 'https://ibpnwppmlvlizuuxland.supabase.co';
-                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicG53d3BtbHZsaXp1dXhsYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNTcwMDAsImV4cCI6MjA1ODgzMzAwMH0.ZKlskNFBzS-tiIblQZJtSbDdva_X-sR2FE0aZaD56_A';
-
-                // Create Supabase client
-                supabaseClient = win.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-                // Initialize and verify storage system
-                await initializeStorage();
-
-                // Verify the connection works
-                const isConnected = await verifySupabaseConnection();
-                if (!isConnected) {
-                    throw new Error('Failed to verify Supabase connection');
-                }
-
-                console.log('Supabase initialized successfully');
-                return true;
+            if (!win.supabase) {
+                throw new Error('Supabase library not found');
             }
+
+            console.log('Initializing Supabase client...');
+
+            const SUPABASE_URL = 'https://ibpnwppmlvlizuuxland.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicG53d3BtbHZsaXp1dXhsYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNTcwMDAsImV4cCI6MjA1ODgzMzAwMH0.ZKlskNFBzS-tiIblQZJtSbDdva_X-sR2FE0aZaD56_A';
+
+            // Create Supabase client
+            supabaseClient = win.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            // Initialize and verify storage system
+            await initializeStorage();
+
+            // Verify the connection works
+            const isConnected = await verifySupabaseConnection();
+            if (!isConnected) {
+                throw new Error('Failed to verify Supabase connection');
+            }
+
+            console.log('Supabase initialized successfully');
+            return true;
         } catch (error) {
             console.error('Error initializing Supabase client:', error);
             displayPlaceholderImages();
