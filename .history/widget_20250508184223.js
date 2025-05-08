@@ -146,9 +146,7 @@
     }
 
     widgetContainers.forEach(container => {
-        if (container instanceof HTMLElement) {
-            createWidgetStrip(container);
-        }
+        createWidgetStrip(container);
     });
 
     // Notify that widget has loaded successfully

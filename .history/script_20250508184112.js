@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Initialize and verify storage system
-    const initializeStorage = async () => {
+    async function initializeStorage() {
         try {
             // Check if storage is available
             const { data: buckets, error: bucketsError } = await supabaseClient.storage.listBuckets();

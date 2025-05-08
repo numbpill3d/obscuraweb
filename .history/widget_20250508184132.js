@@ -8,19 +8,13 @@
 
 (async function () {
     // Helper function for alerts
-    /**
-     * @param {string} message - The message to display
-     */
-    const win98Alert = (message) => {
+    function win98Alert(message) {
         console.warn("[UNDERWEB WIDGET] " + message);
         // Since this is a widget on another site, we won't show actual alerts to avoid disrupting the host site
-    };
+    }
 
     // Initialize Supabase client
-    /** @type {any} */
     let supabaseClient = null;
-
-    /** @type {WidgetImage[]} */
     let images = [
         { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W1', link: '#', tags: 'placeholder' },
         { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W2', link: '#', tags: 'placeholder' },
@@ -30,12 +24,12 @@
     ];
 
     try {
-        if (win.supabase) {
+        if (window.supabase) {
             console.log('Initializing Supabase client for widget...');
             const SUPABASE_URL = 'https://ibpnwppmlvlizuuxland.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicG53d3BtbHZsaXp1dXhsYW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNTcwMDAsImV4cCI6MjA1ODgzMzAwMH0.ZKlskNFBzS-tiIblQZJtSbDdva_X-sR2FE0aZaD56_A';
 
-            supabaseClient = win.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
             // Fetch images from Supabase
             const { data: fetchedImages, error } = await supabaseClient
@@ -65,11 +59,7 @@
         win98Alert('An unexpected error occurred. Displaying placeholders.');
     }
 
-    /**
-     * Create a widget strip and add it to the container
-     * @param {HTMLElement} container - The container element to add the widget to
-     */
-    const createWidgetStrip = (container) => {
+    function createWidgetStrip(container) {
         // Create Windows 98 style container
         const win98Box = document.createElement('div');
         win98Box.style.border = '2px solid';
@@ -146,9 +136,7 @@
     }
 
     widgetContainers.forEach(container => {
-        if (container instanceof HTMLElement) {
-            createWidgetStrip(container);
-        }
+        createWidgetStrip(container);
     });
 
     // Notify that widget has loaded successfully

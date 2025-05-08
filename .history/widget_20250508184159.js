@@ -6,6 +6,15 @@
  * @property {string} tags - Image tags
  */
 
+/**
+ * @typedef {{ supabase?: { createClient(url: string, key: string): any }}} SupabaseWindow
+ */
+
+/**
+ * @type {Window & typeof globalThis & SupabaseWindow}
+ */
+const win = window;
+
 (async function () {
     // Helper function for alerts
     /**
@@ -65,11 +74,7 @@
         win98Alert('An unexpected error occurred. Displaying placeholders.');
     }
 
-    /**
-     * Create a widget strip and add it to the container
-     * @param {HTMLElement} container - The container element to add the widget to
-     */
-    const createWidgetStrip = (container) => {
+    function createWidgetStrip(container) {
         // Create Windows 98 style container
         const win98Box = document.createElement('div');
         win98Box.style.border = '2px solid';
@@ -146,9 +151,7 @@
     }
 
     widgetContainers.forEach(container => {
-        if (container instanceof HTMLElement) {
-            createWidgetStrip(container);
-        }
+        createWidgetStrip(container);
     });
 
     // Notify that widget has loaded successfully

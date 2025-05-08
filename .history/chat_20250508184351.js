@@ -38,98 +38,6 @@
  * @property {Object} [users] - User who created the post
  */
 
-/**
- * Show an error message using the win98Alert function
- * @param {string} message - The error message to display
- */
-const showError = (message) => {
-    win98Alert('Error: ' + message);
-};
-
-/**
- * Windows 98 style alert function
- * @param {string} message - The message to display
- */
-const win98Alert = (message) => {
-    // Create alert container
-    const alertContainer = document.createElement('div');
-    alertContainer.style.position = 'fixed';
-    alertContainer.style.top = '50%';
-    alertContainer.style.left = '50%';
-    alertContainer.style.transform = 'translate(-50%, -50%)';
-    alertContainer.style.zIndex = '9999';
-
-    // Create Windows 98 style box
-    const win98Box = document.createElement('div');
-    win98Box.style.border = '2px solid';
-    win98Box.style.borderColor = '#ffffff #808080 #808080 #ffffff';
-    win98Box.style.backgroundColor = '#c0c0c0';
-    win98Box.style.boxShadow = '2px 2px 0px rgba(0,0,0,0.5)';
-    win98Box.style.padding = '2px';
-    win98Box.style.width = '300px';
-
-    // Create title bar
-    const titleBar = document.createElement('div');
-    titleBar.style.background = 'linear-gradient(90deg, #000080, #1084d0)';
-    titleBar.style.color = 'white';
-    titleBar.style.fontWeight = 'bold';
-    titleBar.style.padding = '3px 5px';
-    titleBar.style.display = 'flex';
-    titleBar.style.justifyContent = 'space-between';
-    titleBar.style.alignItems = 'center';
-    titleBar.innerHTML = '<span>THE UNDERWEB</span><span>X</span>';
-
-    // Create content area
-    const contentArea = document.createElement('div');
-    contentArea.style.padding = '15px';
-    contentArea.style.backgroundColor = '#c0c0c0';
-    contentArea.style.textAlign = 'center';
-
-    // Add message
-    const messageText = document.createElement('p');
-    messageText.textContent = message;
-    messageText.style.margin = '0 0 15px 0';
-
-    // Add OK button
-    const okButton = document.createElement('button');
-    okButton.textContent = 'OK';
-    okButton.style.padding = '5px 20px';
-    okButton.style.border = '2px solid';
-    okButton.style.borderColor = '#ffffff #808080 #808080 #ffffff';
-    okButton.style.backgroundColor = '#c0c0c0';
-    okButton.style.cursor = 'pointer';
-
-    okButton.addEventListener('click', () => {
-        document.body.removeChild(alertContainer);
-    });
-
-    // Assemble the alert
-    contentArea.appendChild(messageText);
-    contentArea.appendChild(okButton);
-    win98Box.appendChild(titleBar);
-    win98Box.appendChild(contentArea);
-    alertContainer.appendChild(win98Box);
-
-    // Add to body
-    document.body.appendChild(alertContainer);
-};
-
-/**
- * Set a demo user for testing when Supabase is not available
- */
-const setDemoUser = () => {
-    /** @type {User} */
-    currentUser = {
-        id: 'demo-user-id',
-        username: 'DemoUser',
-        email: 'demo@example.com',
-        display_name: 'Demo User',
-        is_admin: true,
-        is_moderator: true
-    };
-    updateAuthUI();
-};
-
 document.addEventListener('DOMContentLoaded', () => {
     // DOM elements - Main UI
     /** @type {HTMLElement | null} */
@@ -227,11 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setDemoUser();
     }
 
-    /**
-     * Set a demo user for testing when Supabase is not available
-     */
-    const setDemoUser = () => {
-        /** @type {User} */
+    // Set a demo user for testing when Supabase is not available
+    function setDemoUser() {
         currentUser = {
             id: 'demo-user-id',
             username: 'DemoUser',
@@ -243,11 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAuthUI();
     }
 
-    /**
-     * Windows 98 style alert function
-     * @param {string} message - The message to display
-     */
-    const win98Alert = (message) => {
+    // Windows 98 style alert function
+    function win98Alert(message) {
         // Create alert container
         const alertContainer = document.createElement('div');
         alertContainer.style.position = 'fixed';
@@ -311,13 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(alertContainer);
     }
 
-    /**
-     * Windows 98 style confirm function
-     * @param {string} message - The message to display
-     * @param {Function} [onConfirm] - Callback function when user confirms
-     * @param {Function} [onCancel] - Callback function when user cancels
-     */
-    const win98Confirm = (message, onConfirm, onCancel) => {
+    // Windows 98 style confirm function
+    function win98Confirm(message, onConfirm, onCancel) {
         // Create confirm container
         const confirmContainer = document.createElement('div');
         confirmContainer.style.position = 'fixed';
@@ -404,11 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(confirmContainer);
     }
 
-    /**
-     * Show an error message using the win98Alert function
-     * @param {string} message - The error message to display
-     */
-    const showError = (message) => {
+    function showError(message) {
         win98Alert('Error: ' + message);
     }
 

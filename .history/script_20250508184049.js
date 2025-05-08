@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Initialize and verify storage system
-    const initializeStorage = async () => {
+    async function initializeStorage() {
         try {
             // Check if storage is available
             const { data: buckets, error: bucketsError } = await supabaseClient.storage.listBuckets();
@@ -164,10 +164,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Function to verify Supabase connection
-    const verifySupabaseConnection = async () => {
-        if (!supabaseClient) {
-            return false;
-        }
+    async function verifySupabaseConnection() {
+        if (!supabaseClient) return false;
 
         try {
             // Try a simple query to verify the connection
@@ -890,25 +888,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         copyEmbedButton.addEventListener('click', () => {
             if (embedCodeTextarea instanceof HTMLTextAreaElement) {
                 embedCodeTextarea.select();
-
-                // Use modern clipboard API if available, fallback to execCommand
-                if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(embedCodeTextarea.value)
-                        .then(() => {
-                            win98Alert('Embed code copied to clipboard!');
-                        })
-                        .catch(err => {
-                            console.error('Could not copy text: ', err);
-                            // Fallback
-                            document.execCommand('copy');
-                            win98Alert('Embed code copied to clipboard!');
-                        });
-                } else {
-                    // Fallback for older browsers
-                    document.execCommand('copy');
-                    win98Alert('Embed code copied to clipboard!');
-                }
             }
+            document.execCommand('copy');
+            win98Alert('Embed code copied to clipboard!'); // Windows 98 style alert
         });
     }
 
