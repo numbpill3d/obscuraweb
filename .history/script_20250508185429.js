@@ -888,9 +888,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } finally {
                     // Hide loading spinner
                     const loadingSpinner = document.getElementById('loading-spinner');
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'none';
-                    }
+                    if (loadingSpinner) loadingSpinner.style.display = 'none';
                 }
             } else if (imageUrl) {
                 submittedImageUrl = imageUrl;
@@ -913,9 +911,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 try {
                     // Show loading indicator
                     const loadingSpinner = document.getElementById('loading-spinner');
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'block';
-                    }
+                    if (loadingSpinner) loadingSpinner.style.display = 'block';
 
                     // Validate image URL
                     await validateImage(imageUrl);

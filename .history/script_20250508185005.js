@@ -309,31 +309,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            // Validate URLs before saving
-            /**
-             * Validates if a string is a valid URL
-             * @param {string} urlString - The URL string to validate
-             * @returns {boolean} - True if valid URL, false otherwise
-             */
-            const isValidUrl = (urlString) => {
-                try {
-                    new URL(urlString);
-                    return true;
-                } catch (e) {
-                    return false;
-                }
-            };
-
-            if (!isValidUrl(imageData.src)) {
-                console.error('Invalid image URL:', imageData.src);
-                throw new Error('Invalid image URL format');
-            }
-
-            if (!isValidUrl(imageData.link)) {
-                console.error('Invalid site URL:', imageData.link);
-                throw new Error('Invalid site URL format');
-            }
-
             // Convert the image data to match database schema
             const dbImageData = {
                 image_url: imageData.src,
@@ -343,33 +318,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             console.log('Saving image to Supabase:', dbImageData);
 
-            // Insert into Supabase with retry logic
-            let attempts = 0;
-            const maxAttempts = 3;
-            let data, error;
-
-            while (attempts < maxAttempts) {
-                attempts++;
-                console.log(`Database save attempt ${attempts} of ${maxAttempts}`);
-
-                const result = await supabaseClient
-                    .from('images')
-                    .insert([dbImageData]);
-
-                data = result.data;
-                error = result.error;
-
-                if (!error) break;
-
-                if (attempts < maxAttempts) {
-                    console.log(`Save failed, retrying in 1 second...`);
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                }
-            }
+            // Insert into Supabase
+            const { data, error } = await supabaseClient
+                .from('images')
+                .insert([dbImageData]);
 
             if (error) {
-                console.error('Error saving to Supabase after retries:', error);
-                if (!error.message?.includes('API key') && !error.message?.includes('JWT')) {
+                console.error('Error saving to Supabase:', error);
+                if (!error.message.includes('API key') && !error.message.includes('JWT')) {
                     win98Alert('Warning: Image saved locally but failed to sync with server');
                 }
                 return true; // Still return true since we have local storage backup
@@ -381,7 +337,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Exception saving to Supabase:', error);
             const errorMsg = error instanceof Error ? error.message : 'Unknown error';
             if (!errorMsg.includes('API key') && !errorMsg.includes('JWT')) {
-                win98Alert('Warning: Image saved locally but failed to sync with server. Error: ' + errorMsg);
+                win98Alert('Warning: Image saved locally but failed to sync with server');
             }
             return true; // Still return true since we have local storage backup
         }
@@ -566,16 +522,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('Current images in storage:', images.length);
 
             // Normalize image URLs for comparison
-            /**
-             * Normalizes a URL by removing the protocol
-             * @param {string|undefined} url - The URL to normalize
-             * @returns {string} - The normalized URL
-             */
-            const normalizeUrl = (url) => url?.replace(/^https?:\/\//, '') || '';
+            const normalizeUrl = (url) => url?.replace(/^https?:\/\//, '');
             const newImageUrl = normalizeUrl(image.src || image.image_url);
 
             // Check for duplicates based on normalized URL
-            const isDuplicate = images.some((existing) => {
+            const isDuplicate = images.some(existing => {
                 const existingUrl = normalizeUrl(existing.src || existing.image_url);
                 return existingUrl === newImageUrl;
             });
@@ -621,28 +572,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.log('Successfully loaded images:', parsedImages.length);
 
                 // Ensure all images have consistent properties and sort by timestamp
-                /**
-                 * @type {ImageItem[]}
-                 */
                 const formattedImages = parsedImages
-                    .map(function(image) {
-                        /** @type {ImageItem} */
-                        const formattedImage = {
-                            src: image.src || image.image_url || '',
-                            image_url: image.src || image.image_url || '',
-                            link: image.link || image.site_url || '',
-                            site_url: image.link || image.site_url || '',
-                            tags: image.tags || '',
-                            alt: image.tags || '',
-                            timestamp: image.timestamp || Date.now()
-                        };
-                        return formattedImage;
-                    })
-                    .sort(function(a, b) {
-                        const timestampA = a.timestamp || 0;
-                        const timestampB = b.timestamp || 0;
-                        return timestampB - timestampA;
-                    }); // Sort by timestamp, newest first
+                    .map(image => ({
+                        src: image.src || image.image_url,
+                        image_url: image.src || image.image_url,
+                        link: image.link || image.site_url,
+                        site_url: image.link || image.site_url,
+                        tags: image.tags,
+                        alt: image.tags,
+                        timestamp: image.timestamp || Date.now()
+                    }))
+                    .sort((a, b) => b.timestamp - a.timestamp); // Sort by timestamp, newest first
 
                 console.log('Formatted and sorted images:', formattedImages);
                 return formattedImages;
@@ -715,12 +655,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (imageUpload) {
                 try {
-                    // Show loading spinner
-                    const loadingSpinner = document.getElementById('loading-spinner');
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'block';
-                    }
-
                     if (!supabaseClient) {
                         throw new Error('Supabase client not initialized');
                     }
@@ -885,22 +819,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } catch (error) {
                     console.error('Error handling file upload:', error);
                     win98Alert(error instanceof Error ? error.message : 'Unknown error');
-                } finally {
-                    // Hide loading spinner
-                    const loadingSpinner = document.getElementById('loading-spinner');
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'none';
-                    }
                 }
             } else if (imageUrl) {
                 submittedImageUrl = imageUrl;
 
                 // Validate the image URL first
-                /**
-                 * Validates if an image URL is accessible
-                 * @param {string} url - The URL to validate
-                 * @returns {Promise<boolean>} - Promise that resolves to true if valid
-                 */
                 const validateImage = (url) => {
                     return new Promise((resolve, reject) => {
                         const img = new Image();
@@ -913,9 +836,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 try {
                     // Show loading indicator
                     const loadingSpinner = document.getElementById('loading-spinner');
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'block';
-                    }
+                    if (loadingSpinner) loadingSpinner.style.display = 'block';
 
                     // Validate image URL
                     await validateImage(imageUrl);
@@ -935,53 +856,46 @@ document.addEventListener('DOMContentLoaded', async () => {
                         tags: newImage.tags
                     };
 
-                    // Save to local storage first
-                    saveToLocalStorage(imageData);
-                    console.log('Saved to local storage:', imageData);
+                // Save to local storage first
+                saveToLocalStorage(imageData);
+                console.log('Saved to local storage:', imageData);
 
-                    // Update display
-                    if (imageFeed) {
-                        imageFeed.prepend(createImageItem(imageData));
-                        console.log('Added image to feed:', imageData);
-                    }
+                // Update display
+                if (imageFeed) {
+                    imageFeed.prepend(createImageItem(imageData));
+                    console.log('Added image to feed:', imageData);
+                }
 
-                    // Save to database
-                    try {
-                        const success = await saveImageToDatabase(imageData);
+                // Save to database
+                saveImageToDatabase(imageData)
+                    .then(success => {
                         console.log('Database save result:', success);
                         if (!success) {
                             console.warn('Image saved to local storage only');
                         }
-                    } catch (error) {
+                    })
+                    .catch(error => {
                         console.error('Error saving to database:', error);
-                    }
+                    });
 
-                    // Show success messages
-                    if (submissionMessage) {
-                        submissionMessage.style.display = 'block';
-                    }
-                    if (embedInstructions) {
-                        embedInstructions.style.display = 'block';
-                    }
-
-                    // Reset form and show success message
-                    if (submitForm instanceof HTMLFormElement) {
-                        submitForm.reset();
-                    }
-                    win98Alert('Image submitted successfully!');
-
-                    // Refresh the image feed to ensure it's up to date
-                    setTimeout(() => {
-                        populateImageFeed();
-                    }, 500);
-                } catch (error) {
-                    console.error('Error with image URL submission:', error);
-                    win98Alert(error instanceof Error ? error.message : 'Unknown error with image URL');
-                } finally {
-                    // Hide loading spinner
-                    const loadingSpinner = document.getElementById('loading-spinner');
-                    if (loadingSpinner) loadingSpinner.style.display = 'none';
+                // Show success messages
+                if (submissionMessage) {
+                    submissionMessage.style.display = 'block';
                 }
+                if (embedInstructions) {
+                    embedInstructions.style.display = 'block';
+                }
+
+                // Reset form and show success message
+                if (submitForm instanceof HTMLFormElement) {
+                    submitForm.reset();
+                }
+                win98Alert('Image submitted successfully!');
+
+                // Refresh the image feed to ensure it's up to date
+                setTimeout(() => {
+                    populateImageFeed();
+                }, 500);
             } else {
                 win98Alert('Please upload an image or provide an image URL.');
                 return; // Stop submission if no image provided

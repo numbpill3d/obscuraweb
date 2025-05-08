@@ -626,8 +626,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                  */
                 const formattedImages = parsedImages
                     .map(function(image) {
-                        /** @type {ImageItem} */
-                        const formattedImage = {
+                        return {
                             src: image.src || image.image_url || '',
                             image_url: image.src || image.image_url || '',
                             link: image.link || image.site_url || '',
@@ -636,12 +635,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                             alt: image.tags || '',
                             timestamp: image.timestamp || Date.now()
                         };
-                        return formattedImage;
                     })
                     .sort(function(a, b) {
-                        const timestampA = a.timestamp || 0;
-                        const timestampB = b.timestamp || 0;
-                        return timestampB - timestampA;
+                        return (b.timestamp || 0) - (a.timestamp || 0);
                     }); // Sort by timestamp, newest first
 
                 console.log('Formatted and sorted images:', formattedImages);
@@ -717,9 +713,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 try {
                     // Show loading spinner
                     const loadingSpinner = document.getElementById('loading-spinner');
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'block';
-                    }
+                    if (loadingSpinner) loadingSpinner.style.display = 'block';
 
                     if (!supabaseClient) {
                         throw new Error('Supabase client not initialized');
@@ -888,9 +882,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } finally {
                     // Hide loading spinner
                     const loadingSpinner = document.getElementById('loading-spinner');
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'none';
-                    }
+                    if (loadingSpinner) loadingSpinner.style.display = 'none';
                 }
             } else if (imageUrl) {
                 submittedImageUrl = imageUrl;
@@ -913,9 +905,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 try {
                     // Show loading indicator
                     const loadingSpinner = document.getElementById('loading-spinner');
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'block';
-                    }
+                    if (loadingSpinner) loadingSpinner.style.display = 'block';
 
                     // Validate image URL
                     await validateImage(imageUrl);

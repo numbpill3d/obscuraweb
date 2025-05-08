@@ -913,9 +913,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 try {
                     // Show loading indicator
                     const loadingSpinner = document.getElementById('loading-spinner');
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'block';
-                    }
+                    if (loadingSpinner) loadingSpinner.style.display = 'block';
 
                     // Validate image URL
                     await validateImage(imageUrl);

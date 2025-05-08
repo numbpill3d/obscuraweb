@@ -310,11 +310,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             // Validate URLs before saving
-            /**
-             * Validates if a string is a valid URL
-             * @param {string} urlString - The URL string to validate
-             * @returns {boolean} - True if valid URL, false otherwise
-             */
             const isValidUrl = (urlString) => {
                 try {
                     new URL(urlString);
@@ -566,16 +561,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('Current images in storage:', images.length);
 
             // Normalize image URLs for comparison
-            /**
-             * Normalizes a URL by removing the protocol
-             * @param {string|undefined} url - The URL to normalize
-             * @returns {string} - The normalized URL
-             */
-            const normalizeUrl = (url) => url?.replace(/^https?:\/\//, '') || '';
+            const normalizeUrl = (url) => url?.replace(/^https?:\/\//, '');
             const newImageUrl = normalizeUrl(image.src || image.image_url);
 
             // Check for duplicates based on normalized URL
-            const isDuplicate = images.some((existing) => {
+            const isDuplicate = images.some(existing => {
                 const existingUrl = normalizeUrl(existing.src || existing.image_url);
                 return existingUrl === newImageUrl;
             });
@@ -621,28 +611,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.log('Successfully loaded images:', parsedImages.length);
 
                 // Ensure all images have consistent properties and sort by timestamp
-                /**
-                 * @type {ImageItem[]}
-                 */
                 const formattedImages = parsedImages
-                    .map(function(image) {
-                        /** @type {ImageItem} */
-                        const formattedImage = {
-                            src: image.src || image.image_url || '',
-                            image_url: image.src || image.image_url || '',
-                            link: image.link || image.site_url || '',
-                            site_url: image.link || image.site_url || '',
-                            tags: image.tags || '',
-                            alt: image.tags || '',
-                            timestamp: image.timestamp || Date.now()
-                        };
-                        return formattedImage;
-                    })
-                    .sort(function(a, b) {
-                        const timestampA = a.timestamp || 0;
-                        const timestampB = b.timestamp || 0;
-                        return timestampB - timestampA;
-                    }); // Sort by timestamp, newest first
+                    .map(image => ({
+                        src: image.src || image.image_url,
+                        image_url: image.src || image.image_url,
+                        link: image.link || image.site_url,
+                        site_url: image.link || image.site_url,
+                        tags: image.tags,
+                        alt: image.tags,
+                        timestamp: image.timestamp || Date.now()
+                    }))
+                    .sort((a, b) => b.timestamp - a.timestamp); // Sort by timestamp, newest first
 
                 console.log('Formatted and sorted images:', formattedImages);
                 return formattedImages;
@@ -717,9 +696,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 try {
                     // Show loading spinner
                     const loadingSpinner = document.getElementById('loading-spinner');
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'block';
-                    }
+                    if (loadingSpinner) loadingSpinner.style.display = 'block';
 
                     if (!supabaseClient) {
                         throw new Error('Supabase client not initialized');
@@ -888,9 +865,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } finally {
                     // Hide loading spinner
                     const loadingSpinner = document.getElementById('loading-spinner');
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'none';
-                    }
+                    if (loadingSpinner) loadingSpinner.style.display = 'none';
                 }
             } else if (imageUrl) {
                 submittedImageUrl = imageUrl;
@@ -913,9 +888,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 try {
                     // Show loading indicator
                     const loadingSpinner = document.getElementById('loading-spinner');
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'block';
-                    }
+                    if (loadingSpinner) loadingSpinner.style.display = 'block';
 
                     // Validate image URL
                     await validateImage(imageUrl);
