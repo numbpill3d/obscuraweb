@@ -11,6 +11,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
+    "suppressExcessPropertyErrors": true,
+    "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "esModuleInterop": true

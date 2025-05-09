@@ -4,11 +4,23 @@
  * Common utility functions and constants for THE UNDERWEB
  */
 
-// Extend Window interface to include our custom properties
-// @ts-ignore
-if (!window.UNDERWEB) {
-    window.UNDERWEB = {};
-}
+/**
+ * Extend Window interface to include our custom properties
+ * @typedef {{
+ *   UNDERWEB?: {
+ *     common?: {
+ *       initSupabase: () => Promise<any>,
+ *       win98Alert: (message: string) => void,
+ *       win98Confirm: (message: string, onConfirm?: Function, onCancel?: Function) => void,
+ *       showError: (message: string) => void,
+ *       SUPABASE_CONFIG: { URL: string, ANON_KEY: string }
+ *     }
+ *   }
+ * }} UNDERWEBWindow
+ */
+
+/** @type {Window & typeof globalThis & UNDERWEBWindow} */
+const win = window;
 
 /**
  * Supabase configuration
@@ -27,59 +39,28 @@ const SUPABASE_CONFIG = {
  */
 async function initSupabase() {
     try {
-        // Check if Supabase library is available
-        // @ts-ignore
-        if (!window.supabase) {
-            console.error('Supabase library not found. Make sure to include the Supabase script in your HTML.');
+        // Extend Window interface
+        /** @typedef {{ supabase?: { createClient(url: string, key: string): any }}} SupabaseWindow */
+        /** @type {Window & typeof globalThis & SupabaseWindow} */
+        const win = window;
+
+        if (!win.supabase) {
+            console.error('Supabase library not found');
             return null;
         }
 
         console.log('Initializing Supabase client...');
+        const supabaseClient = win.supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.ANON_KEY);
 
-        // Create Supabase client with retry mechanism
-        let attempts = 0;
-        const maxAttempts = 3;
-        let supabaseClient = null;
-
-        while (attempts < maxAttempts && !supabaseClient) {
-            attempts++;
-            try {
-                // @ts-ignore
-                supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.ANON_KEY);
-
-                // Verify the connection works
-                const { error } = await supabaseClient.auth.getSession();
-                if (error) {
-                    console.warn(`Supabase connection attempt ${attempts} failed:`, error);
-                    supabaseClient = null;
-
-                    if (attempts < maxAttempts) {
-                        // Wait before retrying
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                    } else {
-                        console.error('All Supabase connection attempts failed');
-                        return null;
-                    }
-                }
-            } catch (err) {
-                console.warn(`Supabase initialization attempt ${attempts} failed:`, err);
-                supabaseClient = null;
-
-                if (attempts < maxAttempts) {
-                    // Wait before retrying
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                } else {
-                    throw err;
-                }
-            }
-        }
-
-        if (supabaseClient) {
-            console.log('Supabase initialized successfully');
-            return supabaseClient;
-        } else {
+        // Verify the connection works
+        const { error } = await supabaseClient.auth.getSession();
+        if (error) {
+            console.error('Supabase connection verification failed:', error);
             return null;
         }
+
+        console.log('Supabase initialized successfully');
+        return supabaseClient;
     } catch (error) {
         console.error('Error initializing Supabase client:', error);
         return null;
@@ -270,9 +251,7 @@ function showError(message) {
 }
 
 // Export functions for use in other files
-// @ts-ignore
 window.UNDERWEB = window.UNDERWEB || {};
-// @ts-ignore
 window.UNDERWEB.common = {
     initSupabase,
     win98Alert,

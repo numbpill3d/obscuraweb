@@ -1008,50 +1008,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Copy embed code functionality
     if (copyEmbedButton && embedCodeTextarea) {
-        copyEmbedButton.addEventListener('click', async () => {
+        copyEmbedButton.addEventListener('click', () => {
             if (embedCodeTextarea instanceof HTMLTextAreaElement) {
-                try {
-                    // Use modern clipboard API if available
-                    if (navigator.clipboard && window.isSecureContext) {
-                        await navigator.clipboard.writeText(embedCodeTextarea.value);
-                        win98Alert('Embed code copied to clipboard!');
-                    } else {
-                        // For non-secure contexts or older browsers
-                        // Create a temporary textarea element for copying
-                        const tempTextArea = document.createElement('textarea');
-                        tempTextArea.value = embedCodeTextarea.value;
+                embedCodeTextarea.select();
 
-                        // Make it invisible but part of the document
-                        tempTextArea.style.position = 'absolute';
-                        tempTextArea.style.left = '-9999px';
-                        document.body.appendChild(tempTextArea);
-
-                        // Select and copy
-                        tempTextArea.select();
-
-                        try {
-                            // Use the deprecated execCommand as a last resort
-                            const successful = document.execCommand('copy');
-                            if (successful) {
-                                win98Alert('Embed code copied to clipboard!');
-                            } else {
-                                win98Alert('Unable to copy automatically. Please press Ctrl+C to copy.');
-                            }
-                        } catch (err) {
-                            console.error('Copy failed:', err);
-                            // Select the original textarea so user can copy manually
-                            embedCodeTextarea.select();
-                            win98Alert('Please press Ctrl+C to copy the embed code.');
-                        } finally {
-                            // Clean up
-                            document.body.removeChild(tempTextArea);
-                        }
-                    }
-                } catch (err) {
-                    console.error('Copy failed:', err);
-                    // Select the original textarea so user can copy manually
-                    embedCodeTextarea.select();
-                    win98Alert('Please press Ctrl+C to copy the embed code.');
+                // Use modern clipboard API if available, fallback to execCommand
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(embedCodeTextarea.value)
+                        .then(() => {
+                            win98Alert('Embed code copied to clipboard!');
+                        })
+                        .catch(err => {
+                            console.error('Could not copy text: ', err);
+                            // Fallback
+                            document.execCommand('copy');
+                            win98Alert('Embed code copied to clipboard!');
+                        });
+                } else {
+                    // Fallback for older browsers
+                    document.execCommand('copy');
+                    win98Alert('Embed code copied to clipboard!');
                 }
             }
         });

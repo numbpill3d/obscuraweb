@@ -7,8 +7,17 @@
  */
 
 (async function () {
-    // Add TypeScript type checking for window object
-    // @ts-ignore - Ignore TypeScript errors for global window extensions
+    // Extend Window interface
+    /** @typedef {{
+     *   supabase?: { createClient(url: string, key: string): any },
+     *   UNDERWEB?: {
+     *     common?: {
+     *       SUPABASE_CONFIG?: { URL: string, ANON_KEY: string }
+     *     }
+     *   }
+     * }} SupabaseWindow */
+    /** @type {Window & typeof globalThis & SupabaseWindow} */
+    const win = window;
     // Helper function for alerts
     /**
      * @param {string} message - The message to display
