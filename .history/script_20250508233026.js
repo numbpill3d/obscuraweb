@@ -564,7 +564,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }));
 
                     // Update local storage
-                    localStorage.setItem(APP_CONFIG.STORAGE.LOCAL_STORAGE_KEY, JSON.stringify(formattedImages));
+                    localStorage.setItem('underweb_images', JSON.stringify(formattedImages));
 
                     // Update display only if Supabase has different data
                     const currentDisplay = Array.from(targetElement.children)
@@ -649,18 +649,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     /**
      * @param {any} image
      */
-    /**
-     * Save image to local storage
-     * @param {any} image - The image object to save
-     * @returns {boolean} - True if saved successfully
-     */
     function saveToLocalStorage(image) {
-        // Use common.js implementation if available
-        if (win.UNDERWEB?.common?.saveImageToLocalStorage) {
-            return win.UNDERWEB.common.saveImageToLocalStorage(image);
-        }
-
-        // Fallback implementation
         if (!isLocalStorageAvailable()) {
             console.error('Cannot save to local storage: storage not available');
             return false;
@@ -693,13 +682,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     image_url: image.src || image.image_url,
                     link: image.link || image.site_url,
                     site_url: image.link || image.site_url,
-                    tags: image.tags || '',
-                    alt: image.tags || 'Image',
+                    tags: image.tags,
+                    alt: image.tags,
                     timestamp: Date.now() // Add timestamp for sorting
                 };
 
                 images.unshift(formattedImage); // Add new image to the beginning
-                localStorage.setItem(APP_CONFIG.STORAGE.LOCAL_STORAGE_KEY, JSON.stringify(images));
+                localStorage.setItem('underweb_images', JSON.stringify(images));
                 console.log('Successfully saved new image to local storage:', formattedImage);
                 return true;
             } else {
@@ -712,16 +701,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    /**
-     * Load images from local storage
-     * @returns {ImageItem[]|null} - Array of images or null if none found
-     */
     function loadFromLocalStorage() {
-        // Use common.js implementation if available
-        if (win.UNDERWEB?.common?.loadImagesFromLocalStorage) {
-            return win.UNDERWEB.common.loadImagesFromLocalStorage();
-        }
-
         if (!isLocalStorageAvailable()) {
             console.error('Cannot load from local storage: storage not available');
             return null;
@@ -729,31 +709,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             console.log('Loading images from local storage');
-            const savedImages = localStorage.getItem(APP_CONFIG.STORAGE.LOCAL_STORAGE_KEY);
+            const savedImages = localStorage.getItem('underweb_images');
 
             if (savedImages) {
                 const parsedImages = JSON.parse(savedImages);
                 console.log('Successfully loaded images:', parsedImages.length);
 
                 // Ensure all images have consistent properties and sort by timestamp
-                return parsedImages
-                    .map(image => ({
-                        src: image.src || image.image_url || '',
-                        image_url: image.src || image.image_url || '',
-                        link: image.link || image.site_url || '',
-                        site_url: image.link || image.site_url || '',
-                        tags: image.tags || '',
-                        alt: image.tags || 'Image',
-                        timestamp: image.timestamp || Date.now()
-                    }))
-                    .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); // Sort by timestamp, newest first
+                /**
+                 * @type {ImageItem[]}
+                 */
+                const formattedImages = parsedImages
+                    .map(function(image) {
+                        /** @type {ImageItem} */
+                        const formattedImage = {
+                            src: image.src || image.image_url || '',
+                            image_url: image.src || image.image_url || '',
+                            link: image.link || image.site_url || '',
+                            site_url: image.link || image.site_url || '',
+                            tags: image.tags || '',
+                            alt: image.tags || '',
+                            timestamp: image.timestamp || Date.now()
+                        };
+                        return formattedImage;
+                    })
+                    .sort(function(a, b) {
+                        const timestampA = a.timestamp || 0;
+                        const timestampB = b.timestamp || 0;
+                        return timestampB - timestampA;
+                    }); // Sort by timestamp, newest first
+
+                console.log('Formatted and sorted images:', formattedImages);
+                return formattedImages;
             } else {
                 console.log('No images found in local storage');
                 return null;
             }
         } catch (error) {
             console.error('Error loading from local storage:', error);
-            localStorage.removeItem(APP_CONFIG.STORAGE.LOCAL_STORAGE_KEY); // Clear corrupted data
+            localStorage.removeItem('underweb_images'); // Clear corrupted data
             return null;
         }
     }

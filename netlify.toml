@@ -1,0 +1,36 @@
+# Netlify configuration for THE UNDERWEB
+
+# Since this is a static site, we don't need a build command
+[build]
+  publish = "."
+  command = ""
+
+# Configure redirects for SPA-like navigation
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Add security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self' https://ibpnwppmlvlizuuxland.supabase.co https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://via.placeholder.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;"
+
+# Enable compression
+[build.processing]
+  skip_processing = false
+[build.processing.css]
+  bundle = true
+  minify = true
+[build.processing.js]
+  bundle = true
+  minify = true
+[build.processing.html]
+  pretty_urls = true
+[build.processing.images]
+  compress = true
