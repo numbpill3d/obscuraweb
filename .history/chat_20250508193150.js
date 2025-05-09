@@ -108,9 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
      *     common?: {
      *       win98Alert: (message: string) => void,
      *       win98Confirm: (message: string, onConfirm?: Function, onCancel?: Function) => void,
-     *       showError: (message: string) => void,
-     *       initSupabase: () => Promise<any>,
-     *       SUPABASE_CONFIG?: { URL: string, ANON_KEY: string }
+     *       showError: (message: string) => void
      *     }
      *   }
      * }} SupabaseWindow

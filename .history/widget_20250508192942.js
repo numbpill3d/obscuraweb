@@ -125,7 +125,9 @@
 
         // Add credit text
         const creditText = document.createElement('div');
-        creditText.className = 'widget-credit';
+        creditText.style.fontSize = '10px';
+        creditText.style.textAlign = 'center';
+        creditText.style.marginTop = '5px';
         creditText.innerHTML = '<a href="' + window.location.origin + '" target="_blank">THE UNDERWEB</a> - Explore the hidden web';
 
         // Assemble the widget

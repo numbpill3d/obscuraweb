@@ -115,7 +115,11 @@
             const widgetImage = document.createElement('img');
             widgetImage.src = image.src;
             widgetImage.alt = image.tags || 'THE UNDERWEB';
-            widgetImage.className = 'widget-image';
+            widgetImage.style.width = '80px';
+            widgetImage.style.height = '80px';
+            widgetImage.style.margin = '0 5px';
+            widgetImage.style.cursor = 'pointer';
+            widgetImage.style.border = '2px solid #ffffff';
             widgetImage.title = image.tags || ''; // Show tags on hover
             widgetImage.addEventListener('click', () => {
                 window.open(image.link, '_blank');
@@ -125,7 +129,9 @@
 
         // Add credit text
         const creditText = document.createElement('div');
-        creditText.className = 'widget-credit';
+        creditText.style.fontSize = '10px';
+        creditText.style.textAlign = 'center';
+        creditText.style.marginTop = '5px';
         creditText.innerHTML = '<a href="' + window.location.origin + '" target="_blank">THE UNDERWEB</a> - Explore the hidden web';
 
         // Assemble the widget

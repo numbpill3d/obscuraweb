@@ -38,7 +38,30 @@
  * @property {Object} [users] - User who created the post
  */
 
-// Function declarations will be defined inside the DOMContentLoaded event handler
+/**
+ * Show an error message using the win98Alert function
+ * @param {string} message - The error message to display
+ */
+const showError = (message) => {
+    if (win.UNDERWEB && win.UNDERWEB.common && win.UNDERWEB.common.showError) {
+        win.UNDERWEB.common.showError(message);
+    } else {
+        win98Alert('Error: ' + message);
+    }
+};
+
+/**
+ * Windows 98 style alert function
+ * @param {string} message - The message to display
+ */
+const win98Alert = (message) => {
+    if (win.UNDERWEB && win.UNDERWEB.common && win.UNDERWEB.common.win98Alert) {
+        win.UNDERWEB.common.win98Alert(message);
+    } else {
+        // Fallback if common.js is not loaded
+        alert(message);
+    }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM elements - Main UI
@@ -108,9 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
      *     common?: {
      *       win98Alert: (message: string) => void,
      *       win98Confirm: (message: string, onConfirm?: Function, onCancel?: Function) => void,
-     *       showError: (message: string) => void,
-     *       initSupabase: () => Promise<any>,
-     *       SUPABASE_CONFIG?: { URL: string, ANON_KEY: string }
+     *       showError: (message: string) => void
      *     }
      *   }
      * }} SupabaseWindow
