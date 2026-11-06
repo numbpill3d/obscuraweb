@@ -1,0 +1,5 @@
+# vercel serves this repo as a static site. server.js is only for self-hosting
+# (node server.js); if vercel sees it, it runs the site as an express function
+# and express.static() is ignored there, so css/js/pages all come back as index.html.
+server.js
+.history
