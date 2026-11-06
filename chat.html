@@ -3,773 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHAT - THE UNDERWEB</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="common.js"></script>
-    <style>
-        /* Base Styles and Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-bg: #0a0a14;
-            --secondary-bg: #141428;
-            --tertiary-bg: #1a1a2e;
-            --primary-text: #c8c8ff;
-            --secondary-text: #8080ff;
-            --accent-color: #4f4fff;
-            --accent-glow: #4f4fff80;
-            --border-color: #3333aa;
-            --box-shadow: 0 0 15px #2222aa;
-            --terminal-green: #00ff66;
-        }
-
-        @font-face {
-            font-family: 'VT323';
-            src: url('https://fonts.gstatic.com/s/vt323/v17/pxiKyp0ihIEF2isQFJXUdVNF.woff2') format('woff2');
-            font-display: swap;
-        }
-
-        body {
-            font-family: 'VT323', monospace;
-            background-color: var(--primary-bg);
-            color: var(--primary-text);
-            background-image:
-                radial-gradient(circle at 25% 25%, #1a1a5060 2%, transparent 10%),
-                radial-gradient(circle at 75% 75%, #1a1a5060 2%, transparent 10%),
-                linear-gradient(45deg, #0a0a1480 25%, transparent 25%, transparent 75%, #0a0a1480 75%);
-            background-size: 100px 100px, 100px 100px, 100px 100px;
-            background-attachment: fixed;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Animation Keyframes */
-        @keyframes pulse {
-            0% { opacity: 0.7; text-shadow: 0 0 5px var(--accent-glow); }
-            50% { opacity: 1; text-shadow: 0 0 15px var(--accent-glow), 0 0 30px var(--accent-glow); }
-            100% { opacity: 0.7; text-shadow: 0 0 5px var(--accent-glow); }
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
-            40% { transform: translate(-5px, -5px); filter: hue-rotate(180deg); }
-            60% { transform: translate(5px, 5px); filter: hue-rotate(270deg); }
-            80% { transform: translate(5px, -5px); filter: hue-rotate(360deg); }
-            100% { transform: translate(0); }
-        }
-
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-
-        @keyframes fadeInOut {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
-
-        /* Header Styles */
-        header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 2rem 1rem;
-            position: relative;
-            overflow: hidden;
-            background-color: rgba(10, 10, 20, 0.8);
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
-            animation: scanline 8s linear infinite;
-            z-index: 1;
-        }
-
-        .ascii-art {
-            font-size: 0.5rem;
-            line-height: 0.6rem;
-            white-space: pre;
-            text-align: center;
-            color: var(--accent-color);
-            text-shadow: 0 0 10px var(--accent-glow);
-            animation: pulse 4s infinite;
-            margin-bottom: 1rem;
-            max-width: 100%;
-            overflow-x: auto;
-            display: none;
-        }
-
-        @media (min-width: 768px) {
-            .ascii-art {
-                font-size: 0.6rem;
-                display: block;
-            }
-        }
-
-        @media (min-width: 1200px) {
-            .ascii-art {
-                font-size: 0.8rem;
-            }
-        }
-
-        /* Navigation Styles */
-        nav {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 1rem;
-            gap: 1rem;
-            background-color: rgba(20, 20, 40, 0.7);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        nav a {
-            color: var(--secondary-text);
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--border-color);
-            background-color: rgba(26, 26, 46, 0.8);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        nav a::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(79, 79, 255, 0.2), transparent);
-            transition: all 0.5s ease;
-        }
-
-        nav a:hover {
-            color: var(--primary-text);
-            background-color: rgba(40, 40, 70, 0.9);
-            box-shadow: 0 0 10px var(--accent-glow);
-            transform: translateY(-2px);
-        }
-
-        nav a:hover::before {
-            left: 100%;
-        }
-
-        /* Marquee Styles */
-        marquee {
-            margin: 1rem 0;
-            padding: 0.5rem;
-            background-color: rgba(10, 10, 20, 0.7);
-            color: var(--terminal-green);
-            font-weight: bold;
-            border-top: 1px dashed var(--border-color);
-            border-bottom: 1px dashed var(--border-color);
-        }
-
-        .blink {
-            animation: fadeInOut 1s infinite;
-            color: var(--accent-color);
-        }
-
-        /* Main Content Styles */
-        main {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        @media (min-width: 992px) {
-            main {
-                flex-direction: row;
-                align-items: flex-start;
-            }
-        }
-
-        .win98-box {
-            background-color: rgba(20, 20, 40, 0.8);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--box-shadow);
-            margin-bottom: 1rem;
-            -webkit-backdrop-filter: blur(5px);
-            backdrop-filter: blur(5px);
-            max-width: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .win98-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                linear-gradient(45deg, transparent 65%, rgba(79, 79, 255, 0.1) 75%, transparent 85%),
-                linear-gradient(135deg, transparent 65%, rgba(79, 79, 255, 0.1) 75%, transparent 85%);
-            background-size: 100px 100px;
-            animation: float 10s infinite;
-            pointer-events: none;
-        }
-
-        .win98-box-title {
-            background: linear-gradient(90deg, var(--accent-color), var(--tertiary-bg));
-            color: #ffffff;
-            padding: 0.3rem 0.6rem;
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .win98-box-content {
-            padding: 1rem;
-        }
-
-        /* Chat Page Specific Styles */
-        .chat-container {
-            flex: 3;
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 300px);
-            min-height: 500px;
-        }
-
-        .sidebar {
-            flex: 1;
-            position: sticky;
-            top: 1rem;
-        }
-
-        @media (max-width: 991px) {
-            .sidebar {
-                position: static;
-            }
-        }
-
-        .chat-messages {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            max-height: calc(100vh - 450px);
-            min-height: 300px;
-        }
-
-        .chat-input-container {
-            padding: 1rem;
-            border-top: 1px solid var(--border-color);
-            background-color: rgba(15, 15, 30, 0.8);
-        }
-
-        .chat-input-form {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .chat-input {
-            flex-grow: 1;
-            padding: 0.5rem;
-            background-color: rgba(10, 10, 20, 0.8);
-            color: var(--primary-text);
-            border: 1px solid var(--border-color);
-            font-family: 'VT323', monospace;
-        }
-
-        .chat-submit {
-            padding: 0.5rem 1rem;
-            background-color: var(--tertiary-bg);
-            color: var(--primary-text);
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            font-family: 'VT323', monospace;
-            transition: all 0.3s ease;
-        }
-
-        .chat-submit:hover {
-            background-color: var(--accent-color);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        .message {
-            padding: 0.8rem;
-            border-radius: 1rem;
-            max-width: 80%;
-            position: relative;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .message.sent {
-            align-self: flex-end;
-            background-color: rgba(40, 40, 70, 0.8);
-            border-bottom-right-radius: 0;
-            border-left: 2px solid var(--accent-color);
-        }
-
-        .message.received {
-            align-self: flex-start;
-            background-color: rgba(25, 25, 45, 0.8);
-            border-bottom-left-radius: 0;
-            border-right: 2px solid var(--accent-color);
-        }
-
-        .message.system {
-            align-self: center;
-            background-color: rgba(20, 20, 40, 0.5);
-            color: var(--terminal-green);
-            border: 1px dashed var(--border-color);
-            text-align: center;
-            font-style: italic;
-            max-width: 90%;
-        }
-
-        .message-content {
-            word-break: break-word;
-        }
-
-        .message-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--secondary-text);
-            margin-top: 0.5rem;
-        }
-
-        .avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 0.5rem;
-        }
-
-        .message-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .username {
-            font-weight: bold;
-            color: var(--accent-color);
-        }
-
-        /* Users List */
-        .users-list {
-            list-style: none;
-        }
-
-        .user-item {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem;
-            border-bottom: 1px solid rgba(79, 79, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .user-item:hover {
-            background-color: rgba(79, 79, 255, 0.1);
-        }
-
-        .user-status {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 0.5rem;
-        }
-
-        .status-online {
-            background-color: var(--terminal-green);
-            box-shadow: 0 0 5px var(--terminal-green);
-        }
-
-        .status-idle {
-            background-color: #ffaa00;
-            box-shadow: 0 0 5px #ffaa00;
-        }
-
-        .status-offline {
-            background-color: #ff4444;
-            box-shadow: 0 0 5px #ff4444;
-        }
-
-        /* Channels List */
-        .channels-list {
-            list-style: none;
-        }
-
-        .channel-item {
-            padding: 0.5rem;
-            border-bottom: 1px solid rgba(79, 79, 255, 0.2);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-
-        .channel-item:hover {
-            background-color: rgba(79, 79, 255, 0.1);
-        }
-
-        .channel-item.active {
-            background-color: rgba(79, 79, 255, 0.2);
-            border-left: 3px solid var(--accent-color);
-        }
-
-        .channel-icon {
-            margin-right: 0.5rem;
-            color: var(--accent-color);
-        }
-
-        /* Help Panel */
-        .help-panel {
-            background-color: rgba(15, 15, 30, 0.9);
-            padding: 1rem;
-            margin-top: 1rem;
-            border-left: 3px solid var(--terminal-green);
-        }
-
-        .help-title {
-            color: var(--terminal-green);
-            margin-bottom: 0.5rem;
-            font-size: 1.2rem;
-        }
-
-        .help-item {
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .command {
-            color: var(--accent-color);
-            font-family: 'Courier New', monospace;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 2rem 1rem;
-            margin-top: 2rem;
-            border-top: 1px solid var(--border-color);
-            background-color: rgba(10, 10, 20, 0.8);
-            position: relative;
-            overflow: hidden;
-        }
-
-        footer::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
-            z-index: 1;
-        }
-
-        /* Terminal effect overlay */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.1),
-                rgba(0, 0, 0, 0.1) 1px,
-                transparent 1px,
-                transparent 2px
-            );
-            pointer-events: none;
-            z-index: 1000;
-            opacity: 0.3;
-        }
-
-        /* Dynamic scanline effect */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background-color: rgba(120, 120, 255, 0.1);
-            box-shadow: 0 0 10px rgba(120, 120, 255, 0.2);
-            z-index: 1001;
-            animation: scanline 8s linear infinite;
-            pointer-events: none;
-        }
-
-        /* Stars background effect */
-        .stars {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .star {
-            position: absolute;
-            background-color: var(--primary-text);
-            border-radius: 50%;
-            animation: pulse 3s infinite;
-        }
-
-        /* Links and Text */
-        a {
-            color: var(--secondary-text);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        a:hover {
-            color: var(--primary-text);
-            text-shadow: 0 0 5px var(--accent-glow);
-        }
-
-        a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background-color: var(--accent-color);
-            transition: width 0.3s ease;
-        }
-
-        a:hover::after {
-            width: 100%;
-        }
-
-        /* Emotes panel */
-        .emotes-panel {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0.5rem;
-            margin-top: 1rem;
-            background-color: rgba(15, 15, 30, 0.8);
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            display: none;
-        }
-
-        .emote {
-            cursor: pointer;
-            text-align: center;
-            padding: 0.3rem;
-            border-radius: 0.3rem;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-        }
-
-        .emote:hover {
-            background-color: rgba(79, 79, 255, 0.2);
-            transform: scale(1.1);
-        }
-
-        .toggle-emotes {
-            background: none;
-            border: none;
-            color: var(--secondary-text);
-            cursor: pointer;
-            padding: 0.3rem;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
-
-        .toggle-emotes:hover {
-            color: var(--primary-text);
-            text-shadow: 0 0 5px var(--accent-glow);
-        }
-    </style>
+    <title>CHAT — THE UNDERWEB</title>
+    <meta name="description" content="Commune with fellow digital dreamers in THE UNDERWEB chat.">
+    <meta name="theme-color" content="#0e001a">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="THE UNDERWEB">
+    <meta property="og:title" content="CHAT — THE UNDERWEB">
+    <meta property="og:description" content="Commune with fellow digital dreamers in THE UNDERWEB chat.">
+    <meta property="og:image" content="img/og-featured.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="img/og-featured.png">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <!-- Stars background effect -->
+<body data-page="chat" data-depth="480" data-range="60">
+    <noscript><p class="sticker ghost" style="position:static;display:inline-block;margin:10px">the underweb runs on javascript. the links still work without it.</p></noscript>
     <div class="stars" id="stars"></div>
 
-    <header>
-        <div class="ascii-art">
-            ████████╗██╗  ██╗███████╗    ██╗   ██╗███╗   ██╗██████╗ ███████╗██████╗ ██╗    ██╗███████╗██████╗
-            ╚══██╔══╝██║  ██║██╔════╝    ██║   ██║████╗  ██║██╔══██╗██╔════╝██╔══██╗██║    ██║██╔════╝██╔══██╗
-               ██║   ███████║█████╗      ██║   ██║██╔██╗ ██║██║  ██║█████╗  ██████╔╝██║ █╗ ██║█████╗  ██████╔╝
-               ██║   ██╔══██║██╔══╝      ██║   ██║██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗██║███╗██║██╔══╝  ██╔══██╗
-               ██║   ██║  ██║███████╗    ╚██████╔╝██║ ╚████║██████╔╝███████╗██║  ██║╚███╔███╔╝███████╗██████╔╝
-               ╚═╝   ╚═╝  ╚═╝╚══════╝     ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚══════╝╚═════╝
-        </div>
-        <div class="win98-box responsive-container">
-            <div class="win98-box-title">
-                <span>chat.gif</span>
-                <span>X</span>
-            </div>
-            <div class="win98-box-content">
-                <img src="https://via.placeholder.com/600x150?text=THE+UNDERWEB+CHAT" alt="THE UNDERWEB Chat Banner" class="banner-image">
-            </div>
-        </div>
+    <div class="statusbar" role="status">
+        <span><span class="led"></span><b>signal</b> open</span>
+        <span>depth <b data-depth-readout>-480m</b></span>
+        <span>you are <b>below the surface</b></span>
+        <span class="push">local time <b data-clock>--:--:--</b></span>
+    </div>
+
+    <header class="masthead">
+        <h1>THE UNDERWEB</h1>
+        <a href="index.html" style="background:none"><img class="banner px" src="img/banner-underweb.gif" width="936" height="120" alt="THE UNDERWEB — animated banner"></a>
+        <span class="sticker">live-ish</span>
     </header>
 
-    <nav>
-        <a href="/">HOME</a>
-        <a href="linksindex.html">INDEX</a>
-        <a href="links.html">LINKS</a>
-        <a href="about.html">ABOUT</a>
-        <a href="chat.html">CHAT</a>
+    <nav class="tabs" aria-label="main">
+        <a href="index.html" data-page="surface"><small>00</small>surface</a>
+        <a href="linksindex.html" data-page="index"><small>01</small>index</a>
+        <a href="links.html" data-page="links"><small>02</small>links</a>
+        <a href="about.html" data-page="about"><small>03</small>about</a>
+        <a href="chat.html" data-page="chat"><small>04</small>chat</a>
     </nav>
 
-    <marquee scrollamount="5" behavior="alternate">
-        <span class="blink">★</span> COMMUNE WITH FELLOW DIGITAL DREAMERS - JOIN THE CONVERSATION <span class="blink">★</span>
-    </marquee>
+    <div class="ticker" aria-label="announcements">
+        <div class="ticker-track"><span>★ commune with fellow <b>digital dreamers</b> ★ join the conversation ★ type /help for commands ★ be kind, be strange ★</span></div>
+    </div>
 
-    <main>
+    <main class="page page--split">
         <div class="sidebar">
-            <div class="win98-box">
-                <div class="win98-box-title">
-                    <span>Channels</span>
-                    <span>X</span>
-                </div>
-                <div class="win98-box-content">
-                    <ul class="channels-list">
-                        <li class="channel-item active">
-                            <span class="channel-icon">#</span> general
-                        </li>
-                        <li class="channel-item">
-                            <span class="channel-icon">#</span> digital-art
-                        </li>
-                        <li class="channel-item">
-                            <span class="channel-icon">#</span> web-archaeology
-                        </li>
-                        <li class="channel-item">
-                            <span class="channel-icon">#</span> music
-                        </li>
-                        <li class="channel-item">
-                            <span class="channel-icon">#</span> code
-                        </li>
-                        <li class="channel-item">
-                            <span class="channel-icon">#</span> dreaming
-                        </li>
-                    </ul>
-                </div>
+            <div class="win98-box ">
+            <div class="win98-box-title"><span>channels</span><span>×</span></div>
+            <div class="win98-box-content ">
+                <ul class="channels-list">
+                    <li class="channel-item active" data-channel="general" tabindex="0"><span class="channel-icon">#</span>general</li>
+                    <li class="channel-item" data-channel="digital-art" tabindex="0"><span class="channel-icon">#</span>digital-art</li>
+                    <li class="channel-item" data-channel="web-archaeology" tabindex="0"><span class="channel-icon">#</span>web-archaeology</li>
+                    <li class="channel-item" data-channel="music" tabindex="0"><span class="channel-icon">#</span>music</li>
+                    <li class="channel-item" data-channel="code" tabindex="0"><span class="channel-icon">#</span>code</li>
+                    <li class="channel-item" data-channel="dreaming" tabindex="0"><span class="channel-icon">#</span>dreaming</li>
+                </ul>
             </div>
-
-            <div class="win98-box">
-                <div class="win98-box-title">
-                    <span>Online Users</span>
-                    <span>X</span>
-                </div>
-                <div class="win98-box-content">
-                    <ul class="users-list">
-                        <li class="user-item">
-                            <div class="user-status status-online"></div>
-                            <span>VOID_WALKER</span>
-                        </li>
-                        <li class="user-item">
-                            <div class="user-status status-online"></div>
-                            <span>PIXEL_DREAMER</span>
-                        </li>
-                        <li class="user-item">
-                            <div class="user-status status-idle"></div>
-                            <span>CODE_POET</span>
-                        </li>
-                        <li class="user-item">
-                            <div class="user-status status-offline"></div>
-                            <span>NET_GHOST</span>
-                        </li>
-                        <li class="user-item">
-                            <div class="user-status status-online"></div>
-                            <span>GLITCH_ENTITY</span>
-                        </li>
-                        <li class="user-item">
-                            <div class="user-status status-online"></div>
-                            <span>CURSOR_DANCER</span>
-                        </li>
-                        <li class="user-item">
-                            <div class="user-status status-idle"></div>
-                            <span>ECHO_MEMORY</span>
-                        </li>
-                    </ul>
-                </div>
+        </div>
+            <div class="win98-box tilt-r deep">
+            <div class="win98-box-title"><span>online-users</span><span>×</span></div>
+            <div class="win98-box-content ">
+                <ul class="users-list">
+                    <li class="user-item"><div class="user-status status-online"></div><span>VOID_WALKER</span></li>
+                    <li class="user-item"><div class="user-status status-online"></div><span>PIXEL_DREAMER</span></li>
+                    <li class="user-item"><div class="user-status status-idle"></div><span>CODE_POET</span></li>
+                    <li class="user-item"><div class="user-status status-offline"></div><span>NET_GHOST</span></li>
+                    <li class="user-item"><div class="user-status status-online"></div><span>GLITCH_ENTITY</span></li>
+                    <li class="user-item"><div class="user-status status-online"></div><span>CURSOR_DANCER</span></li>
+                    <li class="user-item"><div class="user-status status-idle"></div><span>ECHO_MEMORY</span></li>
+                </ul>
             </div>
-
-            <div class="win98-box">
-                <div class="win98-box-title">
-                    <span>Commands</span>
-                    <span>X</span>
-                </div>
-                <div class="win98-box-content">
-                    <div class="help-panel">
-                        <div class="help-title">Channel Commands</div>
-                        <div class="help-item">
-                            <span class="command">/join [channel]</span> - Join a channel
-                        </div>
-                        <div class="help-item">
-                            <span class="command">/whisper [user] [message]</span> - Send private message
-                        </div>
-                        <div class="help-item">
-                            <span class="command">/dream [prompt]</span> - Generate a dream image
-                        </div>
-                        <div class="help-item">
-                            <span class="command">/void</span> - Enter the void (silent mode)
-                        </div>
-                        <div class="help-item">
-                            <span class="command">/random</span> - Visit a random website
-                        </div>
-                    </div>
+        </div>
+            <div class="win98-box tilt-l">
+            <div class="win98-box-title"><span>commands.hlp</span><span>×</span></div>
+            <div class="win98-box-content ">
+                <div class="help-panel">
+                    <div class="help-title">channel commands</div>
+                    <div class="help-item"><span class="command">/join [channel]</span> join a channel</div>
+                    <div class="help-item"><span class="command">/whisper [user] [msg]</span> private message</div>
+                    <div class="help-item"><span class="command">/dream [prompt]</span> generate a dream image</div>
+                    <div class="help-item"><span class="command">/void</span> enter the void (silent mode)</div>
+                    <div class="help-item"><span class="command">/random</span> visit a random website</div>
                 </div>
             </div>
         </div>
-
+        </div>
         <div class="chat-container win98-box">
-            <div class="win98-box-title">
-                <span># general</span>
-                <span>X</span>
-            </div>
+            <div class="win98-box-title"><span id="channel-title"># general</span><span>×</span></div>
             <div class="chat-messages" id="chat-messages">
                 <div class="message system">
                     <div class="message-content">
                         Welcome to THE UNDERWEB Chat. This is the beginning of the #general channel.
                     </div>
                 </div>
-
                 <div class="message received">
                     <div class="message-header">
                         <div class="avatar avatar-blue">V</div>
@@ -783,7 +113,6 @@
                         <span>today</span>
                     </div>
                 </div>
-
                 <div class="message received">
                     <div class="message-header">
                         <div class="avatar avatar-pink">P</div>
@@ -797,13 +126,11 @@
                         <span>today</span>
                     </div>
                 </div>
-
                 <div class="message system">
                     <div class="message-content">
                         USER_456 has entered the chat.
                     </div>
                 </div>
-
                 <div class="message received">
                     <div class="message-header">
                         <div class="avatar avatar-green">C</div>
@@ -817,7 +144,6 @@
                         <span>today</span>
                     </div>
                 </div>
-
                 <div class="message sent">
                     <div class="message-content">
                         That sounds amazing! Would love to hear the audio sometime. I've been collecting old web animations myself.
@@ -827,7 +153,6 @@
                         <span>today</span>
                     </div>
                 </div>
-
                 <div class="message received">
                     <div class="message-header">
                         <div class="avatar avatar-blue">V</div>
@@ -841,66 +166,70 @@
                         <span>today</span>
                     </div>
                 </div>
-
                 <div class="message system">
                     <div class="message-content">
                         GLITCH_ENTITY is now dreaming...
                     </div>
                 </div>
             </div>
-
             <div class="chat-input-container">
                 <form class="chat-input-form" id="chat-form">
-                    <input type="text" class="chat-input" id="chat-input" placeholder="Type your message...">
-                    <button type="button" class="toggle-emotes" id="toggle-emotes">[+]</button>
-                    <button type="submit" class="chat-submit">Send</button>
+                    <label class="sr-only" for="chat-input">message</label>
+                    <input type="text" class="chat-input" id="chat-input" placeholder="say something into the static…" autocomplete="off">
+                    <button type="button" class="toggle-emotes" id="toggle-emotes" aria-label="toggle emotes">[+]</button>
+                    <button type="submit" class="chat-submit">send</button>
                 </form>
-
-                <div class="emotes-panel" id="emotes-panel">
-                    <div class="emote">:-)</div>
-                    <div class="emote">:-(</div>
-                    <div class="emote">:-D</div>
-                    <div class="emote">:-O</div>
-                    <div class="emote">;-)</div>
-                    <div class="emote">:-P</div>
-                    <div class="emote">:-|</div>
-                    <div class="emote">:-/</div>
-                    <div class="emote">>_<</div>
-                    <div class="emote">^_^</div>
-                </div>
+                <div class="emotes-panel" id="emotes-panel"><div class="emote">:-)</div><div class="emote">:-(</div><div class="emote">:-D</div><div class="emote">:-O</div><div class="emote">;-)</div><div class="emote">:-P</div><div class="emote">:-|</div><div class="emote">:-/</div><div class="emote">&gt;_&lt;</div><div class="emote">^_^</div></div>
             </div>
         </div>
     </main>
 
-    <footer>
-        <p>&copy; 2025 THE UNDERWEB - <a href="/submit">Submit Image</a> - <a href="linksindex.html">Link Directory</a> - <a href="about.html">About</a> - <a href="chat.html">Chat/Forum</a></p>
+    <footer class="footer">
+        <div class="button-wall">
+            <a href="index.html" title="link to THE UNDERWEB"><img src="img/button-88x31.gif" width="88" height="31" alt="THE UNDERWEB 88x31 button"></a>
+            <span class="b88">hand<br><b>coded</b></span>
+            <span class="b88">no feed<br><b>no algo</b></span>
+            <span class="b88">best viewed<br>in <b>any browser</b></span>
+            <span class="b88">html<br><b>is art</b></span>
+            <span class="b88"><b>webring</b><br>member</span>
+            <span class="b88">stay<br><b>weird</b></span>
+            <span class="b88">made<br>after <b>dark</b></span>
+        </div>
+        <div class="webring">
+            <a href="about.html">▲ ascend</a>
+            <a href="#" data-random-site>✶ random hole ✶</a>
+            <a href="chat.html">descend ▼</a>
+        </div>
+        <p>&copy; <span data-year>2025</span> THE UNDERWEB · a gateway, not a platform · nothing here is tracked</p>
+        <div class="footer-links">
+            <a href="index.html#submit-form">submit an image</a>
+            <a href="links.html#link-submit-form">submit a link</a>
+            <a href="linksindex.html">a–z index</a>
+            <a href="about.html">about</a>
+            <a href="chat.html">chat</a>
+        </div>
     </footer>
 
+    <script src="ui.js"></script>
+    <!-- chat.js (the supabase forum) is not loaded: it has a syntax error upstream and this page has none of its DOM yet -->
     <script>
-        // Create the stars background
         document.addEventListener("DOMContentLoaded", function() {
-            const starsContainer = document.getElementById('stars');
-            const numberOfStars = 100;
-
-            for (let i = 0; i < numberOfStars; i++) {
-                const star = document.createElement('div');
-                star.classList.add('star');
-
-                // Random properties
-                const size = Math.random() * 2 + 1;
-                const left = Math.random() * 100;
-                const top = Math.random() * 100;
-                const delay = Math.random() * 3;
-
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.left = `${left}%`;
-                star.style.top = `${top}%`;
-                star.style.animationDelay = `${delay}s`;
-
-                starsContainer.appendChild(star);
+            var titleEl = document.getElementById('channel-title');
+            function setChannel(name) {
+                titleEl.textContent = '# ' + name;
+                document.querySelectorAll('.channel-item').forEach(function (li) { li.classList.toggle('active', li.dataset.channel === name); });
             }
-
+            document.querySelectorAll('.channel-item').forEach(function (li) {
+                var go = function () {
+                    setChannel(li.dataset.channel);
+                    var m = document.createElement('div'); m.className = 'message system';
+                    m.innerHTML = '<div class="message-content"></div>';
+                    m.firstChild.textContent = 'You have joined the #' + li.dataset.channel + ' channel.';
+                    var box = document.getElementById('chat-messages'); box.appendChild(m); box.scrollTop = box.scrollHeight;
+                };
+                li.addEventListener('click', go);
+                li.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+            });
             // Chat functionality
             const chatForm = document.getElementById('chat-form');
             const chatInput = document.getElementById('chat-input');
@@ -997,7 +326,7 @@
                     const channel = command.split(' ')[1];
                     if (channel) {
                         messageContent.textContent = `You have joined the #${channel} channel.`;
-                        document.querySelector('.win98-box-title span:first-child').textContent = `# ${channel}`;
+                        setChannel(channel);
                     } else {
                         messageContent.textContent = 'Please specify a channel to join.';
                     }
@@ -1152,7 +481,8 @@
                 });
             });
         });
+    
     </script>
-    <script src="chat.js"></script>
+    <script>document.querySelectorAll('[data-year]').forEach(function(e){e.textContent=new Date().getFullYear()});</script>
 </body>
 </html>

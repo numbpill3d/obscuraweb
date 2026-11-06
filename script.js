@@ -1,4 +1,7 @@
 // @ts-check
+// wrapped in an IIFE: common.js already declares a global APP_CONFIG, and redeclaring it
+// at the top level threw a SyntaxError that stopped this whole file from running.
+(function () {
 
 /**
  * Main script for THE UNDERWEB application
@@ -767,11 +770,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Use placeholder images
         const imagesToUse = [
-            { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W1', link: '#', tags: 'placeholder' },
-            { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W2', link: '#', tags: 'placeholder' },
-            { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W3', link: '#', tags: 'placeholder' },
-            { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W4', link: '#', tags: 'placeholder' },
-            { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W5', link: '#', tags: 'placeholder' }
+            { src: 'img/button-88x31.gif', link: 'index.html', tags: 'the underweb' },
+            { src: 'img/button-88x31.gif', link: 'index.html', tags: 'the underweb' },
+            { src: 'img/button-88x31.gif', link: 'index.html', tags: 'the underweb' },
+            { src: 'img/button-88x31.gif', link: 'index.html', tags: 'the underweb' },
+            { src: 'img/button-88x31.gif', link: 'index.html', tags: 'the underweb' }
         ];
 
         // Display a subset of random images in the widget
@@ -1177,3 +1180,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 console.log('Supabase client:', supabaseClient);
 // imageData is only defined within function scope, removing console log that could cause errors
+})();
