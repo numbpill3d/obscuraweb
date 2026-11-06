@@ -3,685 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LINKS INDEX - THE UNDERWEB</title>
-    <meta name="description" content="Explore curated links to the digital underground on THE UNDERWEB. Discover retro web aesthetics, digital art, and forgotten internet treasures.">
-    <meta property="og:title" content="THE UNDERWEB - Links">
-    <meta property="og:description" content="Explore curated links to the digital underground.">
-    <meta property="og:image" content="https://via.placeholder.com/600x150?text=THE+UNDERWEB+LINKS">
-    <meta property="og:url" content="https://example.com/links.html">
+    <title>INDEX — THE UNDERWEB</title>
+    <meta name="description" content="Alphabetical index of every site archived in THE UNDERWEB.">
+    <meta name="theme-color" content="#0e001a">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="THE UNDERWEB">
+    <meta property="og:title" content="INDEX — THE UNDERWEB">
+    <meta property="og:description" content="Alphabetical index of every site archived in THE UNDERWEB.">
+    <meta property="og:image" content="img/og-featured.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        /* Base Styles and Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-bg: #0a0a14;
-            --secondary-bg: #141428;
-            --tertiary-bg: #1a1a2e;
-            --primary-text: #c8c8ff;
-            --secondary-text: #8080ff;
-            --accent-color: #4f4fff;
-            --accent-glow: #4f4fff80;
-            --border-color: #3333aa;
-            --box-shadow: 0 0 15px #2222aa;
-            --terminal-green: #00ff66;
-        }
-
-        @font-face {
-            font-family: 'VT323';
-            src: url('https://fonts.gstatic.com/s/vt323/v17/pxiKyp0ihIEF2isQFJXUdVNF.woff2') format('woff2');
-            font-display: swap;
-        }
-
-        body {
-            font-family: 'VT323', monospace;
-            background-color: var(--primary-bg);
-            color: var(--primary-text);
-            background-image: 
-                radial-gradient(circle at 25% 25%, #1a1a5060 2%, transparent 10%),
-                radial-gradient(circle at 75% 75%, #1a1a5060 2%, transparent 10%),
-                linear-gradient(45deg, #0a0a1480 25%, transparent 25%, transparent 75%, #0a0a1480 75%);
-            background-size: 100px 100px, 100px 100px, 100px 100px;
-            background-attachment: fixed;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Animation Keyframes */
-        @keyframes pulse {
-            0% { opacity: 0.7; text-shadow: 0 0 5px var(--accent-glow); }
-            50% { opacity: 1; text-shadow: 0 0 15px var(--accent-glow), 0 0 30px var(--accent-glow); }
-            100% { opacity: 0.7; text-shadow: 0 0 5px var(--accent-glow); }
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
-            40% { transform: translate(-5px, -5px); filter: hue-rotate(180deg); }
-            60% { transform: translate(5px, 5px); filter: hue-rotate(270deg); }
-            80% { transform: translate(5px, -5px); filter: hue-rotate(360deg); }
-            100% { transform: translate(0); }
-        }
-
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-
-        @keyframes fadeInOut {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        /* Header Styles */
-        header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 2rem 1rem;
-            position: relative;
-            overflow: hidden;
-            background-color: rgba(10, 10, 20, 0.8);
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
-            animation: scanline 8s linear infinite;
-            z-index: 1;
-        }
-
-        .ascii-art {
-            font-size: 0.5rem;
-            line-height: 0.6rem;
-            white-space: pre;
-            text-align: center;
-            color: var(--accent-color);
-            text-shadow: 0 0 10px var(--accent-glow);
-            animation: pulse 4s infinite;
-            margin-bottom: 1rem;
-            max-width: 100%;
-            overflow-x: auto;
-            display: none;
-        }
-
-        @media (min-width: 768px) {
-            .ascii-art {
-                font-size: 0.6rem;
-                display: block;
-            }
-        }
-
-        @media (min-width: 1200px) {
-            .ascii-art {
-                font-size: 0.8rem;
-            }
-        }
-
-        /* Navigation Styles */
-        nav {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 1rem;
-            gap: 1rem;
-            background-color: rgba(20, 20, 40, 0.7);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        nav a {
-            color: var(--secondary-text);
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--border-color);
-            background-color: rgba(26, 26, 46, 0.8);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        nav a::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(79, 79, 255, 0.2), transparent);
-            transition: all 0.5s ease;
-        }
-
-        nav a:hover {
-            color: var(--primary-text);
-            background-color: rgba(40, 40, 70, 0.9);
-            box-shadow: 0 0 10px var(--accent-glow);
-            transform: translateY(-2px);
-        }
-
-        nav a:hover::before {
-            left: 100%;
-        }
-
-        /* Marquee Styles */
-        marquee {
-            margin: 1rem 0;
-            padding: 0.5rem;
-            background-color: rgba(10, 10, 20, 0.7);
-            color: var(--terminal-green);
-            font-weight: bold;
-            border-top: 1px dashed var(--border-color);
-            border-bottom: 1px dashed var(--border-color);
-        }
-
-        .blink {
-            animation: fadeInOut 1s infinite;
-            color: var(--accent-color);
-        }
-
-        /* Main Content Styles */
-        main {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        .win98-box {
-            background-color: rgba(20, 20, 40, 0.8);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--box-shadow);
-            margin: 1rem 0;
-            -webkit-backdrop-filter: blur(5px);
-            backdrop-filter: blur(5px);
-            max-width: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .win98-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                linear-gradient(45deg, transparent 65%, rgba(79, 79, 255, 0.1) 75%, transparent 85%),
-                linear-gradient(135deg, transparent 65%, rgba(79, 79, 255, 0.1) 75%, transparent 85%);
-            background-size: 100px 100px;
-            animation: float 10s infinite;
-            pointer-events: none;
-        }
-
-        .win98-box-title {
-            background: linear-gradient(90deg, var(--accent-color), var(--tertiary-bg));
-            color: #ffffff;
-            padding: 0.3rem 0.6rem;
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .win98-box-content {
-            padding: 1rem;
-        }
-
-        /* Links Index Specific Styles */
-        .index-section {
-            margin-bottom: 2rem;
-        }
-
-        .index-title {
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-            color: var(--accent-color);
-            text-shadow: 0 0 10px var(--accent-glow);
-            animation: pulse 4s infinite;
-        }
-
-        .letter-section {
-            margin-bottom: 2rem;
-        }
-
-        .letter-header {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--accent-color);
-            text-shadow: 0 0 15px var(--accent-glow);
-        }
-
-        .index-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-
-        .index-item {
-            padding: 0.8rem;
-            background-color: rgba(25, 25, 45, 0.7);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        .index-item:hover {
-            background-color: rgba(35, 35, 60, 0.9);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(79, 79, 255, 0.3);
-        }
-
-        .index-link {
-            display: block;
-            color: var(--secondary-text);
-            text-decoration: none;
-            font-size: 1.2rem;
-            margin-bottom: 0.3rem;
-            transition: all 0.3s ease;
-        }
-
-        .index-link:hover {
-            color: var(--primary-text);
-            text-shadow: 0 0 8px var(--accent-glow);
-        }
-
-        .index-description {
-            font-size: 0.9rem;
-            color: var(--primary-text);
-            opacity: 0.8;
-        }
-
-        .index-tags {
-            margin-top: 0.5rem;
-            font-size: 0.8rem;
-            color: var(--secondary-text);
-        }
-
-        /* Alphabet Navigation */
-        .alphabet-nav {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.5rem;
-            margin: 1rem 0 2rem;
-            padding: 1rem;
-            background-color: rgba(15, 15, 30, 0.8);
-            border: 1px solid var(--border-color);
-        }
-
-        .alphabet-nav a {
-            width: 2rem;
-            height: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--secondary-text);
-            text-decoration: none;
-            border: 1px solid var(--border-color);
-            background-color: rgba(25, 25, 45, 0.8);
-            transition: all 0.3s ease;
-        }
-
-        .alphabet-nav a:hover {
-            color: var(--primary-text);
-            background-color: var(--accent-color);
-            transform: translateY(-2px);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        .alphabet-nav a.active {
-            background-color: var(--accent-color);
-            color: white;
-        }
-
-        /* Search Box */
-        .search-container {
-            margin-bottom: 2rem;
-            padding: 1rem;
-            background-color: rgba(15, 15, 30, 0.8);
-            border: 1px solid var(--border-color);
-        }
-
-        .search-form {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .search-input {
-            flex-grow: 1;
-            padding: 0.5rem;
-            background-color: rgba(10, 10, 20, 0.8);
-            color: var(--primary-text);
-            border: 1px solid var(--border-color);
-            font-family: 'VT323', monospace;
-        }
-
-        .search-submit {
-            padding: 0.5rem 1rem;
-            background-color: var(--tertiary-bg);
-            color: var(--primary-text);
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            font-family: 'VT323', monospace;
-            transition: all 0.3s ease;
-        }
-
-        .search-submit:hover {
-            background-color: var(--accent-color);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        /* Stats Section */
-        .stats-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin: 2rem 0;
-            justify-content: space-between;
-        }
-
-        .stat-item {
-            flex: 1;
-            min-width: 120px;
-            padding: 1rem;
-            background-color: rgba(25, 25, 45, 0.7);
-            border: 1px solid var(--border-color);
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--accent-color);
-            text-shadow: 0 0 10px var(--accent-glow);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: var (--secondary-text);
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 2rem 1rem;
-            margin-top: 2rem;
-            border-top: 1px solid var(--border-color);
-            background-color: rgba(10, 10, 20, 0.8);
-            position: relative;
-            overflow: hidden;
-        }
-
-        footer::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
-            z-index: 1;
-        }
-
-        /* Terminal effect overlay */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.1),
-                rgba(0, 0, 0, 0.1) 1px,
-                transparent 1px,
-                transparent 2px
-            );
-            pointer-events: none;
-            z-index: 1000;
-            opacity: 0.3;
-        }
-
-        /* Dynamic scanline effect */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background-color: rgba(120, 120, 255, 0.1);
-            box-shadow: 0 0 10px rgba(120, 120, 255, 0.2);
-            z-index: 1001;
-            animation: scanline 8s linear infinite;
-            pointer-events: none;
-        }
-
-        /* Stars background effect */
-        .stars {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .star {
-            position: absolute;
-            background-color: var(--primary-text);
-            border-radius: 50%;
-            animation: pulse 3s infinite;
-        }
-
-        /* Links and Text */
-        a {
-            color: var(--secondary-text);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        a:hover {
-            color: var(--primary-text);
-            text-shadow: 0 0 5px var(--accent-glow);
-        }
-
-        a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background-color: var(--accent-color);
-            transition: width 0.3s ease;
-        }
-
-        a:hover::after {
-            width: 100%;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .index-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .alphabet-nav {
-                gap: 0.3rem;
-            }
-            
-            .alphabet-nav a {
-                width: 1.8rem;
-                height: 1.8rem;
-                font-size: 0.9rem;
-            }
-            
-            .stats-section {
-                flex-direction: column;
-            }
-        }
-    </style>
+    <meta name="twitter:image" content="img/og-featured.png">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <!-- Stars background effect -->
+<body data-page="index" data-depth="120" data-range="120">
+    <noscript><p class="sticker ghost" style="position:static;display:inline-block;margin:10px">the underweb runs on javascript. the links still work without it.</p></noscript>
     <div class="stars" id="stars"></div>
 
-    <header>
-        <div class="ascii-art">
-            ████████╗██╗  ██╗███████╗    ██╗   ██╗███╗   ██╗██████╗ ███████╗██████╗ ██╗    ██╗███████╗██████╗ 
-            ╚══██╔══╝██║  ██║██╔════╝    ██║   ██║████╗  ██║██╔══██╗██╔════╝██╔══██╗██║    ██║██╔════╝██╔══██╗
-               ██║   ███████║█████╗      ██║   ██║██╔██╗ ██║██║  ██║█████╗  ██████╔╝██║ █╗ ██║█████╗  ██████╔╝
-               ██║   ██╔══██║██╔══╝      ██║   ██║██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗██║███╗██║██╔══╝  ██╔══██╗
-               ██║   ██║  ██║███████╗    ╚██████╔╝██║ ╚████║██████╔╝███████╗██║  ██║╚███╔███╔╝███████╗██████╔╝
-               ╚═╝   ╚═╝  ╚═╝╚══════╝     ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚══════╝╚═════╝ 
-        </div>
-        <div class="win98-box" style="max-width: 600px; margin: 0 auto;">
-            <div class="win98-box-title">
-                <span>linksindex.gif</span>
-                <span>X</span>
-            </div>
-            <div class="win98-box-content">
-                <img src="https://via.placeholder.com/600x150?text=THE+UNDERWEB+LINKS+INDEX" alt="THE UNDERWEB Links Index Banner" style="width: 100%; height: auto;">
-            </div>
-        </div>
+    <div class="statusbar" role="status">
+        <span><span class="led"></span><b>signal</b> open</span>
+        <span>depth <b data-depth-readout>-120m</b></span>
+        <span>you are <b>below the surface</b></span>
+        <span class="push">local time <b data-clock>--:--:--</b></span>
+    </div>
+
+    <header class="masthead">
+        <h1>THE UNDERWEB</h1>
+        <a href="index.html" style="background:none"><img class="banner px" src="img/banner-underweb.gif" width="936" height="120" alt="THE UNDERWEB — animated banner"></a>
+        <span class="sticker">a → z</span>
     </header>
 
-    <nav>
-        <a href="/">HOME</a>
-        <a href="linksindex.html">INDEX</a>
-        <a href="links.html">LINKS</a>
-        <a href="about.html">ABOUT</a>
-        <a href="chat.html">CHAT</a>
+    <nav class="tabs" aria-label="main">
+        <a href="index.html" data-page="surface"><small>00</small>surface</a>
+        <a href="linksindex.html" data-page="index"><small>01</small>index</a>
+        <a href="links.html" data-page="links"><small>02</small>links</a>
+        <a href="about.html" data-page="about"><small>03</small>about</a>
+        <a href="chat.html" data-page="chat"><small>04</small>chat</a>
     </nav>
 
-    <marquee scrollamount="5" behavior="alternate">
-        <span class="blink">★</span> NAVIGATE THE DIGITAL LABYRINTH - FIND WHAT YOU SEEK IN THE INDEXED DEPTHS <span class="blink">★</span>
-    </marquee>
+    <div class="ticker" aria-label="announcements">
+        <div class="ticker-track"><span>★ navigate the digital labyrinth ★ find what you seek in the <b>indexed depths</b> ★ letters in white have something buried under them ★</span></div>
+    </div>
 
-    <main>
-        <div class="win98-box">
-            <div class="win98-box-title">
-                <span>Alphabetical Index</span>
-                <span>X</span>
+    <main class="page page--split">
+        <aside class="sidebar">
+            <div class="win98-box deep">
+            <div class="win98-box-title"><span>stats.dat</span><span>×</span></div>
+            <div class="win98-box-content ">
+                <div class="stats-section">
+                    <div class="stat-item"><div class="stat-number" id="stat-links">0</div><div class="stat-label">sites indexed</div></div>
+                    <div class="stat-item"><div class="stat-number" id="stat-cats">0</div><div class="stat-label">strata</div></div>
+                    <div class="stat-item"><div class="stat-number" id="stat-tags">0</div><div class="stat-label">unique tags</div></div>
+                    <div class="stat-item"><div class="stat-number" id="stat-new" style="font-size:1.7rem">—</div><div class="stat-label">last dig</div></div>
+                </div>
             </div>
-            <div class="win98-box-content">
+        </div>
+            <div class="win98-box tilt-r">
+            <div class="win98-box-title"><span>tags.cloud</span><span>×</span></div>
+            <div class="win98-box-content ">
+                <div id="tag-cloud" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+            </div>
+        </div>
+        </aside>
+        <div class="win98-box ">
+            <div class="win98-box-title"><span>alphabetical-index/</span><span>×</span></div>
+            <div class="win98-box-content ">
                 <div class="search-container">
-                    <form class="search-form" id="search-form">
-                        <input type="text" class="search-input" id="search-input" placeholder="Search the index...">
-                        <button type="submit" class="search-submit">Search</button>
+                    <form class="search-form" id="search-form" role="search">
+                        <label class="sr-only" for="search-input">search the index</label>
+                        <input type="search" class="search-input" id="search-input" placeholder="search the index…" autocomplete="off">
+                        <button type="submit" class="search-submit">search</button>
                     </form>
                 </div>
-                
-                <div class="alphabet-nav" id="alphabet-nav">
-                    <a href="#a" class="active">A</a>
-                    <a href="#b">B</a>
-                    <a href="#c">C</a>
-                    <a href="#d">D</a>
-                    <a href="#e">E</a>
-                    <a href="#f">F</a>
-                    <a href="#g">G</a>
-                    <a href="#h">H</a>
-                    <a href="#i">I</a>
-                    <a href="#j">J</a>
-                    <a href="#k">K</a>
-                    <a href="#l">L</a>
-                    <a href="#m">M</a>
-                    <a href="#n">N</a>
-                    <a href="#o">O</a>
-                    <a href="#p">P</a>
-                    <a href="#q">Q</a>
-                    <a href="#r">R</a>
-                    <a href="#s">S</a>
-                    <a href="#t">T</a>
-                    <a href="#u">U</a>
-                    <a href="#v">V</a>
-                    <a href="#w">W</a>
-                    <a href="#x">X</a>
-                    <a href="#y">Y</a>
-                    <a href="#z">Z</a>
-                    <a href="#0-9">#</a>
-                </div>
-                
-                <div class="stats-section">
-                    <div class="stat-item">
-                        <div class="stat-number">732</div>
-                        <div class="stat-label">
-                            Total Links Indexed
-                        </div>
-                    </div>
-                </div>
+                <nav class="alphabet-nav" id="alphabet-nav" aria-label="jump to letter"><a href="#a">A</a><a href="#b">B</a><a href="#c">C</a><a href="#d">D</a><a href="#e">E</a><a href="#f">F</a><a href="#g">G</a><a href="#h">H</a><a href="#i">I</a><a href="#j">J</a><a href="#k">K</a><a href="#l">L</a><a href="#m">M</a><a href="#n">N</a><a href="#o">O</a><a href="#p">P</a><a href="#q">Q</a><a href="#r">R</a><a href="#s">S</a><a href="#t">T</a><a href="#u">U</a><a href="#v">V</a><a href="#w">W</a><a href="#x">X</a><a href="#y">Y</a><a href="#z">Z</a><a href="#0-9">#</a></nav>
+                <div id="index-out"></div>
             </div>
         </div>
     </main>
 
-    <footer>
-        <p>&copy; 2025 THE UNDERWEB - <a href="/submit">Submit Image</a> - <a href="linksindex.html">Link Directory</a> - <a href="about.html">About</a> - <a href="chat.html">Chat/Forum</a></p>
+    <footer class="footer">
+        <div class="button-wall">
+            <a href="index.html" title="link to THE UNDERWEB"><img src="img/button-88x31.gif" width="88" height="31" alt="THE UNDERWEB 88x31 button"></a>
+            <span class="b88">hand<br><b>coded</b></span>
+            <span class="b88">no feed<br><b>no algo</b></span>
+            <span class="b88">best viewed<br>in <b>any browser</b></span>
+            <span class="b88">html<br><b>is art</b></span>
+            <span class="b88"><b>webring</b><br>member</span>
+            <span class="b88">stay<br><b>weird</b></span>
+            <span class="b88">made<br>after <b>dark</b></span>
+        </div>
+        <div class="webring">
+            <a href="index.html">▲ ascend</a>
+            <a href="#" data-random-site>✶ random hole ✶</a>
+            <a href="links.html">descend ▼</a>
+        </div>
+        <p>&copy; <span data-year>2025</span> THE UNDERWEB · a gateway, not a platform · nothing here is tracked</p>
+        <div class="footer-links">
+            <a href="index.html#submit-form">submit an image</a>
+            <a href="links.html#link-submit-form">submit a link</a>
+            <a href="linksindex.html">a–z index</a>
+            <a href="about.html">about</a>
+            <a href="chat.html">chat</a>
+        </div>
     </footer>
 
+    <script src="links-data.js"></script>
+    <script src="ui.js"></script>
     <script>
-        // Create the stars background
-        document.addEventListener("DOMContentLoaded", function() {
-            const starsContainer = document.getElementById('stars');
-            const numberOfStars = 100;
-            
-            for (let i = 0; i < numberOfStars; i++) {
-                const star = document.createElement('div');
-                star.classList.add('star');
-                
-                // Random properties
-                const size = Math.random() * 2 + 1;
-                const left = Math.random() * 100;
-                const top = Math.random() * 100;
-                const delay = Math.random() * 3;
-                
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.left = `${left}%`;
-                star.style.top = `${top}%`;
-                star.style.animationDelay = `${delay}s`;
-                
-                starsContainer.appendChild(star);
-            }
-            
-            // Alphabet navigation
-            const alphabetLinks = document.querySelectorAll('.alphabet-nav a');
-            
-            alphabetLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Remove active class from all links
-                    alphabetLinks.forEach(l => l.classList.remove('active'));
-                    
-                    // Add active class to clicked link
-                    this.classList.add('active');
-                });
+    (function () {
+        var LINKS = window.UNDERWEB_LINKS || [], CATS = window.UNDERWEB_CATEGORIES || {};
+        var out = document.getElementById('index-out'), nav = document.getElementById('alphabet-nav');
+        var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); };
+        function key(n) { var c = n.trim().charAt(0).toLowerCase(); return /[a-z]/.test(c) ? c : '0-9'; }
+
+        function render(term) {
+            term = (term || '').toLowerCase();
+            var groups = {};
+            LINKS.slice().sort(function (a, b) { return a.name.localeCompare(b.name); }).forEach(function (l) {
+                var hay = (l.name + ' ' + l.desc + ' ' + (l.tags || []).join(' ')).toLowerCase();
+                if (term && hay.indexOf(term) < 0) return;
+                (groups[key(l.name)] = groups[key(l.name)] || []).push(l);
             });
+            out.innerHTML = Object.keys(groups).sort().map(function (k) {
+                return '<section class="index-letter" id="' + k + '"><h3>' + (k === '0-9' ? '#' : k.toUpperCase()) +
+                    '<small>' + groups[k].length + ' site' + (groups[k].length > 1 ? 's' : '') + '</small></h3><ul class="index-list">' +
+                    groups[k].map(function (l) {
+                        return '<li><a href="links.html?q=' + encodeURIComponent(l.name) + '">' + esc(l.name) + '</a>' +
+                            '<span class="meta">' + esc((CATS[l.cat] || {}).name || l.cat) + ' · ' + (l.tags || []).map(function (t) { return '#' + esc(t); }).join(' ') + '</span></li>';
+                    }).join('') + '</ul></section>';
+            }).join('') || '<div class="empty-state show">no entries match. the index is still being dug.</div>';
+            nav.querySelectorAll('a').forEach(function (a) {
+                var k = a.getAttribute('href').slice(1);
+                a.classList.toggle('has', !!groups[k]);
+            });
+        }
+        render('');
+
+        nav.addEventListener('click', function (e) {
+            var a = e.target.closest('a'); if (!a) return;
+            e.preventDefault();
+            nav.querySelectorAll('a').forEach(function (l) { l.classList.remove('active'); });
+            a.classList.add('active');
+            var target = document.getElementById(a.getAttribute('href').slice(1));
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
         });
+        document.getElementById('search-form').addEventListener('submit', function (e) { e.preventDefault(); render(document.getElementById('search-input').value); });
+        document.getElementById('search-input').addEventListener('input', function () { render(this.value); });
+
+        // honest stats, counted from the data
+        var tags = {}; LINKS.forEach(function (l) { (l.tags || []).forEach(function (t) { tags[t] = (tags[t] || 0) + 1; }); });
+        var newest = LINKS.map(function (l) { return l.added || ''; }).sort().pop() || '—';
+        document.getElementById('stat-links').textContent = LINKS.length;
+        document.getElementById('stat-cats').textContent = new Set(LINKS.map(function (l) { return l.cat; })).size;
+        document.getElementById('stat-tags').textContent = Object.keys(tags).length;
+        document.getElementById('stat-new').textContent = newest.slice(0, 7);
+        var top = Object.keys(tags).sort(function (a, b) { return tags[b] - tags[a] || a.localeCompare(b); }).slice(0, 14);
+        document.getElementById('tag-cloud').innerHTML = top.map(function (t) {
+            return '<a class="btn ghost" style="font-size:' + (9 + tags[t] * 2) + 'px" href="links.html?q=' + encodeURIComponent(t) + '">#' + esc(t) + '</a>';
+        }).join(' ');
+    })();
     </script>
+    <script>document.querySelectorAll('[data-year]').forEach(function(e){e.textContent=new Date().getFullYear()});</script>
 </body>
 </html>

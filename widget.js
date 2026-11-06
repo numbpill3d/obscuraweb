@@ -6,6 +6,12 @@
  * @property {string} tags - Image tags
  */
 
+// where this widget was served from, so placeholder art resolves on any host page
+const UNDERWEB_WIDGET_BASE = (function () {
+    try { const cs = document.currentScript; if (cs && cs.src) return new URL('.', cs.src).href; } catch (e) { /* ignore */ }
+    return '';
+})();
+
 (async function () {
     // Add TypeScript type checking for window object
     // @ts-ignore - Ignore TypeScript errors for global window extensions
@@ -24,11 +30,11 @@
 
     /** @type {WidgetImage[]} */
     let images = [
-        { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W1', link: '#', tags: 'placeholder' },
-        { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W2', link: '#', tags: 'placeholder' },
-        { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W3', link: '#', tags: 'placeholder' },
-        { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W4', link: '#', tags: 'placeholder' },
-        { src: 'https://via.placeholder.com/80/c0c0c0/000000?text=W5', link: '#', tags: 'placeholder' }
+        { src: UNDERWEB_WIDGET_BASE + 'img/button-88x31.gif', link: UNDERWEB_WIDGET_BASE || '#', tags: 'the underweb' },
+        { src: UNDERWEB_WIDGET_BASE + 'img/button-88x31.gif', link: UNDERWEB_WIDGET_BASE || '#', tags: 'the underweb' },
+        { src: UNDERWEB_WIDGET_BASE + 'img/button-88x31.gif', link: UNDERWEB_WIDGET_BASE || '#', tags: 'the underweb' },
+        { src: UNDERWEB_WIDGET_BASE + 'img/button-88x31.gif', link: UNDERWEB_WIDGET_BASE || '#', tags: 'the underweb' },
+        { src: UNDERWEB_WIDGET_BASE + 'img/button-88x31.gif', link: UNDERWEB_WIDGET_BASE || '#', tags: 'the underweb' }
     ];
 
     // Attempt to fetch images from Supabase with retry logic
