@@ -20,12 +20,6 @@ const PORT = process.env.PORT || 3000;
 // Enable compression for all responses
 app.use(compression());
 
-// Serve static files from the current directory
-app.use(express.static(__dirname, {
-  maxAge: '1d', // Cache static assets for 1 day
-  etag: true,   // Enable ETags for caching
-}));
-
 // Add security headers
 app.use((req, res, next) => {
   // Help protect against clickjacking
@@ -39,9 +33,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve index.html for all routes to support SPA-like navigation
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+// Serve static files from the current directory
+app.use(express.static(__dirname, {
+  maxAge: '1d', // Cache static assets for 1 day
+  etag: true,   // Enable ETags for caching
+}));
+
+// unknown paths get the themed 404 page with a real 404 status
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, '404.html'));
 });
 
 // Start the server

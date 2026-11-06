@@ -5,11 +5,16 @@
   publish = "."
   command = ""
 
-# Configure redirects for SPA-like navigation
+# unknown paths get the themed 404 page (with a real 404 status)
+[[redirects]]
+  from = "/chat.html"
+  to = "/"
+  status = 302
+
 [[redirects]]
   from = "/*"
-  to = "/index.html"
-  status = 200
+  to = "/404.html"
+  status = 404
 
 # Add security headers
 [[headers]]

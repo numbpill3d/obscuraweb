@@ -427,7 +427,7 @@ form button[type=submit] { margin-top: 14px; width: 100%; }
     background: var(--void); border: 1px solid var(--violet);
 }
 .alphabet-nav a.has { color: var(--bone); background: var(--bruise); border-color: var(--amethyst); }
-.alphabet-nav a:not(.has) { opacity: .35; }
+.alphabet-nav a:not(.has) { opacity: .35; pointer-events: none; cursor: default; }
 .alphabet-nav a.active { background: var(--hot); color: var(--void); border-color: var(--hot); }
 .search-form { display: flex; gap: 8px; }
 .search-form input { flex: 1; }
@@ -604,3 +604,5 @@ form.chat-input-form button { margin: 0; width: auto; flex: none; }
 [hidden] { display: none !important; }
 .feed-empty { margin: 0; padding: 18px; text-align: center; border: 1px dashed var(--violet); color: var(--lavender); }
 .feed-empty a { margin-left: 4px; }
+
+.index-list a.visit { margin-left: 4px; text-decoration: none; }
