@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /.github/
+
+Sitemap: https://obscuraweb.vercel.app/sitemap.xml

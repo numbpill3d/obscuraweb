@@ -212,7 +212,7 @@
 
     // ---------- embed snippets: fill in this site's real address ----------
     function embeds() {
-        var origin = /^https?:/.test(location.protocol) ? location.origin : 'https://your-underweb-domain';
+        var origin = /^https?:/.test(location.protocol) ? location.origin : 'https://obscuraweb.vercel.app';
         doc.querySelectorAll('textarea[data-template]').forEach(function (t) {
             t.value = t.getAttribute('data-template').replace(/\{origin\}/g, origin);
         });

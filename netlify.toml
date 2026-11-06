@@ -5,11 +5,16 @@
   publish = "."
   command = ""
 
-# Configure redirects for SPA-like navigation
+# unknown paths get the themed 404 page (with a real 404 status)
+[[redirects]]
+  from = "/chat.html"
+  to = "/"
+  status = 302
+
 [[redirects]]
   from = "/*"
-  to = "/index.html"
-  status = 200
+  to = "/404.html"
+  status = 404
 
 # Add security headers
 [[headers]]
@@ -19,7 +24,7 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self' https://ibpnwppmlvlizuuxland.supabase.co https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;"
+    Content-Security-Policy = "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; script-src 'self' 'unsafe-inline';"
 
 # Enable compression
 [build.processing]

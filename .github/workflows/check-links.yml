@@ -1,0 +1,37 @@
+# Weekly dead-link check for the directory. Keeps a single open issue labelled
+# "dead-link" up to date, and closes it once every link answers again.
+name: check links
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: check every directory link
+        run: node .github/scripts/check-links.cjs
+      - name: open, update or close the dead-link issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --label dead-link --state open --json number --jq '.[0].number // empty')
+          if [ -f .link-report.md ]; then
+            if [ -n "$existing" ]; then
+              gh issue edit "$existing" --repo "$GITHUB_REPOSITORY" --body-file .link-report.md
+            else
+              gh issue create --repo "$GITHUB_REPOSITORY" --title "dead or moved links in the directory" --label dead-link --body-file .link-report.md
+            fi
+          elif [ -n "$existing" ]; then
+            gh issue close "$existing" --repo "$GITHUB_REPOSITORY" --comment "Every directory link answered on the latest check."
+          fi

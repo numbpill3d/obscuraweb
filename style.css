@@ -427,7 +427,7 @@ form button[type=submit] { margin-top: 14px; width: 100%; }
     background: var(--void); border: 1px solid var(--violet);
 }
 .alphabet-nav a.has { color: var(--bone); background: var(--bruise); border-color: var(--amethyst); }
-.alphabet-nav a:not(.has) { opacity: .35; }
+.alphabet-nav a:not(.has) { opacity: .35; pointer-events: none; cursor: default; }
 .alphabet-nav a.active { background: var(--hot); color: var(--void); border-color: var(--hot); }
 .search-form { display: flex; gap: 8px; }
 .search-form input { flex: 1; }
@@ -588,3 +588,21 @@ form.chat-input-form button { margin: 0; width: auto; flex: none; }
     *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition: none !important; }
     .ticker-track { animation: none; }
 }
+
+/* ==========================================================================
+   submit page
+   ========================================================================== */
+.page--submit { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; max-width: 1100px; }
+.page--submit .submit-intro { grid-column: 1 / -1; }
+@media (max-width: 860px) { .page--submit { grid-template-columns: 1fr; } }
+.steps { margin: 10px 0 12px; padding-left: 1.4em; display: grid; gap: 6px; }
+.steps b { color: var(--bone); }
+.form-error { margin: 12px 0 0; padding: 8px 10px; border: 1px solid var(--hot); color: var(--bone); background: var(--void); font-size: .85rem; }
+.submit-done { padding: 12px; background: var(--void); border: 1px dashed var(--hot); color: var(--bone); }
+.submit-done p { margin: 0 0 10px; }
+.submit-done .btn { margin: 4px 6px 0 0; }
+[hidden] { display: none !important; }
+.feed-empty { margin: 0; padding: 18px; text-align: center; border: 1px dashed var(--violet); color: var(--lavender); }
+.feed-empty a { margin-left: 4px; }
+
+.index-list a.visit { margin-left: 4px; text-decoration: none; }

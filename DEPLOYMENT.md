@@ -11,8 +11,8 @@ This guide will help you deploy THE UNDERWEB application to your own URL. There 
    - [GitHub Pages](#github-pages)
 3. [Option 2: Traditional Web Hosting](#option-2-traditional-web-hosting)
 4. [Option 3: Self-Hosting](#option-3-self-hosting)
-5. [Setting Up Your Supabase Backend](#setting-up-your-supabase-backend)
-6. [Customizing Your Configuration](#customizing-your-configuration)
+5. [How Submissions Work](#how-submissions-work)
+6. [Editing Content](#editing-content)
 7. [Troubleshooting](#troubleshooting)
 
 ## Prerequisites
@@ -20,7 +20,6 @@ This guide will help you deploy THE UNDERWEB application to your own URL. There 
 Before deploying, make sure you have:
 
 - A copy of the THE UNDERWEB codebase
-- A Supabase account (free tier available at [supabase.com](https://supabase.com))
 - Basic understanding of web hosting concepts
 - (Optional) A domain name you want to use
 
@@ -105,64 +104,35 @@ server {
 }
 ```
 
-## Setting Up Your Supabase Backend
+## How Submissions Work
 
-THE UNDERWEB uses Supabase for backend functionality. To set up your own Supabase instance:
+The site has no database. Submissions go through GitHub issues on this repo, and approved ones are written into the site's data files.
 
-1. Create an account at [supabase.com](https://supabase.com)
-2. Create a new project
-3. Note your project URL and anon key
-4. Set up the required tables:
+1. A visitor fills in a form on `submit.html`. `submit.js` opens a prefilled issue from `.github/ISSUE_TEMPLATE/submit-link.yml` or `submit-image.yml`, and the visitor presses **Create** on GitHub.
+2. New submissions get the `submission` label plus `link` or `image`. Review them at **Issues → label: submission**.
+3. To publish one, add the **`approved`** label. `.github/workflows/publish-submission.yml` then:
+   - appends a link to `links-data.js`, or
+   - downloads an image into `img/submissions/` and appends it to `images-data.js`,
+   - commits to `main` (which redeploys the site), comments on the issue and closes it.
+4. If something is wrong (bad URL, image too big, duplicate site), the workflow comments with the reason and removes `approved`. Fix the issue and add the label again.
+5. To reject a submission, close the issue.
 
-   a. Create an `images` table with the following columns:
-      - `id` (uuid, primary key)
-      - `created_at` (timestamp with time zone)
-      - `image_url` (text)
-      - `site_url` (text)
-      - `tags` (text)
+The workflow needs **Settings → Actions → General → Workflow permissions** set to "Read and write". It needs no other secrets.
 
-   b. Enable Row Level Security (RLS) and configure appropriate policies
+## Editing Content
 
-5. Update the configuration in `common.js` with your Supabase URL and anon key:
-
-```javascript
-const APP_CONFIG = {
-    // ... other config
-    SUPABASE: {
-        URL: 'https://your-project-id.supabase.co',
-        ANON_KEY: 'your-anon-key'
-    },
-    // ... other config
-};
-```
-
-## Customizing Your Configuration
-
-You can customize various aspects of THE UNDERWEB by editing the `APP_CONFIG` object in `common.js`:
-
-- Change the application name and version
-- Configure storage settings
-- Adjust API retry attempts and delays
-- Modify UI settings
+- **Directory:** edit `links-data.js`. Every entry needs a real, working `url`.
+- **Image feed and widget:** edit `images-data.js`. Image files live in `img/submissions/`.
 
 ## Troubleshooting
 
-### Images Not Loading
+### A submission didn't publish
 
-- Check your Supabase configuration in `common.js`
-- Verify that your Supabase storage bucket is properly configured
-- Check browser console for any errors
+- Open the **Actions** tab and look at the "publish submission" run for that issue.
+- Check that the issue still has both the `submission` and `link`/`image` labels.
 
 ### Deployment Issues
 
 - Make sure all files are properly uploaded
 - Check if your hosting provider requires specific configurations
 - Verify that your domain DNS settings are correctly configured
-
-### Backend Connection Issues
-
-- Confirm your Supabase URL and anon key are correct
-- Check if your Supabase project is active
-- Verify that the required tables exist with the correct structure
-
-For additional help, please refer to the documentation of your chosen hosting platform or Supabase.

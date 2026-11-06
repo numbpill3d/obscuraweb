@@ -7,21 +7,23 @@
     <meta name="description" content="Alphabetical index of every site archived in THE UNDERWEB.">
     <meta name="theme-color" content="#0e001a">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://obscuraweb.vercel.app/linksindex.html">
+    <link rel="canonical" href="https://obscuraweb.vercel.app/linksindex.html">
     <meta property="og:site_name" content="THE UNDERWEB">
     <meta property="og:title" content="INDEX — THE UNDERWEB">
     <meta property="og:description" content="Alphabetical index of every site archived in THE UNDERWEB.">
-    <meta property="og:image" content="img/og-featured.png">
+    <meta property="og:image" content="https://obscuraweb.vercel.app/img/og-featured.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="img/og-featured.png">
+    <meta name="twitter:image" content="https://obscuraweb.vercel.app/img/og-featured.png">
     <link rel="icon" type="image/png" href="img/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="style.css">
 </head>
 <body data-page="index" data-depth="120" data-range="120">
-    <noscript><p class="sticker ghost" style="position:static;display:inline-block;margin:10px">the underweb runs on javascript. the links still work without it.</p></noscript>
+    <noscript><p class="sticker ghost" style="position:static;display:inline-block;margin:10px">the underweb draws its directory and forms with javascript. turn it on to dig.</p></noscript>
     <div class="stars" id="stars"></div>
 
     <div class="statusbar" role="status">
@@ -42,7 +44,7 @@
         <a href="linksindex.html" data-page="index"><small>01</small>index</a>
         <a href="links.html" data-page="links"><small>02</small>links</a>
         <a href="about.html" data-page="about"><small>03</small>about</a>
-        <a href="chat.html" data-page="chat"><small>04</small>chat</a>
+        <a href="submit.html" data-page="submit"><small>04</small>submit</a>
     </nav>
 
     <div class="ticker" aria-label="announcements">
@@ -92,22 +94,20 @@
             <span class="b88">no feed<br><b>no algo</b></span>
             <span class="b88">best viewed<br>in <b>any browser</b></span>
             <span class="b88">html<br><b>is art</b></span>
-            <span class="b88"><b>webring</b><br>member</span>
             <span class="b88">stay<br><b>weird</b></span>
             <span class="b88">made<br>after <b>dark</b></span>
         </div>
         <div class="webring">
             <a href="index.html">▲ ascend</a>
-            <a href="#" data-random-site>✶ random hole ✶</a>
+            <a href="links.html" data-random-site>✶ random hole ✶</a>
             <a href="links.html">descend ▼</a>
         </div>
         <p>&copy; <span data-year>2025</span> THE UNDERWEB · a gateway, not a platform · nothing here is tracked</p>
         <div class="footer-links">
-            <a href="index.html#submit-form">submit an image</a>
-            <a href="links.html#link-submit-form">submit a link</a>
+            <a href="submit.html#link">submit a link</a>
+            <a href="submit.html#image">submit an image</a>
             <a href="linksindex.html">a–z index</a>
             <a href="about.html">about</a>
-            <a href="chat.html">chat</a>
         </div>
     </footer>
 
@@ -132,13 +132,16 @@
                 return '<section class="index-letter" id="' + k + '"><h3>' + (k === '0-9' ? '#' : k.toUpperCase()) +
                     '<small>' + groups[k].length + ' site' + (groups[k].length > 1 ? 's' : '') + '</small></h3><ul class="index-list">' +
                     groups[k].map(function (l) {
-                        return '<li><a href="links.html?q=' + encodeURIComponent(l.name) + '">' + esc(l.name) + '</a>' +
+                        return '<li><a href="links.html?q=' + encodeURIComponent(l.name) + '">' + esc(l.name) + '</a> <a class="visit" href="' + esc(l.url) + '" target="_blank" rel="noopener" aria-label="visit ' + esc(l.name) + '">↗</a>' +
                             '<span class="meta">' + esc((CATS[l.cat] || {}).name || l.cat) + ' · ' + (l.tags || []).map(function (t) { return '#' + esc(t); }).join(' ') + '</span></li>';
                     }).join('') + '</ul></section>';
             }).join('') || '<div class="empty-state show">no entries match. the index is still being dug.</div>';
             nav.querySelectorAll('a').forEach(function (a) {
                 var k = a.getAttribute('href').slice(1);
-                a.classList.toggle('has', !!groups[k]);
+                var has = !!groups[k];
+                a.classList.toggle('has', has);
+                if (has) { a.removeAttribute('aria-disabled'); a.removeAttribute('tabindex'); }
+                else { a.setAttribute('aria-disabled', 'true'); a.setAttribute('tabindex', '-1'); }
             });
         }
         render('');

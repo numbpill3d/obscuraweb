@@ -7,21 +7,23 @@
     <meta name="description" content="THE UNDERWEB is a curated gateway to the most interesting, obscure, and artistic corners of the internet: digital art galleries, experimental web projects, and forgotten relics of the early web.">
     <meta name="theme-color" content="#0e001a">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://obscuraweb.vercel.app/">
+    <link rel="canonical" href="https://obscuraweb.vercel.app/">
     <meta property="og:site_name" content="THE UNDERWEB">
     <meta property="og:title" content="THE UNDERWEB — a gateway to the web beyond the feed">
     <meta property="og:description" content="THE UNDERWEB is a curated gateway to the most interesting, obscure, and artistic corners of the internet: digital art galleries, experimental web projects, and forgotten relics of the early web.">
-    <meta property="og:image" content="img/og-featured.png">
+    <meta property="og:image" content="https://obscuraweb.vercel.app/img/og-featured.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="img/og-featured.png">
+    <meta name="twitter:image" content="https://obscuraweb.vercel.app/img/og-featured.png">
     <link rel="icon" type="image/png" href="img/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="style.css">
 </head>
 <body data-page="surface" data-depth="0" data-range="120">
-    <noscript><p class="sticker ghost" style="position:static;display:inline-block;margin:10px">the underweb runs on javascript. the links still work without it.</p></noscript>
+    <noscript><p class="sticker ghost" style="position:static;display:inline-block;margin:10px">the underweb draws its directory and forms with javascript. turn it on to dig.</p></noscript>
     <div class="stars" id="stars"></div>
 
     <div class="statusbar" role="status">
@@ -34,7 +36,7 @@
     <header class="masthead">
         <h1>THE UNDERWEB</h1>
         <a href="index.html" style="background:none"><img class="banner px" src="img/banner-underweb.gif" width="936" height="120" alt="THE UNDERWEB — animated banner"></a>
-        <span class="sticker">est. 1999-ish</span>
+        <span class="sticker">est. 2025</span>
     </header>
 
     <nav class="tabs" aria-label="main">
@@ -42,16 +44,13 @@
         <a href="linksindex.html" data-page="index"><small>01</small>index</a>
         <a href="links.html" data-page="links"><small>02</small>links</a>
         <a href="about.html" data-page="about"><small>03</small>about</a>
-        <a href="chat.html" data-page="chat"><small>04</small>chat</a>
+        <a href="submit.html" data-page="submit"><small>04</small>submit</a>
     </nav>
 
     <div class="ticker" aria-label="announcements">
         <div class="ticker-track"><span>★ welcome to <b>the underweb</b> — your portal to the hidden corners of the internet ★ no algorithms ★ hand coded ★ digital art galleries ★ experimental web projects ★ forgotten relics ★ you were never here ★ dig deeper ★</span></div>
     </div>
 
-    <div id="loading-spinner" role="status" aria-live="polite" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:var(--void);border:2px solid var(--lilac);box-shadow:6px 6px 0 var(--bruise);padding:16px 22px;font:11px var(--pixel);text-transform:uppercase;color:var(--lavender)">
-        <span class="blink">▼</span> digging…
-    </div>
 
     <main class="page page--home">
         <section class="area-hero win98-box">
@@ -69,7 +68,7 @@
                     <div class="actions">
                         <a href="links.html" class="btn">open the directory</a>
                         <a href="linksindex.html" class="btn ghost">a–z index</a>
-                        <a href="chat.html" class="btn ghost">join the chat</a>
+                        <a href="submit.html" class="btn ghost">submit a find</a>
                     </div>
                 </div>
             </div>
@@ -83,42 +82,34 @@
             <div class="win98-box-title"><span>drawers.exe</span><span>×</span></div>
             <div class="win98-box-content ">
                 <ul class="drawer">
-                    <li><a href="#image-feed">latest submissions</a></li>
+                    <li><a href="#feed">latest transmissions</a></li>
                     <li><a href="linksindex.html">popular tags</a></li>
-                    <li><a href="#" data-random-site>random site</a></li>
-                    <li><a href="links.html#cat-forums">web rings</a></li>
+                    <li><a href="links.html" data-random-site>random site</a></li>
+                    <li><a href="links.html#cat-forums">webrings &amp; communities</a></li>
+                    <li><a href="submit.html">submit a find</a></li>
                 </ul>
             </div>
         </div>
-        <div class="win98-box " id="submit">
-            <div class="win98-box-title"><span>send-a-transmission.txt</span><span>×</span></div>
+        <div class="win98-box loud" id="submit">
+            <div class="win98-box-title"><span>send-something-down.txt</span><span>×</span></div>
             <div class="win98-box-content ">
-                <p class="small">Found something that belongs down here? Send an image of it and the link it points to.</p>
-                <form id="submit-form">
-                    <label for="image-upload">upload image</label>
-                    <input type="file" id="image-upload" accept="image/*">
-                    <label for="image-url">…or image url</label>
-                    <input type="url" id="image-url" placeholder="https://…/thing.gif">
-                    <label for="site-link">the site it belongs to *</label>
-                    <input type="url" id="site-link" placeholder="https://" required>
-                    <p class="hint">an upload or an image url — one of the two is required.</p>
-                    <label for="tags">tags (comma-separated)</label>
-                    <input type="text" id="tags" placeholder="netart, gifs, webring">
-                    <button type="submit">transmit ↓</button>
-                </form>
-                <div id="submission-message"><p>received. your transmission is sinking into the archive.</p></div>
+                <p class="small">Found something that belongs down here? Send a link for the directory or an image for the feed. A human reviews every one.</p>
+                <div class="actions" style="display:grid;gap:8px">
+                    <a href="submit.html#link" class="btn">submit a link</a>
+                    <a href="submit.html#image" class="btn ghost">submit an image</a>
+                </div>
             </div>
         </div>
         <div class="win98-box deep nudge tilt-r">
-            <div class="win98-box-title"><span>hits.dat</span></div>
+            <div class="win98-box-title"><span>your-visits.dat</span></div>
             <div class="win98-box-content ">
-                <div class="counter" data-counter="42069" aria-label="visitor counter"></div>
-                <p class="small dim" style="text-align:center;margin:6px 0 0">diggers since the first shovel</p>
+                <div class="counter" data-counter="0" aria-label="your visits from this browser"></div>
+                <p class="small dim" style="text-align:center;margin:6px 0 0">your visits, counted only in this browser</p>
             </div>
         </div>
         </aside>
         <section class="area-feed" style="display:grid;gap:26px">
-            <div class="win98-box ">
+            <div class="win98-box " id="feed">
             <div class="win98-box-title"><span>recent-transmissions/</span><span>×</span></div>
             <div class="win98-box-content ">
                 <div id="image-feed"></div>
@@ -182,31 +173,27 @@
             <span class="b88">no feed<br><b>no algo</b></span>
             <span class="b88">best viewed<br>in <b>any browser</b></span>
             <span class="b88">html<br><b>is art</b></span>
-            <span class="b88"><b>webring</b><br>member</span>
             <span class="b88">stay<br><b>weird</b></span>
             <span class="b88">made<br>after <b>dark</b></span>
         </div>
         <div class="webring">
             <a href="index.html">▲ ascend</a>
-            <a href="#" data-random-site>✶ random hole ✶</a>
+            <a href="links.html" data-random-site>✶ random hole ✶</a>
             <a href="linksindex.html">descend ▼</a>
         </div>
         <p>&copy; <span data-year>2025</span> THE UNDERWEB · a gateway, not a platform · nothing here is tracked</p>
         <div class="footer-links">
-            <a href="index.html#submit-form">submit an image</a>
-            <a href="links.html#link-submit-form">submit a link</a>
+            <a href="submit.html#link">submit a link</a>
+            <a href="submit.html#image">submit an image</a>
             <a href="linksindex.html">a–z index</a>
             <a href="about.html">about</a>
-            <a href="chat.html">chat</a>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="links-data.js"></script>
+        <script src="links-data.js"></script>
     <script src="ui.js"></script>
-    <script src="common.js"></script>
+    <script src="images-data.js"></script>
     <script src="script.js"></script>
-    <script src="widget.js"></script>
     <script>document.querySelectorAll('[data-year]').forEach(function(e){e.textContent=new Date().getFullYear()});</script>
 </body>
 </html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUBMIT — THE UNDERWEB</title>
+    <meta name="description" content="Send a link or an image down to THE UNDERWEB. Every submission is reviewed by a human before it appears.">
+    <meta name="theme-color" content="#0e001a">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://obscuraweb.vercel.app/submit.html">
+    <link rel="canonical" href="https://obscuraweb.vercel.app/submit.html">
+    <meta property="og:site_name" content="THE UNDERWEB">
+    <meta property="og:title" content="SUBMIT — THE UNDERWEB">
+    <meta property="og:description" content="Send a link or an image down to THE UNDERWEB. Every submission is reviewed by a human before it appears.">
+    <meta property="og:image" content="https://obscuraweb.vercel.app/img/og-featured.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://obscuraweb.vercel.app/img/og-featured.png">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="submit" data-depth="360" data-range="120">
+    <noscript><p class="sticker ghost" style="position:static;display:inline-block;margin:10px">the underweb draws its directory and forms with javascript. turn it on to dig.</p></noscript>
+    <div class="stars" id="stars"></div>
+
+    <div class="statusbar" role="status">
+        <span><span class="led"></span><b>signal</b> open</span>
+        <span>depth <b data-depth-readout>-360m</b></span>
+        <span>you are <b>below the surface</b></span>
+        <span class="push">local time <b data-clock>--:--:--</b></span>
+    </div>
+
+    <header class="masthead">
+        <h1>THE UNDERWEB</h1>
+        <a href="index.html" style="background:none"><img class="banner px" src="img/banner-gateway.gif" width="936" height="120" alt="THE UNDERWEB gateway banner: digital art galleries, web experiments, early-web relics"></a>
+        <span class="sticker">drop it down</span>
+    </header>
+
+    <nav class="tabs" aria-label="main">
+        <a href="index.html" data-page="surface"><small>00</small>surface</a>
+        <a href="linksindex.html" data-page="index"><small>01</small>index</a>
+        <a href="links.html" data-page="links"><small>02</small>links</a>
+        <a href="about.html" data-page="about"><small>03</small>about</a>
+        <a href="submit.html" data-page="submit"><small>04</small>submit</a>
+    </nav>
+
+    <div class="ticker" aria-label="announcements">
+        <div class="ticker-track"><span>★ found something that belongs down here? ★ <b>send it down</b> ★ every submission is read by a human ★ approved finds appear on the site within minutes ★</span></div>
+    </div>
+
+    <main class="page page--submit">
+        <section class="win98-box loud submit-intro">
+            <div class="win98-box-title"><span>how-submissions-work.txt</span><span>×</span></div>
+            <div class="win98-box-content">
+                <p class="serif" style="font-size:1.15rem">Found a corner of the web that belongs down here? <em>Send it down.</em></p>
+                <ol class="steps">
+                    <li><b>Fill in a form below.</b> Pick a link or an image.</li>
+                    <li><b>Confirm it on GitHub.</b> Pressing send opens the filled-in submission on GitHub in a new tab. Press <i>Create</i> there to send it. You need a free GitHub account.</li>
+                    <li><b>A curator reviews it.</b> Approved submissions appear on the site automatically, and you get a reply on the submission when it's live.</li>
+                </ol>
+                <p class="small dim">Submissions are public on GitHub. Don't include anything private.</p>
+            </div>
+        </section>
+
+        <section class="win98-box tilt-l" id="link">
+            <div class="win98-box-title"><span>submit-a-link.txt</span><span>×</span></div>
+            <div class="win98-box-content">
+                <p class="small">A site for the <a href="links.html">directory</a>.</p>
+                <form id="link-submit-form" data-template="submit-link.yml" data-kind="link" novalidate>
+                    <label for="site-name">site name *</label>
+                    <input type="text" id="site-name" name="site-name" maxlength="80" required>
+                    <label for="site-url">url *</label>
+                    <input type="url" id="site-url" name="site-url" placeholder="https://" required>
+                    <label for="site-description">what is it? *</label>
+                    <input type="text" id="site-description" name="site-description" maxlength="220" placeholder="one line, in your own words" required>
+                    <label for="site-category">stratum *</label>
+                    <select id="site-category" name="site-category" required>
+                        <option value="">choose one</option>
+                        <option value="art">digital art</option>
+                        <option value="curiosities">digital curiosities</option>
+                        <option value="tools">tools &amp; utilities</option>
+                        <option value="forums">forums &amp; communities</option>
+                        <option value="archives">archives</option>
+                    </select>
+                    <label for="site-tags">tags</label>
+                    <input type="text" id="site-tags" name="site-tags" placeholder="comma, separated">
+                    <p class="form-error" role="alert" hidden></p>
+                    <button type="submit">send link ↓</button>
+                </form>
+                <div class="submit-done" role="status" hidden></div>
+            </div>
+        </section>
+
+        <section class="win98-box tilt-r" id="image">
+            <div class="win98-box-title"><span>send-a-transmission.txt</span><span>×</span></div>
+            <div class="win98-box-content">
+                <p class="small">An image for the <a href="index.html#feed">transmissions feed</a> and the embeddable widget. It links to the site you name.</p>
+                <form id="image-submit-form" data-template="submit-image.yml" data-kind="image" novalidate>
+                    <label for="image-url">image url</label>
+                    <input type="url" id="image-url" name="image" placeholder="https://…/thing.gif">
+                    <p class="hint">Have the file instead? Leave this blank and drag the file into the Image box on GitHub after you press send. GIF, PNG, JPG or WebP, under 5&nbsp;MB.</p>
+                    <label for="site-link">the site it belongs to *</label>
+                    <input type="url" id="site-link" name="site-link" placeholder="https://" required>
+                    <label for="alt-text">describe the image *</label>
+                    <input type="text" id="alt-text" name="alt-text" maxlength="160" placeholder="for people using screen readers" required>
+                    <label for="tags">tags</label>
+                    <input type="text" id="tags" name="tags" placeholder="comma, separated">
+                    <p class="form-error" role="alert" hidden></p>
+                    <button type="submit">send image ↓</button>
+                </form>
+                <div class="submit-done" role="status" hidden></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="button-wall">
+            <a href="index.html" title="link to THE UNDERWEB"><img src="img/button-88x31.gif" width="88" height="31" alt="THE UNDERWEB 88x31 button"></a>
+            <span class="b88">hand<br><b>coded</b></span>
+            <span class="b88">no feed<br><b>no algo</b></span>
+            <span class="b88">best viewed<br>in <b>any browser</b></span>
+            <span class="b88">html<br><b>is art</b></span>
+            <span class="b88">stay<br><b>weird</b></span>
+            <span class="b88">made<br>after <b>dark</b></span>
+        </div>
+        <div class="webring">
+            <a href="linksindex.html">▲ ascend</a>
+            <a href="links.html" data-random-site>✶ random hole ✶</a>
+            <a href="about.html">descend ▼</a>
+        </div>
+        <p>&copy; <span data-year>2025</span> THE UNDERWEB · a gateway, not a platform · nothing here is tracked</p>
+        <div class="footer-links">
+            <a href="submit.html#link">submit a link</a>
+            <a href="submit.html#image">submit an image</a>
+            <a href="linksindex.html">a–z index</a>
+            <a href="about.html">about</a>
+        </div>
+    </footer>
+
+    <script src="links-data.js"></script>
+    <script src="ui.js"></script>
+    <script src="submit.js"></script>
+    <script>document.querySelectorAll('[data-year]').forEach(function(e){e.textContent=new Date().getFullYear()});</script>
+</body>
+</html>

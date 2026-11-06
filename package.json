@@ -16,7 +16,7 @@
     "portal",
     "links"
   ],
-  "author": "THE UNDERWEB Team",
+  "author": "numbpill3d",
   "license": "MIT",
   "dependencies": {
     "compression": "^1.7.4",
