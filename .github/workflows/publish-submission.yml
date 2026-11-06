@@ -1,0 +1,68 @@
+# Publishes a submission when a curator adds the "approved" label to its issue.
+# Link submissions go into links-data.js; image submissions are downloaded into
+# img/submissions/ and listed in images-data.js. Vercel redeploys from main.
+name: publish submission
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: publish-submission
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.event.label.name == 'approved' &&
+      contains(github.event.issue.labels.*.name, 'submission') &&
+      github.event.issue.state == 'open'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: add the submission to the site data
+        id: publish
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_LABELS: ${{ toJSON(github.event.issue.labels) }}
+        run: node .github/scripts/publish-submission.cjs
+
+      - name: commit and push
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          git config user.name "underweb-publisher[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add links-data.js images-data.js img/submissions
+          git commit -m "publish submission #${ISSUE_NUMBER}"
+          git push origin HEAD:main
+
+      - name: tell the submitter and close
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file .publish-result
+          gh issue close "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --reason completed
+
+      - name: report a problem
+        if: failure() && steps.publish.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          { echo "Couldn't publish this one automatically:"; echo; cat .publish-error 2>/dev/null || echo "unknown error, see the Actions log"; echo; echo "Edit the issue to fix it, then remove and re-add the **approved** label."; } > .publish-comment
+          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file .publish-comment
+          gh issue edit "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --remove-label approved

@@ -1,0 +1,36 @@
+name: Submit an image
+description: Send an image (and the site it belongs to) to the UNDERWEB transmissions feed.
+title: "[image] "
+labels: ["submission", "image"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for digging. A curator reviews every submission. If it's approved, the image goes into the transmissions feed and the embeddable widget, linked to the site you name.
+  - type: textarea
+    id: image
+    attributes:
+      label: Image
+      description: Paste an image URL, or drag and drop the image file into this box. GIF, PNG, JPG or WebP, under 5 MB.
+    validations:
+      required: true
+  - type: input
+    id: site-link
+    attributes:
+      label: The site it belongs to
+      placeholder: https://
+    validations:
+      required: true
+  - type: input
+    id: alt-text
+    attributes:
+      label: Describe the image
+      description: Short alt text for people using screen readers.
+    validations:
+      required: true
+  - type: input
+    id: tags
+    attributes:
+      label: Tags
+      description: Comma-separated.
+      placeholder: netart, gifs, webring

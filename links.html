@@ -42,7 +42,7 @@
         <a href="linksindex.html" data-page="index"><small>01</small>index</a>
         <a href="links.html" data-page="links"><small>02</small>links</a>
         <a href="about.html" data-page="about"><small>03</small>about</a>
-        <a href="chat.html" data-page="chat"><small>04</small>chat</a>
+        <a href="submit.html" data-page="submit"><small>04</small>submit</a>
     </nav>
 
     <div class="ticker" aria-label="announcements">
@@ -59,6 +59,7 @@
                     <li><a href="#cat-curiosities">curiosities</a></li>
                     <li><a href="#cat-tools">tools &amp; utilities</a></li>
                     <li><a href="#cat-forums">communities</a></li>
+                    <li><a href="#cat-archives">archives</a></li>
                     <li><a href="linksindex.html">a–z index</a></li>
                 </ul>
             </div>
@@ -107,32 +108,11 @@
                 <div class="empty-state" id="empty-state">nothing down here matches that. try another word.</div>
             </div>
         </div>
-            <div class="win98-box loud tilt-r">
+            <div class="win98-box loud tilt-r" id="link-submit">
             <div class="win98-box-title"><span>submit-a-link.txt</span><span>×</span></div>
             <div class="win98-box-content ">
-                <p class="serif" style="font-size:1.15rem">Discovered a site that belongs in <em>THE UNDERWEB?</em> Send it down for consideration.</p>
-                <form id="link-submit-form">
-                    <label for="site-name">site name *</label>
-                    <input type="text" id="site-name" placeholder="name it" required>
-                    <label for="site-url">url *</label>
-                    <input type="url" id="site-url" placeholder="https://" required>
-                    <label for="site-description">what is it? *</label>
-                    <input type="text" id="site-description" placeholder="one line, in your own words" required>
-                    <label for="site-tags">tags</label>
-                    <input type="text" id="site-tags" placeholder="comma, separated">
-                    <label for="site-category">stratum</label>
-                    <select id="site-category" aria-label="Site category">
-                        <option value="">choose one</option>
-                        <option value="art">digital art</option>
-                        <option value="forums">forums</option>
-                        <option value="tools">tools</option>
-                        <option value="archives">archives</option>
-                        <option value="curiosities">digital curiosities</option>
-                        <option value="other">other</option>
-                    </select>
-                    <button type="submit">submit link ↓</button>
-                </form>
-                <div id="submission-message"><p>Thank you. Your link will be examined by our digital archaeologists.</p></div>
+                <p class="serif" style="font-size:1.15rem">Discovered a site that belongs in <em>THE UNDERWEB?</em> Send it down for review.</p>
+                <a href="submit.html#link" class="btn">submit a link →</a>
             </div>
         </div>
         </div>
@@ -145,7 +125,6 @@
             <span class="b88">no feed<br><b>no algo</b></span>
             <span class="b88">best viewed<br>in <b>any browser</b></span>
             <span class="b88">html<br><b>is art</b></span>
-            <span class="b88"><b>webring</b><br>member</span>
             <span class="b88">stay<br><b>weird</b></span>
             <span class="b88">made<br>after <b>dark</b></span>
         </div>
@@ -156,11 +135,10 @@
         </div>
         <p>&copy; <span data-year>2025</span> THE UNDERWEB · a gateway, not a platform · nothing here is tracked</p>
         <div class="footer-links">
-            <a href="index.html#submit-form">submit an image</a>
-            <a href="links.html#link-submit-form">submit a link</a>
+            <a href="submit.html#link">submit a link</a>
+            <a href="submit.html#image">submit an image</a>
             <a href="linksindex.html">a–z index</a>
             <a href="about.html">about</a>
-            <a href="chat.html">chat</a>
         </div>
     </footer>
 
@@ -181,7 +159,6 @@
             sec.innerHTML = '<h2 class="category-title" data-depth="' + CATS[key].depth + '">' + esc(CATS[key].name) + '</h2><div class="links-container"></div>';
             var box = sec.querySelector('.links-container');
             items.forEach(function (l) {
-                var live = l.url && l.url !== '#';
                 var card = document.createElement('article');
                 card.className = 'win98-box link-card';
                 card.dataset.name = l.name; card.dataset.added = l.added || '';
@@ -191,7 +168,7 @@
                         '<canvas class="link-card-image" width="64" height="32" data-sigil="' + esc(l.name) + '" role="img" aria-label="generated sigil for ' + esc(l.name) + '"></canvas>' +
                         '<div class="link-card-description">' + esc(l.desc) + '</div>' +
                         '<div class="link-card-tags">' + (l.tags && l.tags.length ? l.tags.map(function (t) { return '#' + esc(t); }).join(' ') : 'no tags available') + '</div>' +
-                        '<a class="link-button" href="' + esc(l.url || '#') + '"' + (live ? ' target="_blank" rel="noopener"' : ' aria-disabled="true" title="coordinates not yet recovered"') + '>' + (live ? 'visit site →' : 'awaiting coordinates') + '</a>' +
+                        '<a class="link-button" href="' + esc(l.url) + '" target="_blank" rel="noopener">visit site →</a>' +
                     '</div>';
                 box.appendChild(card);
             });
@@ -241,16 +218,6 @@
         doSort(); apply();
         if (location.hash) { var el = document.querySelector(location.hash); el && el.scrollIntoView(); }
 
-        // link submission
-        var form = document.getElementById('link-submit-form'), msg = document.getElementById('submission-message');
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            var name = document.getElementById('site-name').value.trim(),
-                url = document.getElementById('site-url').value.trim(),
-                desc = document.getElementById('site-description').value.trim();
-            if (!name || !url || !desc) return;
-            form.style.display = 'none'; msg.style.display = 'block';
-        });
     })();
     </script>
     <script>document.querySelectorAll('[data-year]').forEach(function(e){e.textContent=new Date().getFullYear()});</script>

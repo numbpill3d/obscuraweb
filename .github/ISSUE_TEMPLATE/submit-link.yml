@@ -1,0 +1,48 @@
+name: Submit a link
+description: Send a site down to THE UNDERWEB directory.
+title: "[link] "
+labels: ["submission", "link"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for digging. A curator reviews every submission. If it's approved, it shows up in the directory at obscuraweb.vercel.app/links.html within a few minutes.
+  - type: input
+    id: site-name
+    attributes:
+      label: Site name
+      placeholder: what it's called
+    validations:
+      required: true
+  - type: input
+    id: site-url
+    attributes:
+      label: URL
+      placeholder: https://
+    validations:
+      required: true
+  - type: input
+    id: site-description
+    attributes:
+      label: What is it?
+      description: One line, in your own words.
+    validations:
+      required: true
+  - type: dropdown
+    id: site-category
+    attributes:
+      label: Stratum
+      options:
+        - art
+        - curiosities
+        - tools
+        - forums
+        - archives
+    validations:
+      required: true
+  - type: input
+    id: site-tags
+    attributes:
+      label: Tags
+      description: Comma-separated.
+      placeholder: netart, gifs, webring
