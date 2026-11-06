@@ -334,6 +334,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         return spinner;
     }
 
+    /**
+     * Small inline notice shown once when the archive server can't be reached.
+     * @param {HTMLElement} feed
+     */
+    function showOfflineNote(feed) {
+        if (!feed || !feed.parentElement || feed.parentElement.querySelector('.feed-offline')) return;
+        const note = document.createElement('p');
+        note.className = 'feed-offline';
+        note.setAttribute('role', 'status');
+        note.textContent = 'the archive server is unreachable right now — showing what this browser has saved.';
+        feed.parentElement.insertBefore(note, feed);
+    }
+
     // Function to create image items for the feed
     /**
      * Create an image item element
@@ -548,10 +561,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     .order('created_at', { ascending: false });
 
                 if (error) {
-                    console.error('Error fetching images from Supabase:', error);
-                    if (!error.message.includes('API key') && !error.message.includes('JWT')) {
-                        win98Alert('Error syncing with server: ' + error.message);
-                    }
+                    // a background sync on page load is not something the visitor did, so it
+                    // never gets a popup: log it and leave a quiet note in the feed instead
+                    console.warn('Error fetching images from Supabase:', error);
+                    showOfflineNote(targetElement);
+                    if (targetElement.contains(loadingSpinner)) targetElement.removeChild(loadingSpinner);
+                    if (targetElement.children.length === 0) displayPlaceholderImages();
                     return;
                 }
 
@@ -586,10 +601,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }
             } catch (error) {
-                console.error('Error syncing with Supabase:', error);
+                console.warn('Error syncing with Supabase:', error);
+                showOfflineNote(targetElement);
                 // Continue showing local storage data
             }
         }
+
+        // the spinner is done whatever happened above (it used to stay forever when the server was down)
+        if (targetElement.contains(loadingSpinner)) targetElement.removeChild(loadingSpinner);
+        if (!supabaseClient) showOfflineNote(targetElement);
 
         // Show placeholders only if no images available
         if (targetElement.children.length === 0 ||
@@ -619,21 +639,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // If no local storage images, use placeholders
         const placeholderImages = [
-            {
-                src: 'data:image/svg+xml,%3Csvg width="300" height="300" xmlns="http://www.w3.org/2000/svg"%3E%3Crect width="100%25" height="100%25" fill="%23c0c0c0"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="24" fill="%23000000" text-anchor="middle" dy=".3em"%3EImage 1%3C/text%3E%3C/svg%3E',
-                link: '#',
-                tags: 'placeholder, sample'
-            },
-            {
-                src: 'data:image/svg+xml,%3Csvg width="300" height="300" xmlns="http://www.w3.org/2000/svg"%3E%3Crect width="100%25" height="100%25" fill="%23c0c0c0"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="24" fill="%23000000" text-anchor="middle" dy=".3em"%3EImage 2%3C/text%3E%3C/svg%3E',
-                link: '#',
-                tags: 'placeholder, example'
-            },
-            {
-                src: 'data:image/svg+xml,%3Csvg width="300" height="300" xmlns="http://www.w3.org/2000/svg"%3E%3Crect width="100%25" height="100%25" fill="%23c0c0c0"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="24" fill="%23000000" text-anchor="middle" dy=".3em"%3EImage 3%3C/text%3E%3C/svg%3E',
-                link: '#',
-                tags: 'placeholder, demo'
-            }
+            { src: 'img/featured.gif', link: 'links.html', tags: 'the surface / the underweb' },
+            { src: 'img/banner-gateway.gif', link: 'links.html', tags: 'galleries, experiments, relics' },
+            { src: 'img/skyscraper.gif', link: 'linksindex.html', tags: 'fall in' }
         ];
 
         placeholderImages.forEach(image => {

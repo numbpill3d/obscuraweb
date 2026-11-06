@@ -182,178 +182,101 @@ async function initializeStorage(supabaseClient) {
 }
 
 /**
- * Windows 98 style alert function
- * @param {string} message - The message to display
+ * Build a themed dialog (styles live in style.css under .uw-dialog).
+ * Returns { overlay, actions, close }. Closes on Escape and on clicking the backdrop.
+ * @param {string} message
+ * @param {string} [title]
  */
-function win98Alert(message) {
-    // Create alert container with modal overlay
-    const alertContainer = document.createElement('div');
-    alertContainer.style.position = 'fixed';
-    alertContainer.style.top = '0';
-    alertContainer.style.left = '0';
-    alertContainer.style.width = '100%';
-    alertContainer.style.height = '100%';
-    alertContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    alertContainer.style.display = 'flex';
-    alertContainer.style.justifyContent = 'center';
-    alertContainer.style.alignItems = 'center';
-    alertContainer.style.zIndex = '9999';
+function buildDialog(message, title) {
+    const overlay = document.createElement('div');
+    overlay.className = 'uw-dialog-overlay';
 
-    // Create Windows 98 style box
-    const win98Box = document.createElement('div');
-    win98Box.style.border = '2px solid';
-    win98Box.style.borderColor = '#ffffff #808080 #808080 #ffffff';
-    win98Box.style.backgroundColor = '#c0c0c0';
-    win98Box.style.boxShadow = '2px 2px 0px rgba(0,0,0,0.5)';
-    win98Box.style.padding = '2px';
-    win98Box.style.width = '300px';
+    const box = document.createElement('div');
+    box.className = 'uw-dialog win98-box';
+    box.setAttribute('role', 'alertdialog');
+    box.setAttribute('aria-modal', 'true');
 
-    // Create title bar
-    const titleBar = document.createElement('div');
-    titleBar.style.background = 'linear-gradient(90deg, #000080, #1084d0)';
-    titleBar.style.color = 'white';
-    titleBar.style.fontWeight = 'bold';
-    titleBar.style.padding = '3px 5px';
-    titleBar.style.display = 'flex';
-    titleBar.style.justifyContent = 'space-between';
-    titleBar.style.alignItems = 'center';
-    titleBar.innerHTML = '<span>THE UNDERWEB</span><span>X</span>';
+    const bar = document.createElement('div');
+    bar.className = 'win98-box-title';
+    const barTitle = document.createElement('span');
+    barTitle.textContent = title || 'the underweb says';
+    const barClose = document.createElement('span');
+    barClose.textContent = '×';
+    barClose.setAttribute('aria-label', 'close');
+    bar.appendChild(barTitle);
+    bar.appendChild(barClose);
 
-    // Create content area
-    const contentArea = document.createElement('div');
-    contentArea.style.padding = '15px';
-    contentArea.style.backgroundColor = '#c0c0c0';
-    contentArea.style.textAlign = 'center';
+    const body = document.createElement('div');
+    body.className = 'win98-box-content uw-dialog-body';
+    const text = document.createElement('p');
+    text.className = 'uw-dialog-text';
+    text.textContent = message;
+    const actions = document.createElement('div');
+    actions.className = 'uw-dialog-actions';
+    body.appendChild(text);
+    body.appendChild(actions);
 
-    // Add message
-    const messageText = document.createElement('p');
-    messageText.textContent = message;
-    messageText.style.margin = '0 0 15px 0';
+    box.appendChild(bar);
+    box.appendChild(body);
+    overlay.appendChild(box);
 
-    // Add OK button
-    const okButton = document.createElement('button');
-    okButton.textContent = 'OK';
-    okButton.style.padding = '5px 20px';
-    okButton.style.border = '2px solid';
-    okButton.style.borderColor = '#ffffff #808080 #808080 #ffffff';
-    okButton.style.backgroundColor = '#c0c0c0';
-    okButton.style.cursor = 'pointer';
+    const previouslyFocused = document.activeElement;
+    let closed = false;
+    function close() {
+        if (closed) return;
+        closed = true;
+        document.removeEventListener('keydown', onKey);
+        overlay.remove();
+        if (previouslyFocused && previouslyFocused instanceof HTMLElement) previouslyFocused.focus();
+    }
+    /** @param {KeyboardEvent} e */
+    function onKey(e) { if (e.key === 'Escape') { e.preventDefault(); overlay.dispatchEvent(new Event('uw-cancel')); } }
+    document.addEventListener('keydown', onKey);
+    barClose.addEventListener('click', () => overlay.dispatchEvent(new Event('uw-cancel')));
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.dispatchEvent(new Event('uw-cancel')); });
 
-    okButton.addEventListener('click', () => {
-        document.body.removeChild(alertContainer);
-    });
-
-    // Assemble the alert
-    contentArea.appendChild(messageText);
-    contentArea.appendChild(okButton);
-    win98Box.appendChild(titleBar);
-    win98Box.appendChild(contentArea);
-    alertContainer.appendChild(win98Box);
-
-    // Add to body
-    document.body.appendChild(alertContainer);
+    return { overlay, actions, close };
 }
 
 /**
- * Windows 98 style confirm function
+ * Themed alert (replaces the old grey win98 box whose text was unreadable on this theme)
+ * @param {string} message - The message to display
+ */
+function win98Alert(message) {
+    const { overlay, actions, close } = buildDialog(message);
+    const ok = document.createElement('button');
+    ok.type = 'button';
+    ok.textContent = 'ok';
+    ok.addEventListener('click', close);
+    overlay.addEventListener('uw-cancel', close);
+    actions.appendChild(ok);
+    document.body.appendChild(overlay);
+    ok.focus();
+}
+
+/**
+ * Themed confirm dialog
  * @param {string} message - The message to display
  * @param {Function} [onConfirm] - Callback function when user confirms
  * @param {Function} [onCancel] - Callback function when user cancels
  */
 function win98Confirm(message, onConfirm, onCancel) {
-    // Create confirm container with modal overlay
-    const confirmContainer = document.createElement('div');
-    confirmContainer.style.position = 'fixed';
-    confirmContainer.style.top = '0';
-    confirmContainer.style.left = '0';
-    confirmContainer.style.width = '100%';
-    confirmContainer.style.height = '100%';
-    confirmContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    confirmContainer.style.display = 'flex';
-    confirmContainer.style.justifyContent = 'center';
-    confirmContainer.style.alignItems = 'center';
-    confirmContainer.style.zIndex = '9999';
-
-    // Create Windows 98 style box
-    const win98Box = document.createElement('div');
-    win98Box.style.border = '2px solid';
-    win98Box.style.borderColor = '#ffffff #808080 #808080 #ffffff';
-    win98Box.style.backgroundColor = '#c0c0c0';
-    win98Box.style.boxShadow = '2px 2px 0px rgba(0,0,0,0.5)';
-    win98Box.style.padding = '2px';
-    win98Box.style.width = '300px';
-
-    // Create title bar
-    const titleBar = document.createElement('div');
-    titleBar.style.background = 'linear-gradient(90deg, #000080, #1084d0)';
-    titleBar.style.color = 'white';
-    titleBar.style.fontWeight = 'bold';
-    titleBar.style.padding = '3px 5px';
-    titleBar.style.display = 'flex';
-    titleBar.style.justifyContent = 'space-between';
-    titleBar.style.alignItems = 'center';
-    titleBar.innerHTML = '<span>THE UNDERWEB</span><span>X</span>';
-
-    // Create content area
-    const contentArea = document.createElement('div');
-    contentArea.style.padding = '15px';
-    contentArea.style.backgroundColor = '#c0c0c0';
-    contentArea.style.textAlign = 'center';
-
-    // Add message
-    const messageText = document.createElement('p');
-    messageText.textContent = message;
-    messageText.style.margin = '0 0 15px 0';
-
-    // Add buttons container
-    const buttonsContainer = document.createElement('div');
-    buttonsContainer.style.display = 'flex';
-    buttonsContainer.style.justifyContent = 'center';
-    buttonsContainer.style.gap = '10px';
-
-    // Add Yes button
-    const yesButton = document.createElement('button');
-    yesButton.textContent = 'Yes';
-    yesButton.style.padding = '5px 20px';
-    yesButton.style.border = '2px solid';
-    yesButton.style.borderColor = '#ffffff #808080 #808080 #ffffff';
-    yesButton.style.backgroundColor = '#c0c0c0';
-    yesButton.style.cursor = 'pointer';
-
-    yesButton.addEventListener('click', () => {
-        document.body.removeChild(confirmContainer);
-        if (onConfirm) {
-            onConfirm();
-        }
-    });
-
-    // Add No button
-    const noButton = document.createElement('button');
-    noButton.textContent = 'No';
-    noButton.style.padding = '5px 20px';
-    noButton.style.border = '2px solid';
-    noButton.style.borderColor = '#ffffff #808080 #808080 #ffffff';
-    noButton.style.backgroundColor = '#c0c0c0';
-    noButton.style.cursor = 'pointer';
-
-    noButton.addEventListener('click', () => {
-        document.body.removeChild(confirmContainer);
-        if (onCancel) {
-            onCancel();
-        }
-    });
-
-    // Assemble the confirm dialog
-    buttonsContainer.appendChild(yesButton);
-    buttonsContainer.appendChild(noButton);
-    contentArea.appendChild(messageText);
-    contentArea.appendChild(buttonsContainer);
-    win98Box.appendChild(titleBar);
-    win98Box.appendChild(contentArea);
-    confirmContainer.appendChild(win98Box);
-
-    // Add to body
-    document.body.appendChild(confirmContainer);
+    const { overlay, actions, close } = buildDialog(message);
+    const yes = document.createElement('button');
+    yes.type = 'button';
+    yes.textContent = 'yes';
+    const no = document.createElement('button');
+    no.type = 'button';
+    no.className = 'btn ghost';
+    no.textContent = 'no';
+    yes.addEventListener('click', () => { close(); if (onConfirm) onConfirm(); });
+    const cancel = () => { close(); if (onCancel) onCancel(); };
+    no.addEventListener('click', cancel);
+    overlay.addEventListener('uw-cancel', cancel);
+    actions.appendChild(yes);
+    actions.appendChild(no);
+    document.body.appendChild(overlay);
+    yes.focus();
 }
 
 /**
