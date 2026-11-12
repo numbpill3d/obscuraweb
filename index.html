@@ -1,199 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE UNDERWEB — a gateway to the web beyond the feed</title>
-    <meta name="description" content="THE UNDERWEB is a curated gateway to the most interesting, obscure, and artistic corners of the internet: digital art galleries, experimental web projects, and forgotten relics of the early web.">
-    <meta name="theme-color" content="#0e001a">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://obscuraweb.vercel.app/">
-    <link rel="canonical" href="https://obscuraweb.vercel.app/">
-    <meta property="og:site_name" content="THE UNDERWEB">
-    <meta property="og:title" content="THE UNDERWEB — a gateway to the web beyond the feed">
-    <meta property="og:description" content="THE UNDERWEB is a curated gateway to the most interesting, obscure, and artistic corners of the internet: digital art galleries, experimental web projects, and forgotten relics of the early web.">
-    <meta property="og:image" content="https://obscuraweb.vercel.app/img/og-featured.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://obscuraweb.vercel.app/img/og-featured.png">
-    <link rel="icon" type="image/png" href="img/favicon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BLACKBOOK — private address book</title>
+  <meta name="description" content="BLACKBOOK is a hand-curated, local-first address book for privacy services and small-web destinations.">
+  <meta name="theme-color" content="#c8c8c8">
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="stylesheet" href="style.css">
 </head>
-<body data-page="surface" data-depth="0" data-range="120">
-    <noscript><p class="sticker ghost" style="position:static;display:inline-block;margin:10px">the underweb draws its directory and forms with javascript. turn it on to dig.</p></noscript>
-    <div class="stars" id="stars"></div>
+<body class="blackbook-shell" data-page="addressbook" data-depth="0" data-range="120">
+  <div class="statusbar blackbook-status" role="status">
+    <span><i class="status-led" aria-hidden="true"></i>BLACKBOOK / LOCAL INDEX</span>
+    <span class="statusbar-spacer"></span>
+    <span>ENTRIES <b id="entry-count">00</b></span>
+    <span>LAST SYNC <b>MANUAL</b></span>
+  </div>
 
-    <div class="statusbar" role="status">
-        <span><span class="led"></span><b>signal</b> open</span>
-        <span>depth <b data-depth-readout>-000m</b></span>
-        <span>you are <b>below the surface</b></span>
-        <span class="push">local time <b data-clock>--:--:--</b></span>
+  <header class="blackbook-header">
+    <div class="mac-mark" aria-hidden="true">◒</div>
+    <div>
+      <h1>BLACKBOOK<span class="blink-caret">_</span></h1>
+      <p class="blackbook-subtitle">private services / hidden libraries / unfriendly browsers</p>
     </div>
+    <div class="header-stamp">VOL. 01<br><b>2004—∞</b></div>
+  </header>
 
-    <header class="masthead">
-        <h1>THE UNDERWEB</h1>
-        <a href="index.html" style="background:none"><img class="banner px" src="img/banner-underweb.gif" width="936" height="120" alt="THE UNDERWEB — animated banner"></a>
-        <span class="sticker">est. 2025</span>
-    </header>
+  <nav class="mac-menu" aria-label="Primary">
+    <a class="is-active" href="#directory">FILEBOOK</a>
+    <a href="#about">ABOUT</a>
+    <a href="#notes">NOTES</a>
+    <span class="menu-spacer"></span>
+    <span>SECURE MODE: <b>LOCAL</b></span>
+  </nav>
 
-    <nav class="tabs" aria-label="main">
-        <a href="index.html" data-page="surface"><small>00</small>surface</a>
-        <a href="linksindex.html" data-page="index"><small>01</small>index</a>
-        <a href="links.html" data-page="links"><small>02</small>links</a>
-        <a href="about.html" data-page="about"><small>03</small>about</a>
-        <a href="submit.html" data-page="submit"><small>04</small>submit</a>
-    </nav>
+  <main id="directory" class="blackbook-layout">
+    <aside class="blackbook-rail" aria-label="Address book controls">
+      <section class="mac-window rail-window">
+        <div class="mac-titlebar"><span class="mac-close" aria-hidden="true"></span><b>COLLECTIONS</b><span>◒</span></div>
+        <div class="mac-window-body">
+          <p class="window-label">SHOW ME</p>
+          <div id="category-list" class="collection-list">
+            <button class="collection is-selected" type="button" data-filter="all"><span>ALL ADDRESSES</span><b>00</b></button>
+            <button class="collection" type="button" data-filter="privacy"><span>PRIVACY</span><b>00</b></button>
+            <button class="collection" type="button" data-filter="library"><span>LIBRARIES</span><b>00</b></button>
+            <button class="collection" type="button" data-filter="community"><span>COMMUNITIES</span><b>00</b></button>
+            <button class="collection" type="button" data-filter="tools"><span>TOOLS</span><b>00</b></button>
+          </div>
+          <hr>
+          <p class="window-label">INDEX NOTES</p>
+          <p class="rail-copy">Hand-checked records for people who still type addresses. No trackers. No rankings. No promises.</p>
+          <div class="mini-stamp">! UNVERIFIED<br>BY DEFAULT</div>
+        </div>
+      </section>
 
-    <div class="ticker" aria-label="announcements">
-        <div class="ticker-track"><span>★ welcome to <b>the underweb</b> — your portal to the hidden corners of the internet ★ no algorithms ★ hand coded ★ digital art galleries ★ experimental web projects ★ forgotten relics ★ you were never here ★ dig deeper ★</span></div>
-    </div>
+      <section class="mac-window rail-window" id="notes">
+        <div class="mac-titlebar"><span class="mac-close" aria-hidden="true"></span><b>FIELD NOTES.TXT</b><span>◒</span></div>
+        <div class="mac-window-body notes-body">
+          <p><b>01</b> Use Tor Browser or another compatible client.</p>
+          <p><b>02</b> Check the fingerprint before trusting a service.</p>
+          <p><b>03</b> A listing is not an endorsement.</p>
+        </div>
+      </section>
+    </aside>
 
+    <section class="directory-panel mac-window" aria-labelledby="directory-title">
+      <div class="mac-titlebar directory-titlebar"><span class="mac-close" aria-hidden="true"></span><b id="directory-title">ADDRESS BOOK — 00 RECORDS</b><span>◒</span></div>
+      <div class="directory-toolbar">
+        <label class="search-field"><span aria-hidden="true">⌕</span><span class="sr-only">Search records</span><input id="search-input" type="search" placeholder="search names, tags, addresses" autocomplete="off"></label>
+        <label class="sort-field"><span>SORT</span><select id="sort-select"><option value="name">A—Z</option><option value="recent">RECENT</option><option value="status">STATUS</option></select></label>
+      </div>
+      <div class="directory-meta"><span id="result-copy">00 records found</span><span>SELECT A RECORD TO INSPECT</span></div>
+      <div id="address-list" class="address-list" role="listbox" aria-label="Onion address records"></div>
+      <div id="empty-state" class="empty-record" hidden>
+        <div class="empty-glyph">∅</div>
+        <h2>NO RECORDS MATCH</h2>
+        <p>Try a shorter search term or return to all addresses.</p>
+      </div>
+      <div class="directory-footer"><span>BLACKBOOK/INDEX.TXT</span><span>READ ONLY // 0001</span></div>
+    </section>
 
-    <main class="page page--home">
-        <section class="area-hero win98-box">
-            <div class="win98-box-title"><span>featured.gif — the underweb, cross-section</span><span>×</span></div>
-            <div class="hero">
-                <figure class="featured-frame" style="margin:0">
-                    <img src="img/featured.gif" width="1200" height="630" alt="Pixel-art cross-section: a bland skyline of identical towers on the surface, and below the ground a hidden cavern of glowing CRT monitors wired down through the dirt.">
-                    <figcaption><span>fig. 01 — the surface / the underweb</span><span>400×210 @3×</span></figcaption>
-                </figure>
-                <div class="hero-copy">
-                    <h2>the web <span>beyond</span> the feed.</h2>
-                    <p class="serif">THE UNDERWEB is a curated gateway to the most <em>interesting, obscure, and artistic</em> corners of the internet.</p>
-                    <p>Here you'll find links to digital art galleries, experimental web projects, and forgotten relics of the early internet era.</p>
-                    <p class="dim">Our mission is to preserve and celebrate the diversity and creativity of the web beyond mainstream platforms.</p>
-                    <div class="actions">
-                        <a href="links.html" class="btn">open the directory</a>
-                        <a href="linksindex.html" class="btn ghost">a–z index</a>
-                        <a href="submit.html" class="btn ghost">submit a find</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <aside class="area-sky">
-            <a href="links.html" style="background:none;display:block"><img class="px" src="img/skyscraper.gif" width="140" height="280" alt="THE UNDERWEB vertical banner: fall in" style="width:140px;height:auto;display:block;box-shadow:4px 4px 0 #000"></a>
-            <p class="small dim" style="margin-top:10px;font-family:var(--pixel);font-size:9px;text-transform:uppercase">↑ this is an ad<br>for the place you're already in</p>
-        </aside>
-        <aside class="area-side" style="display:grid;gap:26px">
-        <div class="win98-box tilt-l">
-            <div class="win98-box-title"><span>drawers.exe</span><span>×</span></div>
-            <div class="win98-box-content ">
-                <ul class="drawer">
-                    <li><a href="#feed">latest transmissions</a></li>
-                    <li><a href="linksindex.html">popular tags</a></li>
-                    <li><a href="links.html" data-random-site>random site</a></li>
-                    <li><a href="links.html#cat-forums">webrings &amp; communities</a></li>
-                    <li><a href="submit.html">submit a find</a></li>
-                </ul>
-            </div>
+    <aside class="blackbook-inspector" aria-label="Selected record">
+      <section class="mac-window inspector-window">
+        <div class="mac-titlebar"><span class="mac-close" aria-hidden="true"></span><b>INSPECTOR</b><span>◒</span></div>
+        <div id="inspector" class="inspector-body"></div>
+      </section>
+      <section class="mac-window envelope-window">
+        <div class="mac-titlebar"><span class="mac-close" aria-hidden="true"></span><b>CONTACT ENVELOPE</b><span>◒</span></div>
+        <div id="envelope" class="envelope-body"></div>
+      </section>
+      <section class="mac-window about-window" id="about">
+        <div class="mac-titlebar"><span class="mac-close" aria-hidden="true"></span><b>ABOUT BLACKBOOK</b><span>◒</span></div>
+        <div class="mac-window-body">
+          <p class="about-lede">A hand-made index for the parts of the internet that do not need a homepage.</p>
+          <p class="small-print">This interface does not connect to Tor or validate destinations. Records are illustrative until you verify them yourself.</p>
         </div>
-        <div class="win98-box loud" id="submit">
-            <div class="win98-box-title"><span>send-something-down.txt</span><span>×</span></div>
-            <div class="win98-box-content ">
-                <p class="small">Found something that belongs down here? Send a link for the directory or an image for the feed. A human reviews every one.</p>
-                <div class="actions" style="display:grid;gap:8px">
-                    <a href="submit.html#link" class="btn">submit a link</a>
-                    <a href="submit.html#image" class="btn ghost">submit an image</a>
-                </div>
-            </div>
-        </div>
-        <div class="win98-box deep nudge tilt-r">
-            <div class="win98-box-title"><span>your-visits.dat</span></div>
-            <div class="win98-box-content ">
-                <div class="counter" data-counter="0" aria-label="your visits from this browser"></div>
-                <p class="small dim" style="text-align:center;margin:6px 0 0">your visits, counted only in this browser</p>
-            </div>
-        </div>
-        </aside>
-        <section class="area-feed" style="display:grid;gap:26px">
-            <div class="win98-box " id="feed">
-            <div class="win98-box-title"><span>recent-transmissions/</span><span>×</span></div>
-            <div class="win98-box-content ">
-                <div id="image-feed"></div>
-            </div>
-        </div>
-            <div class="win98-box loud">
-            <div class="win98-box-title"><span>widget.js — take a piece of the underweb home</span><span>×</span></div>
-            <div class="win98-box-content ">
-                <div id="widget-container" class="widget-container">
-                    <p class="small">Drop this on your own page and it'll show a rotating strip of images from THE UNDERWEB. Clicking one sends visitors to the site it came from.</p>
-                    <div id="embed-code-container" class="embed-code-container">
-                        <label for="embed-code">embed code</label>
-                        <textarea id="embed-code" class="embed-code" rows="3" readonly data-template="&lt;div id=&quot;underweb-widget&quot;&gt;&lt;/div&gt;&lt;script src=&quot;{origin}/widget.js&quot; async&gt;&lt;/script&gt;"><div id="underweb-widget"></div><script src="/widget.js" async></script></textarea>
-                        <div class="copy-row"><button id="copy-embed" type="button" class="copy-button">copy code</button></div>
-                    </div>
-                    <div id="embed-instructions" class="hidden">
-                        <h4>how to use</h4>
-                        <ol class="small">
-                            <li>paste the code where you want the widget to appear</li>
-                            <li>it loads random images from THE UNDERWEB</li>
-                            <li>clicking an image opens the original site</li>
-                        </ol>
-                    </div>
-                    <label>preview</label>
-                    <div id="widget-strip"></div>
-                </div>
-            </div>
-        </div>
-        </section>
-        <section class="area-link">
-            <div class="win98-box tilt-r">
-            <div class="win98-box-title"><span>link-to-us.txt</span><span>×</span></div>
-            <div class="win98-box-content ">
-                <p class="serif" style="font-size:1.15rem">The old web stayed alive because people <em>pointed at each other.</em> Take a button.</p>
-                <div class="shelf">
-                    <img class="" src="img/button-88x31.gif" width="88" height="31" alt="THE UNDERWEB 88x31 button">
-                    <div>
-                        <textarea id="code-88" class="code" readonly rows="2" data-template="&lt;a href=&quot;{origin}/&quot;&gt;&lt;img src=&quot;{origin}/img/button-88x31.gif&quot; width=&quot;88&quot; height=&quot;31&quot; alt=&quot;THE UNDERWEB&quot; style=&quot;image-rendering:pixelated&quot;&gt;&lt;/a&gt;"></textarea>
-                        <div class="copy-row"><button type="button" class="btn ghost" data-copy="#code-88">copy html</button></div>
-                    </div>
-                    <img class="shelf-banner" src="img/banner-gateway.gif" width="468" height="60" alt="THE UNDERWEB 468x60 gateway banner">
-                    <div>
-                        <textarea id="code-468" class="code" readonly rows="2" data-template="&lt;a href=&quot;{origin}/&quot;&gt;&lt;img src=&quot;{origin}/img/banner-gateway.gif&quot; width=&quot;468&quot; height=&quot;60&quot; alt=&quot;THE UNDERWEB&quot; style=&quot;image-rendering:pixelated&quot;&gt;&lt;/a&gt;"></textarea>
-                        <div class="copy-row"><button type="button" class="btn ghost" data-copy="#code-468">copy html</button></div>
-                    </div>
-                    <img class="shelf-banner" src="img/banner-underweb.gif" width="468" height="60" alt="THE UNDERWEB 468x60 main banner">
-                    <div>
-                        <textarea id="code-468b" class="code" readonly rows="2" data-template="&lt;a href=&quot;{origin}/&quot;&gt;&lt;img src=&quot;{origin}/img/banner-underweb.gif&quot; width=&quot;468&quot; height=&quot;60&quot; alt=&quot;THE UNDERWEB&quot; style=&quot;image-rendering:pixelated&quot;&gt;&lt;/a&gt;"></textarea>
-                        <div class="copy-row"><button type="button" class="btn ghost" data-copy="#code-468b">copy html</button></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        </section>
-    </main>
+      </section>
+    </aside>
+  </main>
 
-    <footer class="footer">
-        <div class="button-wall">
-            <a href="index.html" title="link to THE UNDERWEB"><img src="img/button-88x31.gif" width="88" height="31" alt="THE UNDERWEB 88x31 button"></a>
-            <span class="b88">hand<br><b>coded</b></span>
-            <span class="b88">no feed<br><b>no algo</b></span>
-            <span class="b88">best viewed<br>in <b>any browser</b></span>
-            <span class="b88">html<br><b>is art</b></span>
-            <span class="b88">stay<br><b>weird</b></span>
-            <span class="b88">made<br>after <b>dark</b></span>
-        </div>
-        <div class="webring">
-            <a href="index.html">▲ ascend</a>
-            <a href="links.html" data-random-site>✶ random hole ✶</a>
-            <a href="linksindex.html">descend ▼</a>
-        </div>
-        <p>&copy; <span data-year>2025</span> THE UNDERWEB · a gateway, not a platform · nothing here is tracked</p>
-        <div class="footer-links">
-            <a href="submit.html#link">submit a link</a>
-            <a href="submit.html#image">submit an image</a>
-            <a href="linksindex.html">a–z index</a>
-            <a href="about.html">about</a>
-        </div>
-    </footer>
-
-        <script src="links-data.js"></script>
-    <script src="ui.js"></script>
-    <script src="images-data.js"></script>
-    <script src="script.js"></script>
-    <script>document.querySelectorAll('[data-year]').forEach(function(e){e.textContent=new Date().getFullYear()});</script>
+  <footer class="blackbook-footer"><span>© BLACKBOOK / KEEP THE WEB WEIRD</span><span>NO COOKIES · NO ANALYTICS · JUST ADDRESSES</span></footer>
+  <script src="addressbook.js"></script>
 </body>
 </html>
