@@ -20,7 +20,13 @@
         var q = new URLSearchParams();
         q.set('template', template);
         q.set('title', title);
-        Object.keys(fields).forEach(function (k) { if (fields[k]) q.set(k, fields[k]); });
+        // GitHub issue forms use the `body[<field-id>]` query shape for
+        // prefilled values. Using the field id by itself silently drops the
+        // values when GitHub renders the form, which makes an otherwise valid
+        // submission look empty (and is especially confusing for uploads).
+        Object.keys(fields).forEach(function (k) {
+            if (fields[k]) q.set('body[' + k + ']', fields[k]);
+        });
         return REPO + '/issues/new?' + q.toString();
     }
 

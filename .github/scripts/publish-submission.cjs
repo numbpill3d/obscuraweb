@@ -10,6 +10,7 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const CATS = ['art', 'curiosities', 'tools', 'forums', 'archives'];
 const MAX_BYTES = 5 * 1024 * 1024;
 const TYPES = { 'image/gif': 'gif', 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
+const IMAGE_ACCEPT = 'image/gif,image/png,image/jpeg,image/webp,application/octet-stream;q=0.8,*/*;q=0.1';
 
 function fail(msg) {
     fs.writeFileSync(path.join(ROOT, '.publish-error'), msg + '\n');
@@ -106,14 +107,28 @@ async function publishImage(f, issue) {
     if (!alt) fail('The image description (alt text) is empty.');
 
     let res;
-    try { res = await fetch(imgUrl, { redirect: 'follow', headers: { 'User-Agent': 'underweb-publisher' } }); }
-    catch (e) { fail('Could not download the image: ' + e.message); }
+    try {
+        res = await fetch(imgUrl, {
+            redirect: 'follow',
+            signal: AbortSignal.timeout(30_000),
+            headers: {
+                'User-Agent': 'underweb-publisher/1.0 (+https://github.com/numbpill3d/obscuraweb)',
+                Accept: IMAGE_ACCEPT
+            }
+        });
+    } catch (e) {
+        const reason = e && e.name === 'TimeoutError' ? 'timed out after 30 seconds' : (e.message || String(e));
+        fail('Could not download the image from ' + imgUrl + ': ' + reason);
+    }
     if (!res.ok) fail('Could not download the image (HTTP ' + res.status + ').');
-    const type = String(res.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
-    const ext = TYPES[type];
-    if (!ext) fail('The image must be a GIF, PNG, JPG or WebP (got "' + (type || 'unknown') + '").');
-    const buf = Buffer.from(await res.arrayBuffer());
+    let buf;
+    try { buf = Buffer.from(await res.arrayBuffer()); }
+    catch (e) { fail('Could not read the downloaded image: ' + (e.message || String(e))); }
     if (buf.length > MAX_BYTES) fail('The image is larger than 5 MB.');
+
+    const type = String(res.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+    const ext = TYPES[type] || sniffImage(buf);
+    if (!ext) fail('The image must be a GIF, PNG, JPG or WebP (got "' + (type || 'unknown') + '").');
 
     const rel = 'img/submissions/issue-' + issue + '.' + ext;
     fs.writeFileSync(path.join(ROOT, rel), buf);
@@ -121,6 +136,14 @@ async function publishImage(f, issue) {
         src: rel, link, alt, tags: tagsOf(f['tags']), added: today(), issue
     });
     return 'Added the image to the transmissions feed: https://obscuraweb.vercel.app/#feed';
+}
+
+function sniffImage(buf) {
+    if (buf.subarray(0, 6).toString() === 'GIF87a' || buf.subarray(0, 6).toString() === 'GIF89a') return 'gif';
+    if (buf.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return 'png';
+    if (buf.subarray(0, 3).equals(Buffer.from([255, 216, 255]))) return 'jpg';
+    if (buf.subarray(0, 4).toString() === 'RIFF' && buf.subarray(8, 12).toString() === 'WEBP') return 'webp';
+    return null;
 }
 
 (async () => {
