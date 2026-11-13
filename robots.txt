@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /.github/
+Disallow: /.git/
+Disallow: /.history/
+Disallow: /404.html
 
 Sitemap: https://obscuraweb.vercel.app/sitemap.xml

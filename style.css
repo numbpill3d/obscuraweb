@@ -84,8 +84,8 @@ p { margin: 0 0 1em; }
 
 .serif { font-family: var(--serif); font-size: 1.35em; line-height: 1.35; color: var(--bone); }
 .serif em, em.serif { font-style: italic; color: var(--lilac); }
-.small { font-size: .82rem; }
-.dim { color: var(--amethyst); }
+.small { font-size: .9rem; }
+.dim { color: var(--lavender); opacity: .86; }
 .hidden { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -604,5 +604,12 @@ form.chat-input-form button { margin: 0; width: auto; flex: none; }
 [hidden] { display: none !important; }
 .feed-empty { margin: 0; padding: 18px; text-align: center; border: 1px dashed var(--violet); color: var(--lavender); }
 .feed-empty a { margin-left: 4px; }
+.home-pulse { display: grid; gap: 12px; }
+.pulse-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pulse-grid > div { padding: 8px 5px; text-align: center; border: 1px dashed var(--violet); background: var(--void); }
+.pulse-grid b, .pulse-grid span { display: block; }
+.pulse-grid b { color: var(--hot); font: 18px/1 var(--pixel); }
+.pulse-grid span { margin-top: 5px; color: var(--lavender); font: 9px/1.2 var(--pixel); text-transform: uppercase; }
+.home-pulse .btn { justify-self: start; }
 
 .index-list a.visit { margin-left: 4px; text-decoration: none; }

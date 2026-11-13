@@ -218,10 +218,23 @@
         });
     }
 
+    // Keep the homepage snapshot honest: these numbers come from the same
+    // directory data used by the index, never from hand-written counters.
+    function directoryPulse() {
+        var links = window.UNDERWEB_LINKS || [], categories = {}, newest = '';
+        links.forEach(function (link) {
+            categories[link.cat] = true;
+            if (String(link.added || '') > newest) newest = String(link.added || '');
+        });
+        doc.querySelectorAll('[data-home-stat="links"]').forEach(function (e) { e.textContent = links.length; });
+        doc.querySelectorAll('[data-home-stat="strata"]').forEach(function (e) { e.textContent = Object.keys(categories).length; });
+        doc.querySelectorAll('[data-home-stat="checked"]').forEach(function (e) { e.textContent = newest || '—'; });
+    }
+
     window.UW = { sigil: sigil, drawSigils: drawSigils, hash: hash, PAL: PAL, reduced: reduced };
 
     function boot() {
-        embeds(); stars(); gauge(); clock(); counter(); copyButtons(); navState(); ticker(); randomSite(); drawSigils();
+        embeds(); directoryPulse(); stars(); gauge(); clock(); counter(); copyButtons(); navState(); ticker(); randomSite(); drawSigils();
     }
     if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot);
     else boot();
