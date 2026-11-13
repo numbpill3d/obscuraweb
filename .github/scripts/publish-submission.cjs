@@ -5,6 +5,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const net = require('net');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const CATS = ['art', 'curiosities', 'tools', 'forums', 'archives'];
@@ -35,8 +36,22 @@ function parseForm(body) {
 function httpUrl(s) {
     try {
         const u = new URL(String(s).trim());
-        return /^https?:$/.test(u.protocol) ? u.href : null;
+        const allowPrivate = process.env.PUBLISHER_TEST_ALLOW_PRIVATE_HOSTS === '1';
+        return /^https?:$/.test(u.protocol) && !u.username && !u.password && (allowPrivate || !privateHost(u.hostname)) ? u.href : null;
     } catch (e) { return null; }
+}
+
+function privateHost(hostname) {
+    const host = String(hostname || '').toLowerCase().replace(/\.$/, '');
+    if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local') || host === 'metadata.google.internal') return true;
+    if (net.isIP(host) === 4) {
+        const octets = host.split('.').map(Number);
+        return octets[0] === 0 || octets[0] === 10 || octets[0] === 127 ||
+            (octets[0] === 169 && octets[1] === 254) ||
+            (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) ||
+            (octets[0] === 192 && octets[1] === 168);
+    }
+    return net.isIP(host) === 6 && (host === '::1' || host.startsWith('fc') || host.startsWith('fd') || host.startsWith('fe80:'));
 }
 
 function tagsOf(s) {
@@ -60,7 +75,7 @@ function appendEntry(file, globalName, entry) {
     let next;
     if (empty.test(src)) next = src.replace(empty, '$1\n    ' + json + '\n];\n');
     else if (/\}\s*\n\];\s*$/.test(src)) next = src.replace(/\}\s*\n\];\s*$/, '},\n    ' + json + '\n];\n');
-    else fail('Could not find the end of the ' + globalName + ' array in ' + file + '.');
+    else throw new Error('Could not find the end of the ' + globalName + ' array in ' + file + '.');
     fs.writeFileSync(full, next);
 }
 
@@ -68,6 +83,11 @@ function appendEntry(file, globalName, entry) {
 function existingUrls(file) {
     const src = fs.readFileSync(path.join(ROOT, file), 'utf8');
     return Array.from(src.matchAll(/"url"\s*:\s*"([^"]+)"/g), m => m[1]);
+}
+
+function existingImageIssue(issue) {
+    const src = fs.readFileSync(path.join(ROOT, 'images-data.js'), 'utf8');
+    return new RegExp('"issue"\\s*:\\s*' + String(issue) + '(?:\\D|$)').test(src);
 }
 
 function firstImageUrl(text) {
@@ -99,6 +119,9 @@ async function publishLink(f, issue) {
 }
 
 async function publishImage(f, issue) {
+    if (existingImageIssue(issue)) {
+        return 'This image submission was already published: https://obscuraweb.vercel.app/#feed';
+    }
     const imgUrl = httpUrl(firstImageUrl(f['image'] || '') || '');
     const link = httpUrl(f['the site it belongs to']);
     const alt = clean(f['describe the image'], 160);
@@ -121,21 +144,57 @@ async function publishImage(f, issue) {
         fail('Could not download the image from ' + imgUrl + ': ' + reason);
     }
     if (!res.ok) fail('Could not download the image (HTTP ' + res.status + ').');
+    const finalUrl = httpUrl(res.url);
+    if (!finalUrl) fail('The image redirected to an unsafe or unsupported address.');
+    if (Number(res.headers.get('content-length')) > MAX_BYTES) fail('The image is larger than 5 MB.');
     let buf;
-    try { buf = Buffer.from(await res.arrayBuffer()); }
-    catch (e) { fail('Could not read the downloaded image: ' + (e.message || String(e))); }
-    if (buf.length > MAX_BYTES) fail('The image is larger than 5 MB.');
+    try { buf = await readImageBody(res); }
+    catch (e) { fail(e.message || String(e)); }
 
     const type = String(res.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
-    const ext = TYPES[type] || sniffImage(buf);
+    const detected = sniffImage(buf);
+    const ext = detected || TYPES[type];
     if (!ext) fail('The image must be a GIF, PNG, JPG or WebP (got "' + (type || 'unknown') + '").');
 
     const rel = 'img/submissions/issue-' + issue + '.' + ext;
-    fs.writeFileSync(path.join(ROOT, rel), buf);
-    appendEntry('images-data.js', 'UNDERWEB_IMAGES', {
-        src: rel, link, alt, tags: tagsOf(f['tags']), added: today(), issue
-    });
+    const imagePath = path.join(ROOT, rel);
+    try {
+        fs.writeFileSync(imagePath, buf, { flag: 'wx' });
+        appendEntry('images-data.js', 'UNDERWEB_IMAGES', {
+            src: rel, link, alt, tags: tagsOf(f['tags']), added: today(), issue
+        });
+    } catch (e) {
+        if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+        fail('Could not save the published image: ' + (e.message || String(e)));
+    }
     return 'Added the image to the transmissions feed: https://obscuraweb.vercel.app/#feed';
+}
+
+async function readImageBody(res) {
+    if (!res.body || typeof res.body.getReader !== 'function') {
+        const buf = Buffer.from(await res.arrayBuffer());
+        if (buf.length > MAX_BYTES) throw new Error('The image is larger than 5 MB.');
+        return buf;
+    }
+    const reader = res.body.getReader();
+    const chunks = [];
+    let total = 0;
+    try {
+        while (true) {
+            const part = await reader.read();
+            if (part.done) break;
+            total += part.value.byteLength;
+            if (total > MAX_BYTES) {
+                await reader.cancel();
+                throw new Error('The image is larger than 5 MB.');
+            }
+            chunks.push(Buffer.from(part.value));
+        }
+    } catch (e) {
+        try { await reader.cancel(); } catch (_) { /* already closed */ }
+        throw e;
+    }
+    return Buffer.concat(chunks, total);
 }
 
 function sniffImage(buf) {
