@@ -362,7 +362,7 @@ form button[type=submit] { margin-top: 14px; width: 100%; }
 .image-item:nth-child(3n+2) { transform: rotate(.8deg) translateY(4px); }
 .image-item:hover { transform: rotate(0) scale(1.03); border-color: var(--lilac); z-index: 2; position: relative; }
 .image-item a { display: block; background: none; }
-.image-item img { display: block; width: 88px; height: 31px; margin: 6px auto; background: var(--void); image-rendering: pixelated; }
+.image-item img { display: block; width: 88px; height: auto; margin: 6px auto; background: var(--void); image-rendering: pixelated; }
 .image-item .tags, .tags { font: 12px/1.5 var(--pixel); color: var(--lavender); text-transform: lowercase; padding-top: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ---------- widget / embed ---------- */
@@ -372,7 +372,7 @@ form button[type=submit] { margin-top: 14px; width: 100%; }
 }
 .copy-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 #widget-strip { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px; background: var(--void); border: 1px dashed var(--violet); min-height: 60px; }
-.widget-image { width: 88px; height: 31px; object-fit: cover; image-rendering: pixelated; cursor: pointer; border: 1px solid var(--violet); }
+.widget-image { width: 88px; height: auto; image-rendering: pixelated; cursor: pointer; border: 1px solid var(--violet); }
 .widget-image:hover { border-color: var(--hot); }
 
 /* ---------- link-to-us shelf ---------- */
@@ -601,7 +601,7 @@ form.chat-input-form button { margin: 0; width: auto; flex: none; }
 .steps b { color: var(--bone); }
 .button-preview { display: flex; align-items: center; gap: 10px; margin: 8px 0 0; font-size: .85rem; color: var(--lilac); }
 .button-preview[hidden] { display: none; }
-.button-preview img { width: 88px; height: 31px; image-rendering: pixelated; border: 1px solid var(--violet); }
+.button-preview img { width: 88px; height: auto; image-rendering: pixelated; border: 1px solid var(--violet); }
 .hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .form-error { margin: 12px 0 0; padding: 8px 10px; border: 1px solid var(--hot); color: var(--bone); background: var(--void); font-size: .85rem; }
 .submit-done { padding: 12px; background: var(--void); border: 1px dashed var(--hot); color: var(--bone); }

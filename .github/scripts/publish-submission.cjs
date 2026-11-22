@@ -152,8 +152,8 @@ async function publishImage(f, issue) {
 
     const info = sniffImage(buf);
     if (!info) fail('The image must be a GIF or PNG.');
-    if (info.width !== 88 || info.height !== 31) {
-        fail('The image must be exactly 88x31 pixels (got ' + info.width + 'x' + info.height + ').');
+    if (info.width !== 88 || ![31, 32].includes(info.height)) {
+        fail('The image must be 88x31 or 88x32 pixels (got ' + info.width + 'x' + info.height + ').');
     }
     const ext = info.ext;
 

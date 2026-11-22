@@ -1,4 +1,4 @@
-// THE UNDERWEB — on-site 88x31 button submissions.
+// THE UNDERWEB — on-site 88x31 / 88x32 button submissions.
 // Validates the upload, stores it on the non-deploying pending-submissions branch,
 // and files a review issue in the shape publish-submission.cjs already reads.
 // Nothing reaches the site until a curator adds the "approved" label.
@@ -10,7 +10,7 @@ const REPO = 'numbpill3d/obscuraweb';
 const BRANCH = 'pending-submissions';
 const API = 'https://api.github.com/repos/' + REPO;
 const WIDTH = 88;
-const HEIGHT = 31;
+const HEIGHTS = [31, 32];
 const MAX_BYTES = 256 * 1024;
 const MAX_PENDING = 50;
 const ORIGINS = ['https://obscuraweb.vercel.app'];
@@ -83,8 +83,8 @@ module.exports = async function handler(req, res) {
     if (!file) return send(400, { error: 'Choose a GIF or PNG under 256 KB.' });
     const info = imageInfo(file);
     if (!info) return send(400, { error: 'The file must be a GIF or PNG.' });
-    if (info.width !== WIDTH || info.height !== HEIGHT) {
-        return send(400, { error: 'The image must be exactly 88×31 pixels. This one is ' + info.width + '×' + info.height + '.' });
+    if (info.width !== WIDTH || !HEIGHTS.includes(info.height)) {
+        return send(400, { error: 'The image must be 88×31 or 88×32 pixels. This one is ' + info.width + '×' + info.height + '.' });
     }
     const link = siteUrl(data.siteLink);
     if (!link) return send(400, { error: 'Add the site the button belongs to (http:// or https://).' });
@@ -120,7 +120,7 @@ module.exports = async function handler(req, res) {
                 title: '[image] ' + host,
                 labels: ['submission', 'image'],
                 body: [
-                    '### Image', '', '![88x31 submission](' + raw + ')', '',
+                    '### Image', '', '![88x' + info.height + ' submission](' + raw + ')', '',
                     '### The site it belongs to', '', link, '',
                     '### Describe the image', '', alt, '',
                     '### Tags', '', tagList(data.tags) || '_No response_'

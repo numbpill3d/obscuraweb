@@ -1,5 +1,5 @@
 /* THE UNDERWEB — submissions
-   links open a prefilled GitHub issue. 88x31 buttons upload to /api/submit-image,
+   links open a prefilled GitHub issue. 88x31 and 88x32 buttons upload to /api/submit-image,
    which files the same kind of issue. a curator labels it "approved" and
    .github/workflows/publish-submission.yml puts it on the site. */
 (function () {
@@ -74,7 +74,7 @@
         });
     });
 
-    // 88x31 button upload
+    // 88x31 / 88x32 button upload
     var imageForm = document.getElementById('image-submit-form');
     if (imageForm) {
         var MAX_BYTES = 256 * 1024;
@@ -104,12 +104,12 @@
             if (file.size > MAX_BYTES) { fileInput.value = ''; return showError('The file must be under 256 KB.', 'image-file'); }
             var url = URL.createObjectURL(file), probe = new Image();
             probe.onload = function () {
-                if (probe.naturalWidth !== 88 || probe.naturalHeight !== 31) {
+                if (probe.naturalWidth !== 88 || [31, 32].indexOf(probe.naturalHeight) < 0) {
                     URL.revokeObjectURL(url); fileInput.value = '';
-                    return showError('The image must be exactly 88×31 pixels. This one is ' + probe.naturalWidth + '×' + probe.naturalHeight + '.', 'image-file');
+                    return showError('The image must be 88×31 or 88×32 pixels. This one is ' + probe.naturalWidth + '×' + probe.naturalHeight + '.', 'image-file');
                 }
                 previewUrl = url; checked = file; previewImg.src = url;
-                previewText.textContent = '88×31 ✓'; preview.hidden = false;
+                previewText.textContent = '88×' + probe.naturalHeight + ' ✓'; preview.hidden = false;
             };
             probe.onerror = function () { URL.revokeObjectURL(url); fileInput.value = ''; showError('That file could not be read as an image.', 'image-file'); };
             probe.src = url;
@@ -127,7 +127,7 @@
         imageForm.addEventListener('submit', function (e) {
             e.preventDefault();
             var link = val(imageForm, 'site-link'), alt = val(imageForm, 'alt-text');
-            if (!checked) return showError('Choose an 88×31 GIF or PNG.', 'image-file');
+            if (!checked) return showError('Choose an 88×31 or 88×32 GIF or PNG.', 'image-file');
             if (!isHttp(link)) return showError('Add the site the button belongs to (http:// or https://).', 'site-link');
             if (!alt) return showError('Describe the button in a few words.', 'alt-text');
             imageErr.hidden = true; sendBtn.disabled = true; sendBtn.textContent = 'sending…';

@@ -62,9 +62,13 @@ async function main() {
             res.end(Buffer.alloc(5 * 1024 * 1024 + 1));
             return;
         }
-        if (req.url === '/wrong-size') {
+        if (req.url === '/tall') {
             res.writeHead(200, { 'content-type': 'image/png' });
             return res.end(pngOf(88, 32));
+        }
+        if (req.url === '/wrong-size') {
+            res.writeHead(200, { 'content-type': 'image/png' });
+            return res.end(pngOf(88, 33));
         }
         res.writeHead(200, { 'content-type': 'application/octet-stream' });
         res.end(PNG);
@@ -92,9 +96,13 @@ async function main() {
         assert.notEqual(large.code, 0);
         assert.match(large.stderr, /unsafe or unsupported|larger than 256 KB/);
 
+        const tall = await runPublisher(root, body(`http://127.0.0.1:${port}/tall`), 1007);
+        assert.equal(tall.code, 0, tall.stderr);
+        assert.ok(fs.existsSync(path.join(root, 'img/submissions/issue-1007.png')));
+
         const wrongSize = await runPublisher(root, body(`http://127.0.0.1:${port}/wrong-size`), 1006);
         assert.notEqual(wrongSize.code, 0);
-        assert.match(wrongSize.stderr, /exactly 88x31 pixels \(got 88x32\)/);
+        assert.match(wrongSize.stderr, /88x31 or 88x32 pixels \(got 88x33\)/);
         assert.ok(!fs.existsSync(path.join(root, 'img/submissions/issue-1006.png')));
 
         const blocked = await runPublisher(root, body('http://127.0.0.1:8080/image.png'), 1003, false);
