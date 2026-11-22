@@ -61,11 +61,11 @@
             <div class="win98-box-content">
                 <p class="serif" style="font-size:1.15rem">Found a corner of the web that belongs down here? <em>Send it down.</em></p>
                 <ol class="steps">
-                    <li><b>Fill in a form below.</b> Pick a link or an image.</li>
-                    <li><b>Confirm it on GitHub.</b> Pressing send opens the filled-in submission on GitHub in a new tab. Press <i>Create</i> there to send it. You need a free GitHub account.</li>
-                    <li><b>A curator reviews it.</b> Approved submissions appear on the site automatically, and you get a reply on the submission when it's live.</li>
+                    <li><b>Fill in a form below.</b> Send a link, or upload an 88×31 button.</li>
+                    <li><b>Send it.</b> Buttons upload right here, with no account. Links still open on GitHub for you to confirm, which needs a free account.</li>
+                    <li><b>A curator reviews it.</b> Approved submissions appear on the site automatically.</li>
                 </ol>
-                <p class="small dim">Submissions are public on GitHub. Don't include anything private.</p>
+                <p class="small dim">Submissions are filed publicly on GitHub for review, including uploaded buttons. Don't include anything private.</p>
             </div>
         </section>
 
@@ -101,19 +101,21 @@
         <section class="win98-box tilt-r" id="image">
             <div class="win98-box-title"><span>send-a-transmission.txt</span><span>×</span></div>
             <div class="win98-box-content">
-                <p class="small">An image for the <a href="index.html#feed">transmissions feed</a> and the embeddable widget. It links to the site you name.</p>
-                <form id="image-submit-form" data-template="submit-image.yml" data-kind="image" novalidate>
-                    <label for="image-url">image url</label>
-                    <input type="url" id="image-url" name="image" placeholder="https://…/thing.gif">
-                    <p class="hint">Have the file instead? Leave this blank and drag the file into the Image box on GitHub after you press send. GIF, PNG, JPG or WebP, under 5&nbsp;MB.</p>
+                <p class="small">An <b>88×31 pixel</b> button for the <a href="index.html#feed">transmissions feed</a> and the embeddable widget. It links to the site you name.</p>
+                <form id="image-submit-form" novalidate>
+                    <label for="image-file">88×31 button *</label>
+                    <input type="file" id="image-file" name="image" accept="image/gif,image/png" required>
+                    <p class="hint">Exactly 88×31 pixels. GIF or PNG, under 256&nbsp;KB. Animated GIFs are welcome.</p>
+                    <p class="button-preview" id="image-preview" hidden><img alt="" width="88" height="31"><span></span></p>
                     <label for="site-link">the site it belongs to *</label>
                     <input type="url" id="site-link" name="site-link" placeholder="https://" required>
                     <label for="alt-text">describe the image *</label>
                     <input type="text" id="alt-text" name="alt-text" maxlength="160" placeholder="for people using screen readers" required>
                     <label for="tags">tags</label>
                     <input type="text" id="tags" name="tags" placeholder="comma, separated">
+                    <div class="hp-field" aria-hidden="true"><label for="website">leave this empty</label><input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></div>
                     <p class="form-error" role="alert" hidden></p>
-                    <button type="submit">send image ↓</button>
+                    <button type="submit">send button ↓</button>
                 </form>
                 <div class="submit-done" role="status" hidden></div>
             </div>

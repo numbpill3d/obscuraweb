@@ -1,7 +1,7 @@
 /* THE UNDERWEB — submissions
-   each form opens a prefilled GitHub issue (see .github/ISSUE_TEMPLATE/).
-   a curator labels it "approved" and .github/workflows/publish-submission.yml
-   puts it on the site. nothing is stored in this browser. */
+   links open a prefilled GitHub issue. 88x31 buttons upload to /api/submit-image,
+   which files the same kind of issue. a curator labels it "approved" and
+   .github/workflows/publish-submission.yml puts it on the site. */
 (function () {
     'use strict';
     var REPO = 'https://github.com/numbpill3d/obscuraweb';
@@ -43,15 +43,7 @@
                 'site-category': cat, 'site-tags': val(form, 'site-tags')
             }), what: 'link', attach: false };
         }
-        var img = val(form, 'image-url'), link = val(form, 'site-link'), alt = val(form, 'alt-text');
-        if (img && !isHttp(img)) return { error: 'The image url needs to start with http:// or https://, or leave it blank and attach the file on GitHub.', focus: 'image-url' };
-        if (!isHttp(link)) return { error: 'Add the site the image belongs to (http:// or https://).', focus: 'site-link' };
-        if (!alt) return { error: 'Describe the image in a few words.', focus: 'alt-text' };
-        var host = '';
-        try { host = new URL(link).hostname.replace(/^www\./, ''); } catch (e) { /* validated above */ }
-        return { url: issueUrl(form.getAttribute('data-template'), '[image] ' + host, {
-            'image': img, 'site-link': link, 'alt-text': alt, 'tags': val(form, 'tags')
-        }), what: 'image', attach: !img };
+        return { error: 'Unknown form.' };
     }
 
     document.querySelectorAll('form[data-template]').forEach(function (form) {
@@ -70,8 +62,7 @@
             done.innerHTML = '';
             var p = document.createElement('p');
             p.textContent = (win ? 'GitHub opened in a new tab. ' : 'Your browser blocked the new tab. ') +
-                'Your ' + r.what + ' is not sent until you press "Create" there.' +
-                (r.attach ? ' Drag your image file into the Image box first.' : '');
+                'Your ' + r.what + ' is not sent until you press "Create" there.';
             var a = document.createElement('a');
             a.href = r.url; a.target = '_blank'; a.rel = 'noopener'; a.className = 'btn';
             a.textContent = 'open the submission on GitHub →';
@@ -82,6 +73,90 @@
             form.hidden = true; done.hidden = false;
         });
     });
+
+    // 88x31 button upload
+    var imageForm = document.getElementById('image-submit-form');
+    if (imageForm) {
+        var MAX_BYTES = 256 * 1024;
+        var fileInput = imageForm.querySelector('#image-file');
+        var preview = imageForm.querySelector('#image-preview');
+        var previewImg = preview.querySelector('img');
+        var previewText = preview.querySelector('span');
+        var imageErr = imageForm.querySelector('.form-error');
+        var imageDone = imageForm.parentElement.querySelector('.submit-done');
+        var sendBtn = imageForm.querySelector('button[type="submit"]');
+        var checked = null, previewUrl = null;
+
+        var showError = function (message, focusId) {
+            imageErr.textContent = message; imageErr.hidden = false;
+            var f = focusId && imageForm.querySelector('#' + focusId); if (f) f.focus();
+        };
+        var clearPreview = function () {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            previewUrl = null; checked = null; preview.hidden = true; previewImg.removeAttribute('src');
+        };
+
+        fileInput.addEventListener('change', function () {
+            clearPreview(); imageErr.hidden = true;
+            var file = fileInput.files[0];
+            if (!file) return;
+            if (['image/gif', 'image/png'].indexOf(file.type) < 0) { fileInput.value = ''; return showError('The file must be a GIF or PNG.', 'image-file'); }
+            if (file.size > MAX_BYTES) { fileInput.value = ''; return showError('The file must be under 256 KB.', 'image-file'); }
+            var url = URL.createObjectURL(file), probe = new Image();
+            probe.onload = function () {
+                if (probe.naturalWidth !== 88 || probe.naturalHeight !== 31) {
+                    URL.revokeObjectURL(url); fileInput.value = '';
+                    return showError('The image must be exactly 88×31 pixels. This one is ' + probe.naturalWidth + '×' + probe.naturalHeight + '.', 'image-file');
+                }
+                previewUrl = url; checked = file; previewImg.src = url;
+                previewText.textContent = '88×31 ✓'; preview.hidden = false;
+            };
+            probe.onerror = function () { URL.revokeObjectURL(url); fileInput.value = ''; showError('That file could not be read as an image.', 'image-file'); };
+            probe.src = url;
+        });
+
+        var toBase64 = function (file) {
+            return new Promise(function (resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function () { resolve(String(reader.result).split(',')[1]); };
+                reader.onerror = function () { reject(new Error('read failed')); };
+                reader.readAsDataURL(file);
+            });
+        };
+
+        imageForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var link = val(imageForm, 'site-link'), alt = val(imageForm, 'alt-text');
+            if (!checked) return showError('Choose an 88×31 GIF or PNG.', 'image-file');
+            if (!isHttp(link)) return showError('Add the site the button belongs to (http:// or https://).', 'site-link');
+            if (!alt) return showError('Describe the button in a few words.', 'alt-text');
+            imageErr.hidden = true; sendBtn.disabled = true; sendBtn.textContent = 'sending…';
+            toBase64(checked).then(function (fileBase64) {
+                return fetch('/api/submit-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fileBase64: fileBase64, siteLink: link, alt: alt, tags: val(imageForm, 'tags'), website: val(imageForm, 'website') })
+                });
+            }).then(function (res) {
+                return res.json().catch(function () { return {}; }).then(function (body) {
+                    if (!res.ok) throw new Error(body.error || 'The upload failed. Nothing was sent.');
+                });
+            }).then(function () {
+                imageDone.innerHTML = '';
+                var p = document.createElement('p');
+                p.textContent = 'Received. Your button is waiting for a curator and will appear on the site if it is approved.';
+                var again = document.createElement('button');
+                again.type = 'button'; again.className = 'btn ghost'; again.textContent = 'send another';
+                again.addEventListener('click', function () { imageForm.reset(); clearPreview(); imageDone.hidden = true; imageForm.hidden = false; });
+                imageDone.appendChild(p); imageDone.appendChild(again);
+                imageForm.hidden = true; imageDone.hidden = false;
+            }).catch(function (err) {
+                showError(err instanceof TypeError ? 'Could not reach the server. Nothing was sent.' : err.message);
+            }).then(function () {
+                sendBtn.disabled = false; sendBtn.textContent = 'send button ↓';
+            });
+        });
+    }
 
     // arriving via submit.html#link or #image: move focus to that form
     var target = location.hash && document.querySelector(location.hash + ' input');

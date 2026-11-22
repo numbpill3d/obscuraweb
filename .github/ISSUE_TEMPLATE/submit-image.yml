@@ -1,5 +1,5 @@
-name: Submit an image
-description: Send an image (and the site it belongs to) to the UNDERWEB transmissions feed.
+name: Submit an 88x31 button
+description: Send an 88x31 button (and the site it belongs to) to the UNDERWEB transmissions feed.
 title: "[image] "
 labels: ["submission", "image"]
 body:
@@ -11,7 +11,7 @@ body:
     id: image
     attributes:
       label: Image
-      description: Paste an image URL, or drag and drop the image file into this box. GIF, PNG, JPG or WebP, under 5 MB.
+      description: Paste an image URL, or drag and drop the file into this box. Must be exactly 88x31 pixels, GIF or PNG, under 256 KB.
     validations:
       required: true
   - type: input

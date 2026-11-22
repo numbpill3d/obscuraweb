@@ -9,9 +9,8 @@ const net = require('net');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const CATS = ['art', 'curiosities', 'tools', 'forums', 'archives'];
-const MAX_BYTES = 5 * 1024 * 1024;
-const TYPES = { 'image/gif': 'gif', 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
-const IMAGE_ACCEPT = 'image/gif,image/png,image/jpeg,image/webp,application/octet-stream;q=0.8,*/*;q=0.1';
+const MAX_BYTES = 256 * 1024;
+const IMAGE_ACCEPT = 'image/gif,image/png,application/octet-stream;q=0.8,*/*;q=0.1';
 
 function fail(msg) {
     fs.writeFileSync(path.join(ROOT, '.publish-error'), msg + '\n');
@@ -146,15 +145,17 @@ async function publishImage(f, issue) {
     if (!res.ok) fail('Could not download the image (HTTP ' + res.status + ').');
     const finalUrl = httpUrl(res.url);
     if (!finalUrl) fail('The image redirected to an unsafe or unsupported address.');
-    if (Number(res.headers.get('content-length')) > MAX_BYTES) fail('The image is larger than 5 MB.');
+    if (Number(res.headers.get('content-length')) > MAX_BYTES) fail('The image is larger than 256 KB.');
     let buf;
     try { buf = await readImageBody(res); }
     catch (e) { fail(e.message || String(e)); }
 
-    const type = String(res.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
-    const detected = sniffImage(buf);
-    const ext = detected || TYPES[type];
-    if (!ext) fail('The image must be a GIF, PNG, JPG or WebP (got "' + (type || 'unknown') + '").');
+    const info = sniffImage(buf);
+    if (!info) fail('The image must be a GIF or PNG.');
+    if (info.width !== 88 || info.height !== 31) {
+        fail('The image must be exactly 88x31 pixels (got ' + info.width + 'x' + info.height + ').');
+    }
+    const ext = info.ext;
 
     const rel = 'img/submissions/issue-' + issue + '.' + ext;
     const imagePath = path.join(ROOT, rel);
@@ -173,7 +174,7 @@ async function publishImage(f, issue) {
 async function readImageBody(res) {
     if (!res.body || typeof res.body.getReader !== 'function') {
         const buf = Buffer.from(await res.arrayBuffer());
-        if (buf.length > MAX_BYTES) throw new Error('The image is larger than 5 MB.');
+        if (buf.length > MAX_BYTES) throw new Error('The image is larger than 256 KB.');
         return buf;
     }
     const reader = res.body.getReader();
@@ -186,7 +187,7 @@ async function readImageBody(res) {
             total += part.value.byteLength;
             if (total > MAX_BYTES) {
                 await reader.cancel();
-                throw new Error('The image is larger than 5 MB.');
+                throw new Error('The image is larger than 256 KB.');
             }
             chunks.push(Buffer.from(part.value));
         }
@@ -198,10 +199,14 @@ async function readImageBody(res) {
 }
 
 function sniffImage(buf) {
-    if (buf.subarray(0, 6).toString() === 'GIF87a' || buf.subarray(0, 6).toString() === 'GIF89a') return 'gif';
-    if (buf.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return 'png';
-    if (buf.subarray(0, 3).equals(Buffer.from([255, 216, 255]))) return 'jpg';
-    if (buf.subarray(0, 4).toString() === 'RIFF' && buf.subarray(8, 12).toString() === 'WEBP') return 'webp';
+    const sig = buf.subarray(0, 6).toString('latin1');
+    if ((sig === 'GIF87a' || sig === 'GIF89a') && buf.length >= 10) {
+        return { ext: 'gif', width: buf.readUInt16LE(6), height: buf.readUInt16LE(8) };
+    }
+    if (buf.length >= 24 && buf.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) &&
+        buf.subarray(12, 16).toString('latin1') === 'IHDR') {
+        return { ext: 'png', width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+    }
     return null;
 }
 

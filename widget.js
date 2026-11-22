@@ -27,7 +27,7 @@
                 a.href = img.link; a.target = '_blank'; a.rel = 'noopener';
                 var el = document.createElement('img');
                 el.src = abs(img.src); el.alt = img.alt || '';
-                el.style.cssText = 'height:60px;width:auto;display:block;image-rendering:pixelated;';
+                el.style.cssText = 'width:88px;height:31px;display:block;image-rendering:pixelated;';
                 a.appendChild(el); strip.appendChild(a);
             });
             var credit = document.createElement('a');

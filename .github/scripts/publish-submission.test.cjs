@@ -9,7 +9,14 @@ const { spawn } = require('child_process');
 
 const SOURCE = path.join(__dirname, 'publish-submission.cjs');
 const DATA = path.resolve(__dirname, '..', '..', 'images-data.js');
-const PNG = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 0]);
+function pngOf(width, height) {
+    const b = Buffer.alloc(33);
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]).copy(b);
+    b.writeUInt32BE(13, 8); b.write('IHDR', 12, 'latin1');
+    b.writeUInt32BE(width, 16); b.writeUInt32BE(height, 20);
+    return b;
+}
+const PNG = pngOf(88, 31);
 
 function runPublisher(root, body, issue, allowPrivate = true) {
     return new Promise((resolve, reject) => {
@@ -55,6 +62,10 @@ async function main() {
             res.end(Buffer.alloc(5 * 1024 * 1024 + 1));
             return;
         }
+        if (req.url === '/wrong-size') {
+            res.writeHead(200, { 'content-type': 'image/png' });
+            return res.end(pngOf(88, 32));
+        }
         res.writeHead(200, { 'content-type': 'application/octet-stream' });
         res.end(PNG);
     });
@@ -79,7 +90,12 @@ async function main() {
 
         const large = await runPublisher(root, body(`http://127.0.0.1:${port}/large`), 1002);
         assert.notEqual(large.code, 0);
-        assert.match(large.stderr, /unsafe or unsupported|larger than 5 MB/);
+        assert.match(large.stderr, /unsafe or unsupported|larger than 256 KB/);
+
+        const wrongSize = await runPublisher(root, body(`http://127.0.0.1:${port}/wrong-size`), 1006);
+        assert.notEqual(wrongSize.code, 0);
+        assert.match(wrongSize.stderr, /exactly 88x31 pixels \(got 88x32\)/);
+        assert.ok(!fs.existsSync(path.join(root, 'img/submissions/issue-1006.png')));
 
         const blocked = await runPublisher(root, body('http://127.0.0.1:8080/image.png'), 1003, false);
         assert.notEqual(blocked.code, 0);

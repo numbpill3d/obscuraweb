@@ -9,7 +9,7 @@
     "test": "node .github/scripts/publish-submission.test.cjs"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": "22.x"
   },
   "keywords": [
     "web",

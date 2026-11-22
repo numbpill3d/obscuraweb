@@ -4,6 +4,11 @@
   "buildCommand": null,
   "outputDirectory": ".",
   "cleanUrls": false,
+  "git": {
+    "deploymentEnabled": {
+      "pending-submissions": false
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",
