@@ -8,7 +8,7 @@ const path = require('path');
 const net = require('net');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const CATS = ['art', 'curiosities', 'tools', 'forums', 'archives'];
+const CATS = ['art', 'curiosities', 'tools', 'forums', 'communities', 'archives', 'legally-questionable', 'degenerate', 'unhinged'];
 const MAX_BYTES = 256 * 1024;
 const IMAGE_ACCEPT = 'image/gif,image/png,application/octet-stream;q=0.8,*/*;q=0.1';
 

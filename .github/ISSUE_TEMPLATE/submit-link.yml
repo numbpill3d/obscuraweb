@@ -37,7 +37,11 @@ body:
         - curiosities
         - tools
         - forums
+        - communities
         - archives
+        - legally-questionable
+        - degenerate
+        - unhinged
     validations:
       required: true
   - type: input

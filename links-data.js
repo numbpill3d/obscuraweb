@@ -2,14 +2,18 @@
 // one source of truth for links.html (directory), linksindex.html (a–z) and the random-site button.
 // every entry is a real, live site from the fringe of the web. approved link submissions are appended here automatically
 // by .github/workflows/publish-submission.yml — keep the array as plain JSON-style objects.
-//   cat:   art | curiosities | tools | forums | archives
+//   cat:   art | curiosities | tools | forums | communities | archives | legally-questionable | degenerate | unhinged
 //   added: yyyy-mm-dd (drives newest/oldest sorting)
 window.UNDERWEB_CATEGORIES = {
     art:         { name: 'Net Art & Glitch',       depth: '-040m' },
     curiosities: { name: 'Anomalies & Lore',       depth: '-090m' },
     tools:       { name: 'Networks & Signals',     depth: '-150m' },
     forums:      { name: 'Hackers & Subcultures',  depth: '-210m' },
-    archives:    { name: 'Archives & Leaks',       depth: '-300m' }
+    communities: { name: 'Communities & Commons',  depth: '-270m' },
+    archives:    { name: 'Archives & Leaks',       depth: '-300m' },
+    'legally-questionable': { name: 'Legally Questionable', depth: '-330m' },
+    degenerate:  { name: 'Degenerate',              depth: '-360m' },
+    unhinged:    { name: 'Unhinged',                depth: '-390m' }
 };
 
 window.UNDERWEB_LINKS = [

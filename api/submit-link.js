@@ -5,7 +5,7 @@
 
 const REPO = 'numbpill3d/obscuraweb';
 const API = 'https://api.github.com/repos/' + REPO;
-const CATEGORIES = ['art', 'curiosities', 'tools', 'forums', 'archives'];
+const CATEGORIES = ['art', 'curiosities', 'tools', 'forums', 'communities', 'archives', 'legally-questionable', 'degenerate', 'unhinged'];
 const MAX_PENDING = 100;
 const ORIGINS = ['https://obscuraweb.vercel.app'];
 
