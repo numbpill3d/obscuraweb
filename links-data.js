@@ -127,5 +127,6 @@ window.UNDERWEB_LINKS = [
       "tags": ["bbs", "philes", "history"] },
     { "name": "bitsavers", "url": "https://bitsavers.org/", "cat": "archives", "added": "2026-11-06",
       "desc": "Scanned manuals and software images for historic computers.",
-      "tags": ["computing", "manuals", "preservation"] }
+      "tags": ["computing", "manuals", "preservation"] },
+    {"name":"danger/u/s","url":"https://dangeru.us/","cat":"forums","added":"2026-11-23","desc":"obscure but charming lain themed imageboard, very small userbase, but active.","tags":["imageboard","chan","lain","cyberia","niche","burgers"],"issue":15}
 ];
