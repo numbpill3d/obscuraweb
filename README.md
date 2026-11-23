@@ -25,7 +25,7 @@ Nothing on the site is placeholder or demo data. If a section has no real conten
 
 ## Submissions
 
-1. Visitors fill in a form on `submit.html`, which opens a prefilled GitHub issue (a free account is needed to send it).
+1. Visitors fill in a form on `submit.html`. The site sends the link or image to the review queue without sending visitors to GitHub or requiring an account.
 2. Review the issues labelled **submission**.
 3. Add the **approved** label to publish one. The *publish submission* Action adds it to the data files, commits to `main` (which redeploys the site), replies and closes the issue. If something is wrong with the submission, the Action explains why and removes the label.
 4. Close an issue to reject it.

@@ -62,10 +62,10 @@
                 <p class="serif" style="font-size:1.15rem">Found a corner of the web that belongs down here? <em>Send it down.</em></p>
                 <ol class="steps">
                     <li><b>Fill in a form below.</b> Send a link, or upload an 88×31 or 88×32 button.</li>
-                    <li><b>Send it.</b> Buttons upload right here, with no account. Links still open on GitHub for you to confirm, which needs a free account.</li>
+                    <li><b>Send it.</b> Links and buttons are sent right here, with no account or outside pages.</li>
                     <li><b>A curator reviews it.</b> Approved submissions appear on the site automatically.</li>
                 </ol>
-                <p class="small dim">Submissions are filed publicly on GitHub for review, including uploaded buttons. Don't include anything private.</p>
+                <p class="small dim">Submissions are filed publicly for review. Don't include anything private.</p>
             </div>
         </section>
 
@@ -73,7 +73,7 @@
             <div class="win98-box-title"><span>submit-a-link.txt</span><span>×</span></div>
             <div class="win98-box-content">
                 <p class="small">A site for the <a href="links.html">directory</a>.</p>
-                <form id="link-submit-form" data-template="submit-link.yml" data-kind="link" novalidate>
+                <form id="link-submit-form" data-kind="link" novalidate>
                     <label for="site-name">site name *</label>
                     <input type="text" id="site-name" name="site-name" maxlength="80" required>
                     <label for="site-url">url *</label>
@@ -91,6 +91,7 @@
                     </select>
                     <label for="site-tags">tags</label>
                     <input type="text" id="site-tags" name="site-tags" placeholder="comma, separated">
+                    <div class="hp-field" aria-hidden="true"><label for="website">leave this empty</label><input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></div>
                     <p class="form-error" role="alert" hidden></p>
                     <button type="submit">send link ↓</button>
                 </form>

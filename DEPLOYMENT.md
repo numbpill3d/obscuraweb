@@ -106,9 +106,9 @@ server {
 
 ## How Submissions Work
 
-The site has no database. Submissions go through GitHub issues on this repo, and approved ones are written into the site's data files.
+The site has no database. The submission endpoints file GitHub issues for review, and approved ones are written into the site's data files.
 
-1. A visitor fills in a form on `submit.html`. `submit.js` opens a prefilled issue from `.github/ISSUE_TEMPLATE/submit-link.yml` or `submit-image.yml`, and the visitor presses **Create** on GitHub.
+1. A visitor fills in a form on `submit.html`. The site sends links to `/api/submit-link` and images to `/api/submit-image`; the server files the review issue internally.
 2. New submissions get the `submission` label plus `link` or `image`. Review them at **Issues → label: submission**.
 3. To publish one, add the **`approved`** label. `.github/workflows/publish-submission.yml` then:
    - appends a link to `links-data.js`, or

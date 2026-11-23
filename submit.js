@@ -1,10 +1,9 @@
 /* THE UNDERWEB — submissions
-   links open a prefilled GitHub issue. 88x31 and 88x32 buttons upload to /api/submit-image,
-   which files the same kind of issue. a curator labels it "approved" and
-   .github/workflows/publish-submission.yml puts it on the site. */
+   links and 88x31/88x32 buttons go to the on-site submission endpoints.
+   Those endpoints file the review queue internally; visitors never need to
+   leave the site. */
 (function () {
     'use strict';
-    var REPO = 'https://github.com/numbpill3d/obscuraweb';
 
     function isHttp(v) {
         try { var u = new URL(v); return u.protocol === 'http:' || u.protocol === 'https:'; }
@@ -16,65 +15,52 @@
         return el ? el.value.trim() : '';
     }
 
-    function issueUrl(template, title, fields) {
-        var q = new URLSearchParams();
-        q.set('template', template);
-        q.set('title', title);
-        // GitHub issue forms use the `body[<field-id>]` query shape for
-        // prefilled values. Using the field id by itself silently drops the
-        // values when GitHub renders the form, which makes an otherwise valid
-        // submission look empty (and is especially confusing for uploads).
-        Object.keys(fields).forEach(function (k) {
-            if (fields[k]) q.set('body[' + k + ']', fields[k]);
-        });
-        return REPO + '/issues/new?' + q.toString();
-    }
-
-    function build(form) {
-        if (form.getAttribute('data-kind') === 'link') {
-            var name = val(form, 'site-name'), url = val(form, 'site-url'),
-                desc = val(form, 'site-description'), cat = val(form, 'site-category');
-            if (!name) return { error: 'Give the site a name.', focus: 'site-name' };
-            if (!isHttp(url)) return { error: 'The url needs to start with http:// or https://.', focus: 'site-url' };
-            if (!desc) return { error: 'Say what the site is in one line.', focus: 'site-description' };
-            if (!cat) return { error: 'Choose a stratum.', focus: 'site-category' };
-            return { url: issueUrl(form.getAttribute('data-template'), '[link] ' + name, {
-                'site-name': name, 'site-url': url, 'site-description': desc,
-                'site-category': cat, 'site-tags': val(form, 'site-tags')
-            }), what: 'link', attach: false };
-        }
-        return { error: 'Unknown form.' };
-    }
-
-    document.querySelectorAll('form[data-template]').forEach(function (form) {
-        var err = form.querySelector('.form-error');
-        var done = form.parentElement.querySelector('.submit-done');
-        form.addEventListener('submit', function (e) {
+    var linkForm = document.getElementById('link-submit-form');
+    if (linkForm) {
+        var linkErr = linkForm.querySelector('.form-error');
+        var linkDone = linkForm.parentElement.querySelector('.submit-done');
+        var linkBtn = linkForm.querySelector('button[type="submit"]');
+        linkForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            var r = build(form);
-            if (r.error) {
-                err.textContent = r.error; err.hidden = false;
-                var f = form.querySelector('#' + r.focus); if (f) f.focus();
+            var name = val(linkForm, 'site-name'), url = val(linkForm, 'site-url'),
+                desc = val(linkForm, 'site-description'), cat = val(linkForm, 'site-category');
+            var error = !name ? ['Give the site a name.', 'site-name'] :
+                !isHttp(url) ? ['The url needs to start with http:// or https://.', 'site-url'] :
+                !desc ? ['Say what the site is in one line.', 'site-description'] :
+                !cat ? ['Choose a stratum.', 'site-category'] : null;
+            if (error) {
+                linkErr.textContent = error[0]; linkErr.hidden = false;
+                linkForm.querySelector('#' + error[1]).focus();
                 return;
             }
-            err.hidden = true;
-            var win = window.open(r.url, '_blank', 'noopener');
-            done.innerHTML = '';
-            var p = document.createElement('p');
-            p.textContent = (win ? 'GitHub opened in a new tab. ' : 'Your browser blocked the new tab. ') +
-                'Your ' + r.what + ' is not sent until you press "Create" there.';
-            var a = document.createElement('a');
-            a.href = r.url; a.target = '_blank'; a.rel = 'noopener'; a.className = 'btn';
-            a.textContent = 'open the submission on GitHub →';
-            var again = document.createElement('button');
-            again.type = 'button'; again.className = 'btn ghost'; again.textContent = 'send another';
-            again.addEventListener('click', function () { form.reset(); done.hidden = true; form.hidden = false; });
-            done.appendChild(p); done.appendChild(a); done.appendChild(document.createTextNode(' ')); done.appendChild(again);
-            form.hidden = true; done.hidden = false;
+            linkErr.hidden = true; linkBtn.disabled = true; linkBtn.textContent = 'sending…';
+            fetch('/api/submit-link', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: name, url: url, description: desc, category: cat,
+                    tags: val(linkForm, 'site-tags'), website: val(linkForm, 'website')
+                })
+            }).then(function (res) {
+                return res.json().catch(function () { return {}; }).then(function (body) {
+                    if (!res.ok) throw new Error(body.error || 'The submission failed. Nothing was sent.');
+                });
+            }).then(function () {
+                linkDone.innerHTML = '';
+                var p = document.createElement('p');
+                p.textContent = 'Received. Your link is waiting for a curator and will appear in the directory if it is approved.';
+                var again = document.createElement('button');
+                again.type = 'button'; again.className = 'btn ghost'; again.textContent = 'send another';
+                again.addEventListener('click', function () { linkForm.reset(); linkDone.hidden = true; linkForm.hidden = false; });
+                linkDone.appendChild(p); linkDone.appendChild(again);
+                linkForm.hidden = true; linkDone.hidden = false;
+            }).catch(function (err) {
+                linkErr.textContent = err instanceof TypeError ? 'Could not reach the server. Nothing was sent.' : err.message;
+                linkErr.hidden = false;
+            }).then(function () { linkBtn.disabled = false; linkBtn.textContent = 'send link ↓'; });
         });
-    });
+    }
 
-    // 88x31 / 88x32 button upload
+    // Keep the image upload on the same page as the link submission.
     var imageForm = document.getElementById('image-submit-form');
     if (imageForm) {
         var MAX_BYTES = 256 * 1024;
