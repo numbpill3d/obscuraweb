@@ -129,5 +129,6 @@ window.UNDERWEB_LINKS = [
       "desc": "Scanned manuals and software images for historic computers.",
       "tags": ["computing", "manuals", "preservation"] },
     {"name":"danger/u/s","url":"https://dangeru.us/","cat":"forums","added":"2026-11-23","desc":"obscure but charming lain themed imageboard, very small userbase, but active.","tags":["imageboard","chan","lain","cyberia","niche","burgers"],"issue":15},
-    {"name":"Black Fog Zine","url":"https://blackfogzine.org/","cat":"art","added":"2026-11-23","desc":"Eccentric Comics and Art Zine","tags":["zine","magazine","art","comics","collective"],"issue":21}
+    {"name":"Black Fog Zine","url":"https://blackfogzine.org/","cat":"art","added":"2026-11-23","desc":"Eccentric Comics and Art Zine","tags":["zine","magazine","art","comics","collective"],"issue":21},
+    {"name":"poet.net: demoscene forum","url":"https://www.pouet.net/","cat":"art","added":"2026-11-23","desc":"online demoscene resource and forum","tags":["demoscene","forum","community","web","art"],"issue":22}
 ];
